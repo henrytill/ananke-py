@@ -1,9 +1,10 @@
 import argparse
 import os
 from enum import Enum
+from pathlib import Path
 
-from tartarus.Data import Entries
-from tartarus.GPG import GPG
+import tartarus.gpg as gpg
+from tartarus.data import Entries
 
 
 class Verbosity(Enum):
@@ -23,9 +24,9 @@ def lookup(args: argparse.Namespace):
     Args:
         args: The arguments provided by the user.
     """
-    config_home = os.getenv('XDG_CONFIG_HOME') or '~/.config'
     data_dir = os.getenv('HECATE_DATA_DIR')
     if data_dir is None:
+        config_home: Path = os.getenv('XDG_CONFIG_HOME') or '~/.config'
         data_dir = os.path.join(config_home, 'hecate')
         data_file = os.path.join(data_dir, 'db', 'data.json')
     else:
@@ -39,7 +40,7 @@ def lookup(args: argparse.Namespace):
     # Print the entry
     for e in entry:
         ciphertext = e.ciphertext
-        plaintext = GPG.decrypt(ciphertext)
+        plaintext = gpg.decrypt(ciphertext)
         print(plaintext)
 
 

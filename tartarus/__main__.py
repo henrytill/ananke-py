@@ -1,4 +1,4 @@
-from tartarus.CLI import main
+from tartarus.cli import main
 
 if __name__ == "__main__":
     main()
