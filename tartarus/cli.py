@@ -1,9 +1,8 @@
 import argparse
-import os
 from enum import Enum
-from pathlib import Path
 
 import tartarus.gpg as gpg
+from tartarus.config import ConfigBuilder
 from tartarus.data import Entries
 
 
@@ -24,27 +23,28 @@ def lookup(args: argparse.Namespace):
     Args:
         args: The arguments provided by the user.
     """
-    data_dir = os.getenv('HECATE_DATA_DIR')
-    if data_dir is None:
-        config_home: Path = os.getenv('XDG_CONFIG_HOME') or '~/.config'
-        data_dir = os.path.join(config_home, 'hecate')
-        data_file = os.path.join(data_dir, 'db', 'data.json')
-    else:
-        data_file = os.path.join(data_dir, 'db', 'data.json')
-    # Parse the data file
-    with open(data_file, 'r') as f:
+    config = ConfigBuilder().with_env().with_defaults().build()
+
+    with open(config.data_file, 'r') as f:
         data = f.read()
         entries = Entries.from_json(data)
-    # Lookup the entry
-    entry = entries.lookup(args.description, args.identity)
-    # Print the entry
-    for e in entry:
-        ciphertext = e.ciphertext
-        plaintext = gpg.decrypt(ciphertext)
+
+    results = entries.lookup(args.description, args.identity)
+
+    for r in results:
+        plaintext = gpg.decrypt(r.ciphertext)
         print(plaintext)
 
 
-def main():
+def main() -> int:
+    """
+    The main entry point of the application.
+
+    This function parses the command line arguments and calls the appropriate function.
+
+    Returns:
+        The exit code of the application.
+    """
     parser = argparse.ArgumentParser(description='A minimal password manager.')
     subparsers = parser.add_subparsers(help='Commands')
 
@@ -56,8 +56,10 @@ def main():
 
     args = parser.parse_args()
 
-    # Call the appropriate function based on the provided command
-    if hasattr(args, 'func'):
-        args.func(args)
-    else:
+    if not hasattr(args, 'func'):
         parser.print_help()
+        return 1
+
+    args.func(args)
+
+    return 0

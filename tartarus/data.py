@@ -1,38 +1,10 @@
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
-from pathlib import Path
 from typing import NewType, Optional
 
 KeyId = NewType('KeyId', str)
 """Represents a GPG Key Id."""
-
-
-class Backend(Enum):
-    """
-    Represents the backend used to store the data.
-    """
-
-    SQLITE = 1
-    JSON = 2
-
-
-@dataclass
-class Config:
-    """
-    A configuration object.
-    """
-
-    data_dir: Path
-    """The directory where the data is stored."""
-    backend: Backend
-    """The backend used to store the data."""
-    gpg_key_id: KeyId
-    """The GPG Key Id used for encryption."""
-    allow_multiple_keys: bool
-    """Whether or not to allow multiple GPG keys to be used for encryption."""
-
 
 Id = NewType('Id', str)
 """Uniquely identifies an 'Entry'."""
@@ -98,17 +70,22 @@ class Entry:
         except KeyError:
             return None
 
-    def to_string(self, verbosity: int) -> str:
+    def to_ordered_dict(self) -> dict:
         """
-        Converts the 'Entry' to a string.
-
-        Args:
-            verbosity: The verbosity level of the output.
+        Converts the 'Entry' to an ordered dictionary.
 
         Returns:
-            The 'Entry' as a string.
+            The converted 'Entry'.
         """
-        return f'{self.ciphertext}'
+        return {
+            'timestamp': self.timestamp.isoformat(),
+            'id': self.id,
+            'keyid': self.key_id,
+            'description': self.description,
+            'identity': self.identity,
+            'ciphertext': self.ciphertext,
+            'meta': self.meta,
+        }
 
 
 @dataclass
@@ -152,6 +129,12 @@ class Entries:
             return cls.__from_dicts(object)
         else:
             return cls([])
+
+    def sort(self) -> None:
+        """
+        Sorts the entries by timestamp.
+        """
+        self.entries.sort(key=lambda entry: entry.timestamp, reverse=True)
 
     def lookup(self, description: Description, identity: Optional[Identity] = None) -> list[Entry]:
         """
