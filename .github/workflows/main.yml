@@ -25,7 +25,11 @@ jobs:
           cache: "poetry"
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --with test --sync
       - name: Test
         run: |
-          poetry run test
+          poetry run test_coverage
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
