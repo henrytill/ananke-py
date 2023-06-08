@@ -8,5 +8,6 @@
   "python.terminal.activateEnvironment": false,
   "python.testing.unittestEnabled": true,
   "python.testing.unittestArgs": ["-v", "-s", "./tests", "-p", "test_*.py"],
-  "python.testing.pytestEnabled": false
+  "python.testing.pytestEnabled": false,
+  "coverage-gutters.coverageFileNames": ["coverage.xml"]
 }
