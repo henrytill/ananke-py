@@ -145,9 +145,6 @@ class ConfigBuilder:
         """
         Builds a configuration object.
 
-        Note:
-            This method will create the data directory if it does not exist.
-
         Returns:
             The configuration object.
         """
@@ -171,8 +168,6 @@ class ConfigBuilder:
             key_id=self.key_id,
             allow_multiple_keys=self.allow_multiple_keys,
         )
-
-        os.makedirs(config.data_dir, exist_ok=True)
 
         # Return the configuration
         return config
