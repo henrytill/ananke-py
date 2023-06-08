@@ -1,9 +1,9 @@
 import argparse
 from enum import Enum
 
-import tartarus.gpg as gpg
-from tartarus.config import ConfigBuilder
-from tartarus.data import Entries
+from . import gpg
+from .config import ConfigBuilder
+from .data import Entries
 
 
 class Verbosity(Enum):

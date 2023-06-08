@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-from tartarus.data import KeyId
+from .data import KeyId
 
 
 class Env:
@@ -45,7 +45,6 @@ class Backend(Enum):
             raise ValueError(f'Invalid Backend string: {s}')
 
 
-@dataclass
 class ConfigBuilder:
     """
     A configuration builder.
@@ -55,6 +54,9 @@ class ConfigBuilder:
     backend: Optional[Backend] = None
     key_id: Optional[KeyId] = None
     allow_multiple_keys: Optional[bool] = None
+
+    def __init__(self) -> None:
+        pass
 
     def with_env(self) -> 'ConfigBuilder':
         """
@@ -149,6 +151,19 @@ class ConfigBuilder:
         Returns:
             The configuration object.
         """
+
+        if self.data_dir is None:
+            raise ValueError('data_dir is not set')
+
+        if self.backend is None:
+            raise ValueError('backend is not set')
+
+        if self.key_id is None:
+            raise ValueError('key_id is not set')
+
+        if self.allow_multiple_keys is None:
+            raise ValueError('allow_multiple_keys is not set')
+
         # Create a configuration object
         config = Config(
             data_dir=self.data_dir,
@@ -188,7 +203,7 @@ class Config:
         Returns:
             The path to the data file.
         """
-        return os.path.join(self.data_dir, 'db', 'data.json')
+        return self.data_dir / 'db' / 'data.json'
 
 
 def get_config_file_path() -> Path:

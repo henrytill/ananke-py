@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from typing import NewType, Optional
+from typing import Any, Dict, NewType, Optional
 
 KeyId = NewType('KeyId', str)
 """Represents a GPG Key Id."""
@@ -46,7 +46,7 @@ class Entry:
     meta: Optional[Metadata]
 
     @classmethod
-    def from_dict(cls, data: dict) -> Optional['Entry']:
+    def from_dict(cls, data: Dict[Any, Any]) -> Optional['Entry']:
         """
         Creates an 'Entry' from a dictionary.
 
@@ -64,13 +64,13 @@ class Entry:
                 timestamp=datetime.fromisoformat(data['timestamp']),
                 description=Description(data['description']),
                 identity=Identity(data['identity']) if 'identity' in data else None,
-                ciphertext=Ciphertext(data['ciphertext']),
+                ciphertext=Ciphertext(data['ciphertext'].encode('utf-8')),
                 meta=Metadata(data['meta']) if 'meta' in data else None,
             )
         except KeyError:
             return None
 
-    def to_ordered_dict(self) -> dict:
+    def to_ordered_dict(self) -> Dict[str, Any]:
         """
         Converts the 'Entry' to an ordered dictionary.
 
@@ -100,20 +100,6 @@ class Entries:
     entries: list[Entry]
 
     @classmethod
-    def __from_dicts(cls, data: list[dict]) -> 'Entries':
-        """
-        Creates an 'Entries' object from a list of dictionaries.
-
-        Args:
-            data: The list of dictionaries to create the 'Entries' object from.
-
-        Returns:
-            The created 'Entries' object.
-        """
-        ret = [Entry.from_dict(entry) for entry in data if Entry.from_dict(entry) is not None]
-        return cls(ret)
-
-    @classmethod
     def from_json(cls, data: str) -> 'Entries':
         """
         Creates an 'Entries' object from a JSON string.
@@ -124,11 +110,16 @@ class Entries:
         Returns:
             The created 'Entries' object.
         """
-        object = json.loads(data)
-        if isinstance(object, list):
-            return cls.__from_dicts(object)
-        else:
-            return cls([])
+        object: list[Dict[str, Any]] = json.loads(data)
+
+        ret: list[Entry] = []
+
+        for item in object:
+            maybe_entry = Entry.from_dict(item)
+            if maybe_entry is not None:
+                ret.append(maybe_entry)
+
+        return cls(ret)
 
     def sort(self) -> None:
         """
@@ -153,7 +144,7 @@ class Entries:
             entry
             for entry in self.entries
             if description.lower() in entry.description.lower()
-            and (identity is None or identity.lower() in entry.identity.lower())
+            and (identity is None or (entry.identity is not None and identity.lower() in entry.identity.lower()))
         ]
 
 
