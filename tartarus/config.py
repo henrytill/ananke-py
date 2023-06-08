@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from distutils.util import strtobool
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Mapping, Optional
 
 from .data import KeyId
 
@@ -58,26 +58,29 @@ class ConfigBuilder:
     def __init__(self) -> None:
         pass
 
-    def with_env(self) -> 'ConfigBuilder':
+    def with_env(self, env: Mapping[str, str]) -> 'ConfigBuilder':
         """
         Updates unset attributes from environment variables.
+
+        Args:
+            env: The environment variables.
 
         Returns:
             The updated configuration.
         """
-        data_dir = os.getenv(Env.DATA_DIR)
+        data_dir = env.get(Env.DATA_DIR)
         if data_dir is not None:
             self.data_dir = Path(data_dir)
 
-        backend = os.getenv(Env.BACKEND)
+        backend = env.get(Env.BACKEND)
         if backend is not None:
             self.backend = Backend.from_str(backend)
 
-        key_id = os.getenv(Env.KEY_ID)
+        key_id = env.get(Env.KEY_ID)
         if key_id is not None:
             self.key_id = KeyId(key_id)
 
-        allow_multiple_keys = os.getenv(Env.ALLOW_MULTIPLE_KEYS)
+        allow_multiple_keys = env.get(Env.ALLOW_MULTIPLE_KEYS)
         if allow_multiple_keys is not None:
             try:
                 self.allow_multiple_keys = bool(strtobool(allow_multiple_keys))
@@ -86,50 +89,53 @@ class ConfigBuilder:
 
         return self
 
-    def with_config_file(self, path: Path) -> 'ConfigBuilder':
+    def with_config(self, config: str) -> 'ConfigBuilder':
         """
-        Updates unset attributes from a configuration file.
+        Updates unset attributes from the string representation of a configuration file.
 
         Args:
-            path: The path to the configuration file.
+            config: The string representation of a configuration file.
 
         Returns:
             The updated configuration.
         """
-        config = configparser.ConfigParser()
-        config.read(path)
+        config_parser = configparser.ConfigParser()
+        config_parser.read_string(config)
 
-        data_dir = config.get('data', 'dir', fallback=None)
+        data_dir = config_parser.get('data', 'dir', fallback=None)
         if data_dir is not None:
             self.data_dir = Path(data_dir)
 
-        backend = config.get('data', 'backend', fallback=None)
+        backend = config_parser.get('data', 'backend', fallback=None)
         if backend is not None:
             self.backend = Backend.from_str(backend)
 
-        key_id = config.get('gpg', 'key_id', fallback=None)
+        key_id = config_parser.get('gpg', 'key_id', fallback=None)
         if key_id is not None:
             self.key_id = KeyId(key_id)
 
-        allow_multiple_keys = config.getboolean('gpg', 'allow_multiple_keys', fallback=None)
+        allow_multiple_keys = config_parser.getboolean('gpg', 'allow_multiple_keys', fallback=None)
         if allow_multiple_keys is not None:
             self.allow_multiple_keys = bool(allow_multiple_keys)
 
         return self
 
-    def with_defaults(self) -> 'ConfigBuilder':
+    def with_defaults(self, env: Mapping[str, str] = {}) -> 'ConfigBuilder':
         """
         Updates unset attributes with default values.
+
+        Args:
+            env: The environment variables.
 
         Returns:
             The updated configuration.
         """
         if self.data_dir is None:
             if os.name == 'nt':
-                local_app_data = os.getenv("LOCALAPPDATA")
+                local_app_data = env.get("LOCALAPPDATA")
                 data_home = Path(local_app_data) if local_app_data else Path.home() / 'AppData' / 'Local'
             else:
-                xdg_data_home = os.getenv('XDG_DATA_HOME')
+                xdg_data_home = env.get('XDG_DATA_HOME')
                 data_home = Path(xdg_data_home) if xdg_data_home else Path.home() / '.local' / 'share'
             self.data_dir = data_home / 'hecate'
 
@@ -201,9 +207,12 @@ class Config:
         return self.data_dir / 'db' / 'data.json'
 
 
-def get_config_file_path() -> Path:
+def get_config_file_path(env: Mapping[str, str]) -> Path:
     """
     Returns the path to the configuration file.
+
+    Args:
+        env: The environment variables.
 
     Returns:
         The path to the configuration file.
@@ -212,10 +221,10 @@ def get_config_file_path() -> Path:
         FileNotFoundError: If the configuration directory does not exist.
     """
     if os.name == 'nt':
-        app_data = os.getenv('APPDATA')
+        app_data = env.get('APPDATA')
         config_home = Path(app_data) if app_data else Path.home() / 'AppData' / 'Roaming'
     else:
-        xdg_config_home = os.getenv('XDG_CONFIG_HOME')
+        xdg_config_home = env.get('XDG_CONFIG_HOME')
         config_home = Path(xdg_config_home) if xdg_config_home else Path.home() / '.config'
 
     if not config_home.exists():

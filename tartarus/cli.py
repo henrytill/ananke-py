@@ -1,4 +1,5 @@
 import argparse
+import os
 from enum import Enum
 
 from . import gpg
@@ -23,7 +24,9 @@ def lookup(args: argparse.Namespace):
     Args:
         args: The arguments provided by the user.
     """
-    config = ConfigBuilder().with_env().with_defaults().build()
+    env = os.environ
+
+    config = ConfigBuilder().with_defaults(env).with_env(env).build()
 
     with open(config.data_file, 'r') as f:
         data = f.read()
