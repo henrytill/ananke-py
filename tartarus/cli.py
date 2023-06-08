@@ -3,7 +3,7 @@ import os
 from enum import Enum
 
 from . import gpg
-from .config import OS, ConfigBuilder
+from .config import ConfigBuilder, OsFamily
 from .data import Entries
 
 
@@ -25,7 +25,7 @@ def lookup(args: argparse.Namespace):
         args: The arguments provided by the user.
     """
     env = os.environ
-    host_os = OS.from_str(os.name)
+    host_os = OsFamily.from_str(os.name)
     config = ConfigBuilder().with_defaults(host_os, env).with_env(env).build()
 
     with open(config.data_file, 'r') as f:

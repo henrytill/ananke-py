@@ -8,9 +8,16 @@ from typing import Mapping, Optional
 from .data import KeyId
 
 
-class OS(Enum):
+class Env:
+    DATA_DIR: str = 'TARTARUS_DATA_DIR'
+    BACKEND: str = 'TARTARUS_BACKEND'
+    KEY_ID: str = 'TARTARUS_KEY_ID'
+    ALLOW_MULTIPLE_KEYS: str = 'TARTARUS_ALLOW_MULTIPLE_KEYS'
+
+
+class OsFamily(Enum):
     """
-    Represents the operating system.
+    The operating system family.
     """
 
     POSIX = 1
@@ -23,7 +30,7 @@ class OS(Enum):
         }[self]
 
     @staticmethod
-    def from_str(s: str) -> 'OS':
+    def from_str(s: str) -> 'OsFamily':
         """
         Creates an OS from a string.
 
@@ -34,8 +41,8 @@ class OS(Enum):
             The created OS.
         """
         match = {
-            'posix': OS.POSIX,
-            'nt': OS.NT,
+            'posix': OsFamily.POSIX,
+            'nt': OsFamily.NT,
         }
         try:
             return match[s]
@@ -43,16 +50,9 @@ class OS(Enum):
             raise ValueError(f'Invalid OS string: {s}')
 
 
-class Env:
-    DATA_DIR: str = 'TARTARUS_DATA_DIR'
-    BACKEND: str = 'TARTARUS_BACKEND'
-    KEY_ID: str = 'TARTARUS_KEYID'
-    ALLOW_MULTIPLE_KEYS: str = 'TARTARUS_ALLOW_MULTIPLE_KEYS'
-
-
 class Backend(Enum):
     """
-    Represents the backend used to store the data.
+    The backend used to store application data.
     """
 
     SQLITE = 1
@@ -115,7 +115,7 @@ class ConfigBuilder:
         Updates unset attributes from environment variables.
 
         Args:
-            env: The environment variables.
+            env: An environment. Typically, this is `os.environ`.
 
         Returns:
             The updated configuration.
@@ -172,23 +172,25 @@ class ConfigBuilder:
 
         return self
 
-    def with_defaults(self, os: OS, env: Mapping[str, str] = {}) -> 'ConfigBuilder':
+    def with_defaults(self, os_family: OsFamily, env: Mapping[str, str] = {}) -> 'ConfigBuilder':
         """
         Updates unset attributes with default values.
 
         Args:
-            env: The environment variables.
+            os_family: The operating system family.
+            env: An environment. Typically, this is `os.environ`.
 
         Returns:
             The updated configuration.
         """
         if self.data_dir is None:
-            if os == OS.NT:
+            if os_family == OsFamily.NT:
                 local_app_data = env.get("LOCALAPPDATA")
                 data_home = Path(local_app_data) if local_app_data else Path.home() / 'AppData' / 'Local'
             else:
                 xdg_data_home = env.get('XDG_DATA_HOME')
                 data_home = Path(xdg_data_home) if xdg_data_home else Path.home() / '.local' / 'share'
+
             self.data_dir = data_home / 'tartarus'
 
         if self.backend is None:
@@ -206,7 +208,6 @@ class ConfigBuilder:
         Returns:
             The configuration object.
         """
-
         if self.data_dir is None:
             raise ValueError('data_dir is not set')
 
@@ -259,17 +260,18 @@ class Config:
         return self.data_dir / 'db' / 'data.json'
 
 
-def get_config_file_path(os: OS, env: Mapping[str, str] = {}) -> Path:
+def get_config_file_path(os_family: OsFamily, env: Mapping[str, str] = {}) -> Path:
     """
     Returns the path to the configuration file.
 
     Args:
-        env: The environment variables.
+        os_family: The operating system family.
+        env: An environment. Typically, this is `os.environ`.
 
     Returns:
         The path to the configuration file.
     """
-    if os == OS.NT:
+    if os_family == OsFamily.NT:
         app_data = env.get('APPDATA')
         config_home = Path(app_data) if app_data else Path.home() / 'AppData' / 'Roaming'
     else:

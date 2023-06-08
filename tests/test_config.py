@@ -3,21 +3,21 @@ from pathlib import Path
 from textwrap import dedent
 
 from tartarus import config
-from tartarus.config import OS, Backend, ConfigBuilder, Env
+from tartarus.config import Backend, ConfigBuilder, Env, OsFamily
 from tartarus.data import KeyId
 
 
-class TestOS(unittest.TestCase):
+class TestOsFamily(unittest.TestCase):
     def test_from_str(self):
-        self.assertEqual(OS.from_str('posix'), OS.POSIX)
-        self.assertEqual(OS.from_str('nt'), OS.NT)
+        self.assertEqual(OsFamily.from_str('posix'), OsFamily.POSIX)
+        self.assertEqual(OsFamily.from_str('nt'), OsFamily.NT)
 
     def test_from_str_with_invalid_os(self):
-        self.assertRaises(ValueError, OS.from_str, 'invalid')
+        self.assertRaises(ValueError, OsFamily.from_str, 'invalid')
 
     def test_str(self):
-        self.assertEqual(str(OS.POSIX), 'posix')
-        self.assertEqual(str(OS.NT), 'nt')
+        self.assertEqual(str(OsFamily.POSIX), 'posix')
+        self.assertEqual(str(OsFamily.NT), 'nt')
 
 
 class TestBackend(unittest.TestCase):
@@ -35,7 +35,7 @@ class ConfigFile:
     KEY_ID = 'alice_file@example.com'
     ALLOW_MULTIPLE_KEYS = 'true'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return dedent(
             f"""\
             [data]
@@ -56,10 +56,10 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertRaises(ValueError, ConfigBuilder().build)
 
     def test_build_with_defaults_posix(self):
-        self.assertRaises(ValueError, ConfigBuilder().with_defaults(OS.POSIX).build)
+        self.assertRaises(ValueError, ConfigBuilder().with_defaults(OsFamily.POSIX).build)
 
     def test_build_with_defaults_nt(self):
-        self.assertRaises(ValueError, ConfigBuilder().with_defaults(OS.NT).build)
+        self.assertRaises(ValueError, ConfigBuilder().with_defaults(OsFamily.NT).build)
 
     def test_build_without_data_dir(self):
         self.assertRaises(
@@ -106,7 +106,7 @@ class TestConfigBuilder(unittest.TestCase):
             'XDG_DATA_HOME': str(self.data_dir),
         }
 
-        config = ConfigBuilder(key_id=self.key_id).with_defaults(OS.POSIX, env).build()
+        config = ConfigBuilder(key_id=self.key_id).with_defaults(OsFamily.POSIX, env).build()
 
         self.assertEqual(config.data_dir, self.data_dir / 'tartarus')
         self.assertEqual(config.backend, Backend.JSON)
@@ -118,7 +118,7 @@ class TestConfigBuilder(unittest.TestCase):
             'LOCALAPPDATA': str(self.data_dir),
         }
 
-        config = ConfigBuilder(key_id=self.key_id).with_defaults(OS.NT, env).build()
+        config = ConfigBuilder(key_id=self.key_id).with_defaults(OsFamily.NT, env).build()
 
         self.assertEqual(config.data_dir, self.data_dir / 'tartarus')
         self.assertEqual(config.backend, Backend.JSON)
@@ -192,7 +192,7 @@ class TestConfigBuilder(unittest.TestCase):
             Env.KEY_ID: str(key_id),
         }
 
-        config = ConfigBuilder().with_defaults(OS.POSIX).with_config(partial_config_ini).with_env(env).build()
+        config = ConfigBuilder().with_defaults(OsFamily.POSIX).with_config(partial_config_ini).with_env(env).build()
 
         self.assertEqual(config.data_dir, self.data_dir)
         self.assertEqual(config.backend, Backend.SQLITE)
@@ -206,25 +206,25 @@ class TestGetConfigFilePath(unittest.TestCase):
     config_home = Path('/foo/bar')
 
     def test_get_config_file_path_posix(self):
-        path = config.get_config_file_path(OS.POSIX, {})
+        path = config.get_config_file_path(OsFamily.POSIX, {})
         self.assertEqual(path, Path.home() / '.config' / 'tartarus' / 'tartarus.ini')
 
     def test_get_config_file_path_nt(self):
-        path = config.get_config_file_path(OS.NT, {})
+        path = config.get_config_file_path(OsFamily.NT, {})
         self.assertEqual(path, Path.home() / 'AppData' / 'Roaming' / 'tartarus' / 'tartarus.ini')
 
     def test_get_config_file_path_with_xdg_config_home(self):
         env = {
             'XDG_CONFIG_HOME': str(self.config_home),
         }
-        path = config.get_config_file_path(OS.POSIX, env)
+        path = config.get_config_file_path(OsFamily.POSIX, env)
         self.assertEqual(path, self.config_home / 'tartarus' / 'tartarus.ini')
 
     def test_get_config_file_path_with_appdata(self):
         env = {
             'APPDATA': str(self.config_home),
         }
-        path = config.get_config_file_path(OS.NT, env)
+        path = config.get_config_file_path(OsFamily.NT, env)
         self.assertEqual(path, self.config_home / 'tartarus' / 'tartarus.ini')
 
 
