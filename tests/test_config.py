@@ -32,7 +32,7 @@ class TestBackend(unittest.TestCase):
 class ConfigFile:
     BACKEND = 'sqlite'
     DATA_DIR = '/tmp/data'
-    KEY_ID = 'alice.example.com'
+    KEY_ID = 'alice_file@example.com'
     ALLOW_MULTIPLE_KEYS = 'true'
 
     def __str__(self):
@@ -49,6 +49,9 @@ class ConfigFile:
 
 
 class TestConfigBuilder(unittest.TestCase):
+    data_dir = Path('/foo/bar')
+    key_id = KeyId('alice@example.com')
+
     def test_build(self):
         self.assertRaises(ValueError, ConfigBuilder().build)
 
@@ -63,7 +66,7 @@ class TestConfigBuilder(unittest.TestCase):
             ValueError,
             ConfigBuilder(
                 backend=Backend.SQLITE,
-                key_id=KeyId('test_key_id'),
+                key_id=self.key_id,
                 allow_multiple_keys=True,
             ).build,
         )
@@ -72,7 +75,7 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertRaises(
             ValueError,
             ConfigBuilder(
-                data_dir=Path('/foo/data'),
+                data_dir=self.data_dir,
                 backend=Backend.SQLITE,
                 allow_multiple_keys=True,
             ).build,
@@ -82,8 +85,8 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertRaises(
             ValueError,
             ConfigBuilder(
-                data_dir=Path('/foo/data'),
-                key_id=KeyId('test_key_id'),
+                data_dir=self.data_dir,
+                key_id=self.key_id,
                 allow_multiple_keys=True,
             ).build,
         )
@@ -92,56 +95,56 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertRaises(
             ValueError,
             ConfigBuilder(
-                data_dir=Path('/foo/data'),
+                data_dir=self.data_dir,
                 backend=Backend.SQLITE,
-                key_id=KeyId('test_key_id'),
+                key_id=self.key_id,
             ).build,
         )
 
     def test_build_with_defaults_posix_env(self):
         env = {
-            'XDG_DATA_HOME': '/foo/data',
+            'XDG_DATA_HOME': str(self.data_dir),
         }
 
-        config = ConfigBuilder(key_id=KeyId('test_key_id')).with_defaults(OS.POSIX, env).build()
+        config = ConfigBuilder(key_id=self.key_id).with_defaults(OS.POSIX, env).build()
 
-        self.assertEqual(config.data_dir, Path('/foo/data/tartarus'))
+        self.assertEqual(config.data_dir, self.data_dir / 'tartarus')
         self.assertEqual(config.backend, Backend.JSON)
-        self.assertEqual(config.key_id, 'test_key_id')
+        self.assertEqual(config.key_id, self.key_id)
         self.assertEqual(config.allow_multiple_keys, False)
 
     def test_build_with_defaults_nt_env(self):
         env = {
-            'LOCALAPPDATA': '/foo/data',
+            'LOCALAPPDATA': str(self.data_dir),
         }
 
-        config = ConfigBuilder(key_id=KeyId('test_key_id')).with_defaults(OS.NT, env).build()
+        config = ConfigBuilder(key_id=self.key_id).with_defaults(OS.NT, env).build()
 
-        self.assertEqual(config.data_dir, Path('/foo/data/tartarus'))
+        self.assertEqual(config.data_dir, self.data_dir / 'tartarus')
         self.assertEqual(config.backend, Backend.JSON)
-        self.assertEqual(config.key_id, 'test_key_id')
+        self.assertEqual(config.key_id, self.key_id)
         self.assertEqual(config.allow_multiple_keys, False)
 
     def test_build_with_env(self):
         env = {
-            Env.DATA_DIR: str(Path('/foo/data')),
+            Env.DATA_DIR: str(self.data_dir),
             Env.BACKEND: 'sqlite',
-            Env.KEY_ID: 'test_key_id',
+            Env.KEY_ID: str(self.key_id),
             Env.ALLOW_MULTIPLE_KEYS: 'true',
         }
 
         config = ConfigBuilder().with_env(env).build()
 
-        self.assertEqual(config.data_dir, Path('/foo/data'))
+        self.assertEqual(config.data_dir, self.data_dir)
         self.assertEqual(config.backend, Backend.SQLITE)
-        self.assertEqual(config.key_id, 'test_key_id')
+        self.assertEqual(config.key_id, self.key_id)
         self.assertEqual(config.allow_multiple_keys, True)
 
     def test_build_with_env_non_bool_allow_multiple_keys(self):
         env = {
-            Env.DATA_DIR: str(Path('/foo/data')),
+            Env.DATA_DIR: str(self.data_dir),
             Env.BACKEND: 'sqlite',
-            Env.KEY_ID: 'test_key_id',
+            Env.KEY_ID: str(self.key_id),
             Env.ALLOW_MULTIPLE_KEYS: 'invalid',
         }
 
@@ -158,18 +161,20 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertEqual(config.allow_multiple_keys, True)
 
     def test_build_with_config_file_with_env(self):
+        key_id = KeyId('alice_env@example.com')
+
         env = {
-            Env.DATA_DIR: str(Path('/foo/data')),
+            Env.DATA_DIR: str(self.data_dir),
             Env.BACKEND: 'json',
-            Env.KEY_ID: 'test_key_id_env',
+            Env.KEY_ID: str(key_id),
             Env.ALLOW_MULTIPLE_KEYS: 'false',
         }
 
         config = ConfigBuilder().with_config(str(ConfigFile())).with_env(env).build()
 
-        self.assertEqual(config.data_dir, Path('/foo/data'))
+        self.assertEqual(config.data_dir, self.data_dir)
         self.assertEqual(config.backend, Backend.JSON)
-        self.assertEqual(config.key_id, 'test_key_id_env')
+        self.assertEqual(config.key_id, key_id)
         self.assertEqual(config.allow_multiple_keys, False)
 
     def test_build_with_defaults_with_config_file_with_env(self):
@@ -180,22 +185,26 @@ class TestConfigBuilder(unittest.TestCase):
             """
         )
 
+        key_id = KeyId('alice_env@example.com')
+
         env = {
-            Env.DATA_DIR: str(Path('/foo/data')),
-            Env.KEY_ID: 'test_key_id_env',
+            Env.DATA_DIR: str(self.data_dir),
+            Env.KEY_ID: str(key_id),
         }
 
         config = ConfigBuilder().with_defaults(OS.POSIX).with_config(partial_config_ini).with_env(env).build()
 
-        self.assertEqual(config.data_dir, Path('/foo/data'))
+        self.assertEqual(config.data_dir, self.data_dir)
         self.assertEqual(config.backend, Backend.SQLITE)
-        self.assertEqual(config.key_id, 'test_key_id_env')
+        self.assertEqual(config.key_id, key_id)
         self.assertEqual(config.allow_multiple_keys, False)
 
-        self.assertEqual(config.data_file, Path('/foo/data/db/data.json'))
+        self.assertEqual(config.data_file, self.data_dir / 'db' / 'data.json')
 
 
 class TestGetConfigFilePath(unittest.TestCase):
+    config_home = Path('/foo/bar')
+
     def test_get_config_file_path_posix(self):
         path = config.get_config_file_path(OS.POSIX, {})
         self.assertEqual(path, Path.home() / '.config' / 'tartarus' / 'tartarus.ini')
@@ -206,17 +215,17 @@ class TestGetConfigFilePath(unittest.TestCase):
 
     def test_get_config_file_path_with_xdg_config_home(self):
         env = {
-            'XDG_CONFIG_HOME': str(Path('/foo/bar')),
+            'XDG_CONFIG_HOME': str(self.config_home),
         }
         path = config.get_config_file_path(OS.POSIX, env)
-        self.assertEqual(path, Path('/foo/bar/tartarus/tartarus.ini'))
+        self.assertEqual(path, self.config_home / 'tartarus' / 'tartarus.ini')
 
     def test_get_config_file_path_with_appdata(self):
         env = {
-            'APPDATA': str(Path('/foo/bar')),
+            'APPDATA': str(self.config_home),
         }
         path = config.get_config_file_path(OS.NT, env)
-        self.assertEqual(path, Path('/foo/bar/tartarus/tartarus.ini'))
+        self.assertEqual(path, self.config_home / 'tartarus' / 'tartarus.ini')
 
 
 if __name__ == '__main__':
