@@ -1,5 +1,4 @@
 import configparser
-import os
 from dataclasses import dataclass
 from distutils.util import strtobool
 from enum import Enum
@@ -9,11 +8,46 @@ from typing import Mapping, Optional
 from .data import KeyId
 
 
+class OS(Enum):
+    """
+    Represents the operating system.
+    """
+
+    POSIX = 1
+    NT = 2
+
+    def __str__(self) -> str:
+        return {
+            self.POSIX: 'posix',
+            self.NT: 'nt',
+        }[self]
+
+    @staticmethod
+    def from_str(s: str) -> 'OS':
+        """
+        Creates an OS from a string.
+
+        Args:
+            s: The string to create the OS from.
+
+        Returns:
+            The created OS.
+        """
+        match = {
+            'posix': OS.POSIX,
+            'nt': OS.NT,
+        }
+        try:
+            return match[s]
+        except KeyError:
+            raise ValueError(f'Invalid OS string: {s}')
+
+
 class Env:
-    DATA_DIR: str = 'HECATE_DATA_DIR'
-    BACKEND: str = 'HECATE_BACKEND'
-    KEY_ID: str = 'HECATE_KEYID'
-    ALLOW_MULTIPLE_KEYS: str = 'HECATE_ALLOW_MULTIPLE_KEYS'
+    DATA_DIR: str = 'TARTARUS_DATA_DIR'
+    BACKEND: str = 'TARTARUS_BACKEND'
+    KEY_ID: str = 'TARTARUS_KEYID'
+    ALLOW_MULTIPLE_KEYS: str = 'TARTARUS_ALLOW_MULTIPLE_KEYS'
 
 
 class Backend(Enum):
@@ -50,13 +84,31 @@ class ConfigBuilder:
     A configuration builder.
     """
 
-    data_dir: Optional[Path] = None
-    backend: Optional[Backend] = None
-    key_id: Optional[KeyId] = None
-    allow_multiple_keys: Optional[bool] = None
+    data_dir: Optional[Path]
+    backend: Optional[Backend]
+    key_id: Optional[KeyId]
+    allow_multiple_keys: Optional[bool]
 
-    def __init__(self) -> None:
-        pass
+    def __init__(
+        self,
+        data_dir: Optional[Path] = None,
+        backend: Optional[Backend] = None,
+        key_id: Optional[KeyId] = None,
+        allow_multiple_keys: Optional[bool] = None,
+    ) -> None:
+        """
+        Creates a configuration builder.
+
+        Args:
+            data_dir: The data directory.
+            backend: The backend.
+            key_id: The key ID.
+            allow_multiple_keys: Whether multiple keys are allowed.
+        """
+        self.data_dir = data_dir
+        self.backend = backend
+        self.key_id = key_id
+        self.allow_multiple_keys = allow_multiple_keys
 
     def with_env(self, env: Mapping[str, str]) -> 'ConfigBuilder':
         """
@@ -120,7 +172,7 @@ class ConfigBuilder:
 
         return self
 
-    def with_defaults(self, env: Mapping[str, str] = {}) -> 'ConfigBuilder':
+    def with_defaults(self, os: OS, env: Mapping[str, str] = {}) -> 'ConfigBuilder':
         """
         Updates unset attributes with default values.
 
@@ -131,13 +183,13 @@ class ConfigBuilder:
             The updated configuration.
         """
         if self.data_dir is None:
-            if os.name == 'nt':
+            if os == OS.NT:
                 local_app_data = env.get("LOCALAPPDATA")
                 data_home = Path(local_app_data) if local_app_data else Path.home() / 'AppData' / 'Local'
             else:
                 xdg_data_home = env.get('XDG_DATA_HOME')
                 data_home = Path(xdg_data_home) if xdg_data_home else Path.home() / '.local' / 'share'
-            self.data_dir = data_home / 'hecate'
+            self.data_dir = data_home / 'tartarus'
 
         if self.backend is None:
             self.backend = Backend.JSON
@@ -207,7 +259,7 @@ class Config:
         return self.data_dir / 'db' / 'data.json'
 
 
-def get_config_file_path(env: Mapping[str, str]) -> Path:
+def get_config_file_path(os: OS, env: Mapping[str, str] = {}) -> Path:
     """
     Returns the path to the configuration file.
 
@@ -216,18 +268,12 @@ def get_config_file_path(env: Mapping[str, str]) -> Path:
 
     Returns:
         The path to the configuration file.
-
-    Raises:
-        FileNotFoundError: If the configuration directory does not exist.
     """
-    if os.name == 'nt':
+    if os == OS.NT:
         app_data = env.get('APPDATA')
         config_home = Path(app_data) if app_data else Path.home() / 'AppData' / 'Roaming'
     else:
         xdg_config_home = env.get('XDG_CONFIG_HOME')
         config_home = Path(xdg_config_home) if xdg_config_home else Path.home() / '.config'
-
-    if not config_home.exists():
-        raise FileNotFoundError(f"The configuration directory '{config_home}' does not exist.")
 
     return config_home / 'tartarus' / 'tartarus.ini'

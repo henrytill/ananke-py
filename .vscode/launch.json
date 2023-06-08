@@ -12,8 +12,8 @@
       "justMyCode": true,
       "args": ["lookup", "foomail"],
       "env": {
-        "HECATE_DATA_DIR": "./example",
-        "HECATE_KEYID": "371C136C",
+        "TARTARUS_DATA_DIR": "./example",
+        "TARTARUS_KEYID": "371C136C",
         "GNUPGHOME": "./example/gnupg"
       }
     }
