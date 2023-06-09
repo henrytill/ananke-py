@@ -1,6 +1,6 @@
 import configparser
 from dataclasses import dataclass
-from distutils.util import strtobool
+from distutils import util
 from enum import Enum
 from pathlib import Path
 from typing import Mapping, Optional
@@ -135,7 +135,7 @@ class ConfigBuilder:
         allow_multiple_keys = env.get(Env.ALLOW_MULTIPLE_KEYS)
         if allow_multiple_keys is not None:
             try:
-                self.allow_multiple_keys = bool(strtobool(allow_multiple_keys))
+                self.allow_multiple_keys = bool(util.strtobool(allow_multiple_keys))
             except ValueError:
                 self.allow_multiple_keys = False
 

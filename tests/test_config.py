@@ -1,6 +1,6 @@
+import textwrap
 import unittest
 from pathlib import Path
-from textwrap import dedent
 
 from tartarus import config
 from tartarus.config import Backend, ConfigBuilder, Env, OsFamily
@@ -36,7 +36,7 @@ class ConfigFile:
     ALLOW_MULTIPLE_KEYS = 'true'
 
     def __str__(self) -> str:
-        return dedent(
+        return textwrap.dedent(
             f"""\
             [data]
             backend={self.BACKEND}
@@ -178,7 +178,7 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertEqual(config.allow_multiple_keys, False)
 
     def test_build_with_defaults_with_config_file_with_env(self):
-        partial_config_ini = dedent(
+        partial_config_ini = textwrap.dedent(
             """\
             [data]
             backend=sqlite
