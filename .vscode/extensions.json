@@ -1,3 +1,10 @@
 {
-  "recommendations": ["tamasfe.even-better-toml"]
+  "recommendations": [
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "ms-python.flake8",
+    "tamasfe.even-better-toml",
+    "esbenp.prettier-vscode",
+    "ryanluker.vscode-coverage-gutters"
+  ]
 }

@@ -17,7 +17,6 @@
   // "postCreateCommand": "pip3 install --user -r requirements.txt",
 
   // Configure tool-specific properties.
-  // "customizations": {},
   "customizations": {
     "vscode": {
       "extensions": [
@@ -25,7 +24,8 @@
         "ms-python.isort",
         "ms-python.flake8",
         "tamasfe.even-better-toml",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "ryanluker.vscode-coverage-gutters"
       ]
     }
   },
