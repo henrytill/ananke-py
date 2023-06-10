@@ -78,7 +78,7 @@ SchemaVersion = NewType('SchemaVersion', int)
 """Represents a schema version."""
 
 
-class MigratableStore(AbstractStore):
+class AbstractMigratableStore(AbstractStore):
     @abstractmethod
     def migrate(self, schema_version: SchemaVersion, key_id: KeyId) -> None:
         pass
