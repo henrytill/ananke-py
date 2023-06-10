@@ -32,13 +32,13 @@ class OsFamily(Enum):
     @staticmethod
     def from_str(s: str) -> 'OsFamily':
         """
-        Creates an OS from a string.
+        Creates an OsFamily from a string.
 
         Args:
-            s: The string to create the OS from.
+            s: The string to create the OsFamily from.
 
         Returns:
-            The created OS.
+            The created OsFamily.
         """
         match = {
             'posix': OsFamily.POSIX,
@@ -47,7 +47,7 @@ class OsFamily(Enum):
         try:
             return match[s]
         except KeyError:
-            raise ValueError(f'Invalid OS string: {s}')
+            raise ValueError(f'Invalid OsFamily string: {s}')
 
 
 class Backend(Enum):
