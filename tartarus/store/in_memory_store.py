@@ -17,15 +17,6 @@ class EntryMap(defaultdict[Description, set[Entry]]):
 
 class InMemoryQuery(Query):
     def __init__(self, query: Query):
-        """
-        Creates a query for filtering entries in memory.
-
-        Args:
-            query: The query to filter by.
-
-        Returns:
-            A query for filtering entries in memory.
-        """
         super().__init__(query.id, query.description, query.identity, query.meta)
 
     def match_id(self, entry: Entry) -> bool:

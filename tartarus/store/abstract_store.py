@@ -27,15 +27,6 @@ class Query:
         identity: Optional[Identity] = None,
         meta: Optional[Metadata] = None,
     ):
-        """
-        Creates a query for filtering entries.
-
-        Args:
-            id: Optional ID to filter by.
-            description: Optional description to filter by.
-            identity: Optional identity to filter by.
-            meta: Optional metadata to filter by.
-        """
         self.id = id
         self.description = description
         self.identity = identity

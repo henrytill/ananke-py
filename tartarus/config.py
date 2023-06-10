@@ -96,15 +96,6 @@ class ConfigBuilder:
         key_id: Optional[KeyId] = None,
         allow_multiple_keys: Optional[bool] = None,
     ) -> None:
-        """
-        Creates a configuration builder.
-
-        Args:
-            data_dir: The data directory.
-            backend: The backend.
-            key_id: The key ID.
-            allow_multiple_keys: Whether multiple keys are allowed.
-        """
         self.data_dir = data_dir
         self.backend = backend
         self.key_id = key_id
