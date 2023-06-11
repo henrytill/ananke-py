@@ -2,7 +2,7 @@ import argparse
 import os
 from enum import Enum
 
-from . import gpg
+from .codec import GpgCodec
 from .config import ConfigBuilder, OsFamily
 from .data import Entries
 
@@ -25,6 +25,8 @@ def lookup(args: argparse.Namespace):
     host_os = OsFamily.from_str(os.name)
     config = ConfigBuilder().with_defaults(host_os, env).with_env(env).build()
 
+    codec = GpgCodec(config.key_id)
+
     with open(config.data_file, 'r') as f:
         data = f.read()
         entries = Entries.from_json(data)
@@ -32,7 +34,7 @@ def lookup(args: argparse.Namespace):
     results = entries.lookup(args.description, args.identity)
 
     for r in results:
-        plaintext = gpg.decrypt(r.ciphertext)
+        plaintext = codec.decode(r.ciphertext)
         print(plaintext)
 
 
