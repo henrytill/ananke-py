@@ -23,7 +23,7 @@ Metadata = NewType('Metadata', str)
 """Contains additional non-specific information for an 'Entry'."""
 
 
-def parse_utc_iso_timestamp(timestamp: str) -> datetime:
+def parse_timestamp(timestamp: str) -> datetime:
     """Parses a UTC ISO timestamp into a datetime object.
 
     Args:
@@ -36,13 +36,13 @@ def parse_utc_iso_timestamp(timestamp: str) -> datetime:
         ValueError: If the timestamp is in an invalid format.
 
     Examples:
-        >>> parse_utc_iso_timestamp('2023-06-07T02:58:54.640805116Z')
+        >>> parse_timestamp('2023-06-07T02:58:54.640805116Z')
         datetime.datetime(2023, 6, 7, 2, 58, 54, 640805)
 
-        >>> parse_utc_iso_timestamp('2023-06-07T02:58:54Z')
+        >>> parse_timestamp('2023-06-07T02:58:54Z')
         datetime.datetime(2023, 6, 7, 2, 58, 54)
 
-        >>> parse_utc_iso_timestamp('2023-06-07T02:58Z')
+        >>> parse_timestamp('2023-06-07T02:58Z')
         datetime.datetime(2023, 6, 7, 2, 58)
     """
     # Remove the Zulu indication
@@ -141,7 +141,7 @@ class Entry:
             return cls(
                 id=Id(data['id']),
                 key_id=KeyId(data['keyid']),
-                timestamp=parse_utc_iso_timestamp(data['timestamp']),
+                timestamp=parse_timestamp(data['timestamp']),
                 description=Description(data['description']),
                 identity=Identity(data['identity']) if 'identity' in data else None,
                 ciphertext=Ciphertext(base64.b64decode(data['ciphertext'])),
@@ -179,8 +179,7 @@ class Entries:
 
     @classmethod
     def from_json(cls, data: str) -> 'Entries':
-        """
-        Creates an 'Entries' object from a JSON string.
+        """Creates an 'Entries' object from a JSON string.
 
         Args:
             data: The JSON string to create the 'Entries' object from.
