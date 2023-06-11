@@ -1,3 +1,4 @@
+import base64
 import json
 from dataclasses import dataclass
 from datetime import datetime
@@ -20,6 +21,69 @@ Ciphertext = NewType('Ciphertext', bytes)
 
 Metadata = NewType('Metadata', str)
 """Contains additional non-specific information for an 'Entry'."""
+
+
+def parse_utc_iso_timestamp(timestamp: str) -> datetime:
+    """
+    Parses a UTC ISO timestamp into a datetime object.
+
+    Args:
+        timestamp: The timestamp to parse.
+
+    Returns:
+        The parsed datetime object.
+
+    Raises:
+        ValueError: If the timestamp is in an invalid format.
+
+    Examples:
+        >>> parse_utc_iso_timestamp('2023-06-07T02:58:54.640805116Z')
+        datetime.datetime(2023, 6, 7, 2, 58, 54, 640805)
+
+        >>> parse_utc_iso_timestamp('2023-06-07T02:58:54Z')
+        datetime.datetime(2023, 6, 7, 2, 58, 54)
+
+        >>> parse_utc_iso_timestamp('2023-06-07T02:58Z')
+        datetime.datetime(2023, 6, 7, 2, 58)
+
+    """
+    # Remove the Zulu indication
+    timestamp = timestamp.rstrip('Z')
+
+    # Separate date and time components
+    date, time = timestamp.split('T')
+
+    # Extract time components
+    time_components = time.split(':')
+    time_components_len = len(time_components)
+
+    if time_components_len not in (2, 3):
+        raise ValueError('Invalid timestamp format')
+
+    # Extract time components and update the format string and timestamp_str incrementally
+    hours = time_components[0]
+    minutes = time_components[1]
+    fmt = '%Y-%m-%dT%H:%M'
+    timestamp_str = f'{date}T{hours}:{minutes}'
+
+    if time_components_len == 3:  # seconds exist
+        seconds = time_components[2]
+        if '.' in seconds:
+            # seconds include fractional part
+            seconds_components = seconds.split('.')
+            if len(seconds_components) != 2:
+                raise ValueError('Invalid timestamp format')
+
+            seconds = seconds_components[0]
+            microseconds = seconds_components[1][:6]
+            fmt += ':%S.%f'
+            timestamp_str += f':{seconds}.{microseconds}'
+        else:
+            fmt += ':%S'
+            timestamp_str += f':{seconds}'
+
+    # Parse the timestamp string into a datetime object
+    return datetime.strptime(timestamp_str, fmt)
 
 
 @dataclass
@@ -61,7 +125,7 @@ class Entry:
             return cls(
                 id=Id(data['id']),
                 key_id=KeyId(data['keyid']),
-                timestamp=datetime.fromisoformat(data['timestamp']),
+                timestamp=parse_utc_iso_timestamp(data['timestamp']),
                 description=Description(data['description']),
                 identity=Identity(data['identity']) if 'identity' in data else None,
                 ciphertext=Ciphertext(base64.b64decode(data['ciphertext'])),
