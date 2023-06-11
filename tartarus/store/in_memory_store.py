@@ -45,9 +45,7 @@ class InMemoryQuery(Query):
 
 
 class InMemoryStore(AbstractStore):
-    """
-    InMemoryStore is an implementation of the AbstractStore interface that stores data in memory.
-    """
+    """InMemoryStore is an implementation of the AbstractStore interface that stores data in memory."""
 
     def __init__(self):
         self.storage = EntryMap()

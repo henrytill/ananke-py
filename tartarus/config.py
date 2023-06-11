@@ -16,9 +16,7 @@ class Env:
 
 
 class OsFamily(Enum):
-    """
-    The operating system family.
-    """
+    """The operating system family."""
 
     POSIX = 1
     NT = 2
@@ -31,8 +29,7 @@ class OsFamily(Enum):
 
     @staticmethod
     def from_str(s: str) -> 'OsFamily':
-        """
-        Creates an OsFamily from a string.
+        """Creates an OsFamily from a string.
 
         Args:
             s: The string to create the OsFamily from.
@@ -51,17 +48,14 @@ class OsFamily(Enum):
 
 
 class Backend(Enum):
-    """
-    The backend used to store application data.
-    """
+    """The backend used to store application data."""
 
     SQLITE = 1
     JSON = 2
 
     @staticmethod
     def from_str(s: str) -> 'Backend':
-        """
-        Creates a Backend from a string.
+        """Creates a Backend from a string.
 
         Args:
             s: The string to create the Backend from.
@@ -80,9 +74,7 @@ class Backend(Enum):
 
 
 class ConfigBuilder:
-    """
-    A configuration builder.
-    """
+    """A configuration builder."""
 
     data_dir: Optional[Path]
     backend: Optional[Backend]
@@ -102,8 +94,7 @@ class ConfigBuilder:
         self.allow_multiple_keys = allow_multiple_keys
 
     def with_env(self, env: Mapping[str, str]) -> 'ConfigBuilder':
-        """
-        Updates unset attributes from environment variables.
+        """Updates unset attributes from environment variables.
 
         Args:
             env: An environment. Typically, this is `os.environ`.
@@ -133,8 +124,7 @@ class ConfigBuilder:
         return self
 
     def with_config(self, config: str) -> 'ConfigBuilder':
-        """
-        Updates unset attributes from the string representation of a configuration file.
+        """Updates unset attributes from the string representation of a configuration file.
 
         Args:
             config: The string representation of a configuration file.
@@ -164,8 +154,7 @@ class ConfigBuilder:
         return self
 
     def with_defaults(self, os_family: OsFamily, env: Mapping[str, str] = {}) -> 'ConfigBuilder':
-        """
-        Updates unset attributes with default values.
+        """Updates unset attributes with default values.
 
         Args:
             os_family: The operating system family.
@@ -193,8 +182,7 @@ class ConfigBuilder:
         return self
 
     def build(self) -> 'Config':
-        """
-        Builds a configuration object.
+        """Builds a configuration object.
 
         Returns:
             The configuration object.
@@ -225,8 +213,7 @@ class ConfigBuilder:
 
 @dataclass(frozen=True)
 class Config:
-    """
-    A configuration object.
+    """A configuration object.
 
     Attributes:
         data_dir: The directory where the data is stored.
@@ -252,8 +239,7 @@ class Config:
 
 
 def get_config_file(os_family: OsFamily, env: Mapping[str, str] = {}) -> Path:
-    """
-    Returns the path to the configuration file.
+    """Returns the path to the configuration file.
 
     Args:
         os_family: The operating system family.

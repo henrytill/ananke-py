@@ -24,8 +24,7 @@ Metadata = NewType('Metadata', str)
 
 
 def parse_utc_iso_timestamp(timestamp: str) -> datetime:
-    """
-    Parses a UTC ISO timestamp into a datetime object.
+    """Parses a UTC ISO timestamp into a datetime object.
 
     Args:
         timestamp: The timestamp to parse.
@@ -45,7 +44,6 @@ def parse_utc_iso_timestamp(timestamp: str) -> datetime:
 
         >>> parse_utc_iso_timestamp('2023-06-07T02:58Z')
         datetime.datetime(2023, 6, 7, 2, 58)
-
     """
     # Remove the Zulu indication
     timestamp = timestamp.rstrip('Z')
@@ -87,8 +85,7 @@ def parse_utc_iso_timestamp(timestamp: str) -> datetime:
 
 
 class Entry:
-    """
-    A record that stores an encrypted value along with associated information.
+    """A record that stores an encrypted value along with associated information.
 
     Attributes:
         id: Uniquely identifies the entry.
@@ -131,8 +128,7 @@ class Entry:
 
     @classmethod
     def from_dict(cls, data: Dict[Any, Any]) -> Optional['Entry']:
-        """
-        Creates an 'Entry' from a dictionary.
+        """Creates an 'Entry' from a dictionary.
 
         Args:
             data: The dictionary to create the 'Entry' from.
@@ -155,8 +151,7 @@ class Entry:
             return None
 
     def to_ordered_dict(self) -> Dict[str, Any]:
-        """
-        Converts the 'Entry' to an ordered dictionary.
+        """Converts the 'Entry' to an ordered dictionary.
 
         Returns:
             The converted 'Entry'.
@@ -174,8 +169,7 @@ class Entry:
 
 @dataclass
 class Entries:
-    """
-    A collection of 'Entry' objects.
+    """A collection of 'Entry' objects.
 
     Attributes:
         entries: The collection of entries.
@@ -206,14 +200,11 @@ class Entries:
         return cls(ret)
 
     def sort(self) -> None:
-        """
-        Sorts the entries by timestamp.
-        """
+        """Sorts the entries by timestamp."""
         self.entries.sort(key=lambda entry: entry.timestamp, reverse=True)
 
     def lookup(self, description: Description, identity: Optional[Identity] = None) -> list[Entry]:
-        """
-        Searches for entries that match the provided description and identity.
+        """Searches for entries that match the provided description and identity.
 
         Matching is fuzzy and case-insensitive.
 

@@ -5,8 +5,7 @@ from ..data import Description, Entry, Id, Identity, KeyId, Metadata
 
 
 class Query:
-    """
-    A query for filtering entries.
+    """A query for filtering entries.
 
     Attributes:
         id: Optional ID to filter by.

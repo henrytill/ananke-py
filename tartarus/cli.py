@@ -8,9 +8,7 @@ from .data import Entries
 
 
 class Verbosity(Enum):
-    """
-    Represents the verbosity level of the output.
-    """
+    """Represents the verbosity level of the output."""
 
     LOW = 1
     MEDIUM = 2
@@ -18,8 +16,7 @@ class Verbosity(Enum):
 
 
 def lookup(args: argparse.Namespace):
-    """
-    Searches for an 'Entry' that matches the provided description.
+    """Searches for an 'Entry' that matches the provided description.
 
     Args:
         args: The arguments provided by the user.
@@ -40,8 +37,7 @@ def lookup(args: argparse.Namespace):
 
 
 def main() -> int:
-    """
-    The main entry point of the application.
+    """The main entry point of the application.
 
     This function parses the command line arguments and calls the appropriate function.
 
