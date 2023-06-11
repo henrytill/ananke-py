@@ -206,25 +206,25 @@ class TestGetConfigFilePath(unittest.TestCase):
     config_home = Path('/foo/bar')
 
     def test_get_config_file_path_posix(self):
-        path = config.get_config_file_path(OsFamily.POSIX, {})
+        path = config.get_config_file(OsFamily.POSIX, {})
         self.assertEqual(path, Path.home() / '.config' / 'tartarus' / 'tartarus.ini')
 
     def test_get_config_file_path_nt(self):
-        path = config.get_config_file_path(OsFamily.NT, {})
+        path = config.get_config_file(OsFamily.NT, {})
         self.assertEqual(path, Path.home() / 'AppData' / 'Roaming' / 'tartarus' / 'tartarus.ini')
 
     def test_get_config_file_path_with_xdg_config_home(self):
         env = {
             'XDG_CONFIG_HOME': str(self.config_home),
         }
-        path = config.get_config_file_path(OsFamily.POSIX, env)
+        path = config.get_config_file(OsFamily.POSIX, env)
         self.assertEqual(path, self.config_home / 'tartarus' / 'tartarus.ini')
 
     def test_get_config_file_path_with_appdata(self):
         env = {
             'APPDATA': str(self.config_home),
         }
-        path = config.get_config_file_path(OsFamily.NT, env)
+        path = config.get_config_file(OsFamily.NT, env)
         self.assertEqual(path, self.config_home / 'tartarus' / 'tartarus.ini')
 
 

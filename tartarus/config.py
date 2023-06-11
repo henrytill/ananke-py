@@ -251,7 +251,7 @@ class Config:
         return self.data_dir / 'db' / 'data.json'
 
 
-def get_config_file_path(os_family: OsFamily, env: Mapping[str, str] = {}) -> Path:
+def get_config_file(os_family: OsFamily, env: Mapping[str, str] = {}) -> Path:
     """
     Returns the path to the configuration file.
 
