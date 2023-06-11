@@ -86,7 +86,6 @@ def parse_utc_iso_timestamp(timestamp: str) -> datetime:
     return datetime.strptime(timestamp_str, fmt)
 
 
-@dataclass
 class Entry:
     """
     A record that stores an encrypted value along with associated information.
@@ -108,6 +107,27 @@ class Entry:
     identity: Optional[Identity]
     ciphertext: Ciphertext
     meta: Optional[Metadata]
+
+    def __init__(
+        self,
+        id: Id,
+        key_id: KeyId,
+        timestamp: datetime,
+        description: Description,
+        identity: Optional[Identity],
+        ciphertext: Ciphertext,
+        meta: Optional[Metadata],
+    ):
+        self.id = id
+        self.key_id = key_id
+        self.timestamp = timestamp
+        self.description = description
+        self.identity = identity
+        self.ciphertext = ciphertext
+        self.meta = meta
+
+    def __hash__(self) -> int:
+        return hash(self.id)
 
     @classmethod
     def from_dict(cls, data: Dict[Any, Any]) -> Optional['Entry']:

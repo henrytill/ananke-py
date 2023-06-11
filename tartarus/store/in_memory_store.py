@@ -9,10 +9,10 @@ class EntryMap(defaultdict[Description, set[Entry]]):
         super().__init__(set)
 
     def add(self, entry: Entry) -> None:
-        self.get(entry.description, set()).add(entry)
+        self[entry.description].add(entry)
 
     def discard(self, entry: Entry) -> None:
-        self.get(entry.description, set()).discard(entry)
+        self[entry.description].discard(entry)
 
 
 class InMemoryQuery(Query):
