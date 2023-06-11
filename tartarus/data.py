@@ -64,7 +64,7 @@ class Entry:
                 timestamp=datetime.fromisoformat(data['timestamp']),
                 description=Description(data['description']),
                 identity=Identity(data['identity']) if 'identity' in data else None,
-                ciphertext=Ciphertext(data['ciphertext'].encode('utf-8')),
+                ciphertext=Ciphertext(base64.b64decode(data['ciphertext'])),
                 meta=Metadata(data['meta']) if 'meta' in data else None,
             )
         except KeyError:
