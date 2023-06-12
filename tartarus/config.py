@@ -1,3 +1,4 @@
+"""Configuration."""
 import configparser
 from dataclasses import dataclass
 from distutils import util
@@ -9,6 +10,8 @@ from .data import KeyId
 
 
 class Env:
+    """Environment variables used for configuration."""
+
     DATA_DIR: str = 'TARTARUS_DATA_DIR'
     BACKEND: str = 'TARTARUS_BACKEND'
     KEY_ID: str = 'TARTARUS_KEY_ID'
@@ -28,11 +31,11 @@ class OsFamily(Enum):
         }[self]
 
     @staticmethod
-    def from_str(s: str) -> 'OsFamily':
+    def from_str(os_family_str: str) -> 'OsFamily':
         """Creates an OsFamily from a string.
 
         Args:
-            s: The string to create the OsFamily from.
+            os_family_str: The string to create the OsFamily from.
 
         Returns:
             The created OsFamily.
@@ -42,9 +45,9 @@ class OsFamily(Enum):
             'nt': OsFamily.NT,
         }
         try:
-            return match[s]
-        except KeyError:
-            raise ValueError(f'Invalid OsFamily string: {s}')
+            return match[os_family_str]
+        except KeyError as exc:
+            raise ValueError(f'Invalid OsFamily string: {os_family_str}') from exc
 
 
 class Backend(Enum):
@@ -54,7 +57,7 @@ class Backend(Enum):
     JSON = 2
 
     @staticmethod
-    def from_str(s: str) -> 'Backend':
+    def from_str(backend_str: str) -> 'Backend':
         """Creates a Backend from a string.
 
         Args:
@@ -68,18 +71,18 @@ class Backend(Enum):
             'json': Backend.JSON,
         }
         try:
-            return match[s]
-        except KeyError:
-            raise ValueError(f'Invalid Backend string: {s}')
+            return match[backend_str]
+        except KeyError as exc:
+            raise ValueError(f'Invalid Backend string: {backend_str}') from exc
 
 
 class ConfigBuilder:
     """A configuration builder."""
 
-    data_dir: Optional[Path]
-    backend: Optional[Backend]
-    key_id: Optional[KeyId]
-    allow_multiple_keys: Optional[bool]
+    _data_dir: Optional[Path]
+    _backend: Optional[Backend]
+    _key_id: Optional[KeyId]
+    _allow_multiple_keys: Optional[bool]
 
     def __init__(
         self,
@@ -87,11 +90,11 @@ class ConfigBuilder:
         backend: Optional[Backend] = None,
         key_id: Optional[KeyId] = None,
         allow_multiple_keys: Optional[bool] = None,
-    ) -> None:
-        self.data_dir = data_dir
-        self.backend = backend
-        self.key_id = key_id
-        self.allow_multiple_keys = allow_multiple_keys
+    ):
+        self._data_dir = data_dir
+        self._backend = backend
+        self._key_id = key_id
+        self._allow_multiple_keys = allow_multiple_keys
 
     def with_env(self, env: Mapping[str, str]) -> 'ConfigBuilder':
         """Updates unset attributes from environment variables.
@@ -104,22 +107,22 @@ class ConfigBuilder:
         """
         data_dir = env.get(Env.DATA_DIR)
         if data_dir is not None:
-            self.data_dir = Path(data_dir)
+            self._data_dir = Path(data_dir)
 
         backend = env.get(Env.BACKEND)
         if backend is not None:
-            self.backend = Backend.from_str(backend)
+            self._backend = Backend.from_str(backend)
 
         key_id = env.get(Env.KEY_ID)
         if key_id is not None:
-            self.key_id = KeyId(key_id)
+            self._key_id = KeyId(key_id)
 
         allow_multiple_keys = env.get(Env.ALLOW_MULTIPLE_KEYS)
         if allow_multiple_keys is not None:
             try:
-                self.allow_multiple_keys = bool(util.strtobool(allow_multiple_keys))
+                self._allow_multiple_keys = bool(util.strtobool(allow_multiple_keys))
             except ValueError:
-                self.allow_multiple_keys = False
+                self._allow_multiple_keys = False
 
         return self
 
@@ -137,23 +140,23 @@ class ConfigBuilder:
 
         data_dir = config_parser.get('data', 'dir', fallback=None)
         if data_dir is not None:
-            self.data_dir = Path(data_dir)
+            self._data_dir = Path(data_dir)
 
         backend = config_parser.get('data', 'backend', fallback=None)
         if backend is not None:
-            self.backend = Backend.from_str(backend)
+            self._backend = Backend.from_str(backend)
 
         key_id = config_parser.get('gpg', 'key_id', fallback=None)
         if key_id is not None:
-            self.key_id = KeyId(key_id)
+            self._key_id = KeyId(key_id)
 
         allow_multiple_keys = config_parser.getboolean('gpg', 'allow_multiple_keys', fallback=None)
         if allow_multiple_keys is not None:
-            self.allow_multiple_keys = bool(allow_multiple_keys)
+            self._allow_multiple_keys = bool(allow_multiple_keys)
 
         return self
 
-    def with_defaults(self, os_family: OsFamily, env: Mapping[str, str] = {}) -> 'ConfigBuilder':
+    def with_defaults(self, os_family: OsFamily, env: Mapping[str, str]) -> 'ConfigBuilder':
         """Updates unset attributes with default values.
 
         Args:
@@ -163,7 +166,7 @@ class ConfigBuilder:
         Returns:
             The updated configuration.
         """
-        if self.data_dir is None:
+        if self._data_dir is None:
             if os_family == OsFamily.NT:
                 local_app_data = env.get("LOCALAPPDATA")
                 data_home = Path(local_app_data) if local_app_data else Path.home() / 'AppData' / 'Local'
@@ -171,13 +174,13 @@ class ConfigBuilder:
                 xdg_data_home = env.get('XDG_DATA_HOME')
                 data_home = Path(xdg_data_home) if xdg_data_home else Path.home() / '.local' / 'share'
 
-            self.data_dir = data_home / 'tartarus'
+            self._data_dir = data_home / 'tartarus'
 
-        if self.backend is None:
-            self.backend = Backend.JSON
+        if self._backend is None:
+            self._backend = Backend.JSON
 
-        if self.allow_multiple_keys is None:
-            self.allow_multiple_keys = False
+        if self._allow_multiple_keys is None:
+            self._allow_multiple_keys = False
 
         return self
 
@@ -187,24 +190,24 @@ class ConfigBuilder:
         Returns:
             The configuration object.
         """
-        if self.data_dir is None:
+        if self._data_dir is None:
             raise ValueError('data_dir is not set')
 
-        if self.backend is None:
+        if self._backend is None:
             raise ValueError('backend is not set')
 
-        if self.key_id is None:
+        if self._key_id is None:
             raise ValueError('key_id is not set')
 
-        if self.allow_multiple_keys is None:
+        if self._allow_multiple_keys is None:
             raise ValueError('allow_multiple_keys is not set')
 
         # Create a configuration object
         config = Config(
-            data_dir=self.data_dir,
-            backend=self.backend,
-            key_id=self.key_id,
-            allow_multiple_keys=self.allow_multiple_keys,
+            data_dir=self._data_dir,
+            backend=self._backend,
+            key_id=self._key_id,
+            allow_multiple_keys=self._allow_multiple_keys,
         )
 
         # Return the configuration
@@ -238,7 +241,7 @@ class Config:
         return self.data_dir / 'db' / 'data.json'
 
 
-def get_config_file(os_family: OsFamily, env: Mapping[str, str] = {}) -> Path:
+def get_config_file(os_family: OsFamily, env: Mapping[str, str]) -> Path:
     """Returns the path to the configuration file.
 
     Args:

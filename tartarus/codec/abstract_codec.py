@@ -1,9 +1,15 @@
+"""An abstract codec."""
 from abc import ABC, abstractmethod
 
 from ..data import Ciphertext, Plaintext
 
 
 class AbstractCodec(ABC):
+    """An abstract codec.
+
+    This class is used to encode Plaintexts and decode Ciphertexts.
+    """
+
     @abstractmethod
     def encode(self, plaintext: Plaintext) -> Ciphertext:
         """Encodes a Plaintext into a Ciphertext.
@@ -13,8 +19,10 @@ class AbstractCodec(ABC):
 
         Returns:
             The encoded Ciphertext.
+
+        Raises:
+            ValueError: If the Plaintext could not be encoded.
         """
-        pass
 
     @abstractmethod
     def decode(self, ciphertext: Ciphertext) -> Plaintext:
@@ -25,5 +33,7 @@ class AbstractCodec(ABC):
 
         Returns:
             The decoded Plaintext.
+
+        Raises:
+            ValueError: If the Ciphertext could not be decoded.
         """
-        pass

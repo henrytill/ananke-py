@@ -1,17 +1,29 @@
+"""Tests for the 'in_memory_store' module."""
 import datetime
 import unittest
 
-from tartarus.data import Ciphertext, Description, Entry, Id, Identity, KeyId, Metadata
+from tartarus.data import (
+    Ciphertext,
+    Description,
+    Entry,
+    EntryId,
+    Identity,
+    KeyId,
+    Metadata,
+)
 from tartarus.store import InMemoryStore, Query
 
 
 class TestInMemoryStore(unittest.TestCase):
+    """Tests for the 'InMemoryStore' class."""
+
     def setUp(self):
         self.store = InMemoryStore()
 
     def test_put(self):
+        """Tests the 'put' method."""
         entry = Entry(
-            id=Id('1'),
+            entry_id=EntryId('1'),
             description=Description('test'),
             timestamp=datetime.datetime.now(),
             identity=Identity('test'),

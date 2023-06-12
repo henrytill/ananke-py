@@ -1,3 +1,4 @@
+"""The command line interface."""
 import argparse
 import os
 from enum import Enum
@@ -27,14 +28,14 @@ def lookup(args: argparse.Namespace):
 
     codec = GpgCodec(config.key_id)
 
-    with open(config.data_file, 'r') as f:
-        data = f.read()
+    with open(config.data_file, 'r', encoding='utf-8') as file:
+        data = file.read()
         entries = Entries.from_json(data)
 
     results = entries.lookup(args.description, args.identity)
 
-    for r in results:
-        plaintext = codec.decode(r.ciphertext)
+    for result in results:
+        plaintext = codec.decode(result.ciphertext)
         print(plaintext)
 
 

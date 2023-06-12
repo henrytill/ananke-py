@@ -16,3 +16,13 @@ test = ["coverage>=5.1"]
 [tool.black]
 line-length = 120
 skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+known_first_party = ["tartarus"]
+
+[tool.pylint]
+max-line-length = 120
+disable = [
+    "C0414", # useless-import-alias, we use aliases for type checking
+]

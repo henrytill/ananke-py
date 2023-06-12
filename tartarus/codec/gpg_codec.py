@@ -1,3 +1,4 @@
+"""The GpgCodec class."""
 import subprocess
 
 from ..data import Ciphertext, KeyId, Plaintext
@@ -5,9 +6,14 @@ from .abstract_codec import AbstractCodec
 
 
 class GpgCodec(AbstractCodec):
-    """GpgCodec is an implementation of the AbstractCodec interface that uses GPG."""
+    """A GPG codec.
 
-    def __init__(self, key_id: KeyId) -> None:
+    This class is used to encode Plaintexts and decode Ciphertexts using GPG.
+    """
+
+    _key_id: KeyId
+
+    def __init__(self, key_id: KeyId):
         """Creates a new GpgCodec with the given KeyId.
 
         Args:
@@ -17,6 +23,7 @@ class GpgCodec(AbstractCodec):
 
     @property
     def key_id(self) -> KeyId:
+        """Returns the KeyId of this GpgCodec."""
         return self._key_id
 
     @key_id.setter
@@ -24,12 +31,18 @@ class GpgCodec(AbstractCodec):
         self._key_id = key_id
 
     def encode(self, plaintext: Plaintext) -> Ciphertext:
-        input: bytes = plaintext.encode('utf-8')
+        input_bytes: bytes = plaintext.encode('utf-8')
         cmd = ['gpg', '--batch', '--encrypt', '--recipient', self.key_id]
-        output: bytes = subprocess.run(cmd, input=input, capture_output=True).stdout
-        return Ciphertext(output)
+        try:
+            output_bytes: bytes = subprocess.run(cmd, input=input_bytes, capture_output=True, check=True).stdout
+        except subprocess.CalledProcessError as exc:
+            raise ValueError(f'Could not encode Plaintext: {exc.stderr.decode("utf-8")}') from exc
+        return Ciphertext(output_bytes)
 
     def decode(self, ciphertext: Ciphertext) -> Plaintext:
         cmd = ['gpg', '--batch', '--decrypt']
-        result: bytes = subprocess.run(cmd, input=ciphertext, capture_output=True).stdout
+        try:
+            result: bytes = subprocess.run(cmd, input=ciphertext, capture_output=True, check=True).stdout
+        except subprocess.CalledProcessError as exc:
+            raise ValueError(f'Could not decode Ciphertext: {exc.stderr.decode("utf-8")}') from exc
         return Plaintext(result.decode('utf-8'))

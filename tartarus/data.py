@@ -1,3 +1,4 @@
+"""Core data structures and related functions."""
 import base64
 import json
 from dataclasses import dataclass
@@ -7,7 +8,7 @@ from typing import Any, Dict, NewType, Optional
 KeyId = NewType('KeyId', str)
 """Represents a GPG Key Id."""
 
-Id = NewType('Id', str)
+EntryId = NewType('EntryId', str)
 """Uniquely identifies an 'Entry'."""
 
 Description = NewType('Description', str)
@@ -97,7 +98,7 @@ class Entry:
         meta: Optional field for additional non-specific information.
     """
 
-    id: Id
+    entry_id: EntryId
     key_id: KeyId
     timestamp: datetime
     description: Description
@@ -107,7 +108,7 @@ class Entry:
 
     def __init__(
         self,
-        id: Id,
+        entry_id: EntryId,
         key_id: KeyId,
         timestamp: datetime,
         description: Description,
@@ -115,7 +116,7 @@ class Entry:
         ciphertext: Ciphertext,
         meta: Optional[Metadata],
     ):
-        self.id = id
+        self.entry_id = entry_id
         self.key_id = key_id
         self.timestamp = timestamp
         self.description = description
@@ -124,7 +125,7 @@ class Entry:
         self.meta = meta
 
     def __hash__(self) -> int:
-        return hash(self.id)
+        return hash(self.entry_id)
 
     @classmethod
     def from_dict(cls, data: Dict[Any, Any]) -> Optional['Entry']:
@@ -139,7 +140,7 @@ class Entry:
         data = {k.lower(): v for k, v in data.items()}
         try:
             return cls(
-                id=Id(data['id']),
+                entry_id=EntryId(data['id']),
                 key_id=KeyId(data['keyid']),
                 timestamp=parse_timestamp(data['timestamp']),
                 description=Description(data['description']),
@@ -158,7 +159,7 @@ class Entry:
         """
         return {
             'timestamp': self.timestamp.isoformat(),
-            'id': self.id,
+            'id': self.entry_id,
             'keyid': self.key_id,
             'description': self.description,
             'identity': self.identity,
@@ -187,11 +188,11 @@ class Entries:
         Returns:
             The created 'Entries' object.
         """
-        object: list[Dict[str, Any]] = json.loads(data)
+        raw_entries: list[Dict[str, Any]] = json.loads(data)
 
         ret: list[Entry] = []
 
-        for item in object:
+        for item in raw_entries:
             maybe_entry = Entry.from_dict(item)
             if maybe_entry is not None:
                 ret.append(maybe_entry)
