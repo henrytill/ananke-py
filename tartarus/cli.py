@@ -2,10 +2,11 @@
 import argparse
 import os
 from enum import Enum
+from typing import Optional
 
 from .codec import GpgCodec
-from .config import ConfigBuilder, OsFamily
-from .data import Entries
+from .config import Config, ConfigBuilder, OsFamily
+from .data import Description, Entries, Identity, Plaintext
 
 
 class Verbosity(Enum):
@@ -16,15 +17,24 @@ class Verbosity(Enum):
     HIGH = 3
 
 
-def lookup(args: argparse.Namespace):
-    """Searches for an 'Entry' that matches the provided description.
+def lookup(
+    config: Config,
+    description: Description,
+    maybe_identity: Optional[Identity] = None,
+    verbosity: Verbosity = Verbosity.MEDIUM,
+) -> list[Plaintext]:
+    """Searches for entries that match the provided description and identity, and
+    returns the plaintexts of the matching entries.
 
     Args:
-        args: The arguments provided by the user.
+        description: The description to search for.
+        maybe_identity: The identity to search for.
+        verbosity: The verbosity level of the output.
+
+    Returns:
+        A list of plaintexts that match the provided description and identity.
     """
-    env = os.environ
-    host_os = OsFamily.from_str(os.name)
-    config = ConfigBuilder().with_defaults(host_os, env).with_env(env).build()
+    del verbosity  # Unused.
 
     codec = GpgCodec(config.key_id)
 
@@ -32,17 +42,37 @@ def lookup(args: argparse.Namespace):
         data = file.read()
         entries = Entries.from_json(data)
 
-    results = entries.lookup(args.description, args.identity)
+    return [codec.decode(result.ciphertext) for result in entries.lookup(description, maybe_identity)]
 
-    for result in results:
-        plaintext = codec.decode(result.ciphertext)
+
+def handle_lookup(args: argparse.Namespace) -> int:
+    """Handles the 'lookup' command.
+
+    Args:
+        args: The command line arguments.
+
+    Returns:
+        The exit code of the application.
+    """
+    description: Description = args.description
+    maybe_identity: Optional[Identity] = args.identity
+    verbosity: Verbosity = args.verbosity
+
+    env = os.environ
+    host_os = OsFamily.from_str(os.name)
+    config = ConfigBuilder().with_defaults(host_os, env).with_env(env).build()
+
+    for plaintext in lookup(config, description, maybe_identity, verbosity):
         print(plaintext)
+
+    return 0
 
 
 def main() -> int:
     """The main entry point of the application.
 
-    This function parses the command line arguments and calls the appropriate function.
+    This function parses the command line arguments and calls the appropriate
+    function.
 
     Returns:
         The exit code of the application.
@@ -51,17 +81,17 @@ def main() -> int:
     subparsers = parser.add_subparsers(help='Commands')
 
     parser_lookup = subparsers.add_parser('lookup')
-    parser_lookup.add_argument('description')
-    parser_lookup.add_argument('--identity')
+    parser_lookup.add_argument('description', type=Description)
+    parser_lookup.add_argument('--identity', type=Identity)
     parser_lookup.add_argument('--verbosity', default=1, type=Verbosity)
-    parser_lookup.set_defaults(func=lookup)
+    parser_lookup.set_defaults(func=handle_lookup)
 
     args = parser.parse_args()
 
     if not hasattr(args, 'func'):
         parser.print_help()
-        return 1
+        return 2
 
-    args.func(args)
+    ret: int = args.func(args)
 
-    return 0
+    return ret
