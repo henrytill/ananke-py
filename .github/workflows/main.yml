@@ -15,10 +15,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+          cache: "pip"
+      - name: Install project dependencies
         run: |
-          sudo apt install -yqq python3-pip python3-coverage python3-venv
-      - name: Test
+          make venv
+      - name: Test with coverage
         run: |
           make coverage
       - name: Upload coverage reports to Codecov
