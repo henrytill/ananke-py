@@ -39,6 +39,7 @@ class TestBackend(unittest.TestCase):
         self.assertRaises(ValueError, Backend.from_str, 'invalid')
 
 
+# pylint: disable=too-few-public-methods
 class ConfigFile:
     """A configuration file."""
 

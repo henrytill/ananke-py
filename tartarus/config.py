@@ -9,6 +9,7 @@ from typing import Mapping, Optional
 from .data import KeyId
 
 
+# pylint: disable=too-few-public-methods
 class Env:
     """Environment variables used for configuration."""
 
