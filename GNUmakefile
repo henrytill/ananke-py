@@ -34,6 +34,12 @@ coverage: $(VENV_TARGET)
 	python -m coverage run -m unittest discover -v -s tests
 	python -m coverage xml
 
+.PHONY: lint
+lint: $(VENV_TARGET)
+	source $(VENV_ACTIVATE)
+	python -m flake8 --config .flake8
+	python -m pylint tartarus tests
+
 .PHONY: clean
 clean:
 	rm -rf $(VENV)
