@@ -6,6 +6,7 @@
     "ms-python.pylint",
     "tamasfe.even-better-toml",
     "esbenp.prettier-vscode",
-    "ryanluker.vscode-coverage-gutters"
+    "ryanluker.vscode-coverage-gutters",
+    "ms-vscode.makefile-tools"
   ]
 }

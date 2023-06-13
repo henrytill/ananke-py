@@ -9,5 +9,6 @@
   "python.testing.unittestEnabled": true,
   "python.testing.unittestArgs": ["-v", "-s", "./tests", "-p", "test_*.py"],
   "python.testing.pytestEnabled": false,
-  "coverage-gutters.coverageFileNames": ["coverage.xml"]
+  "coverage-gutters.coverageFileNames": ["coverage.xml"],
+  "makefile.makefilePath": "GNUmakefile"
 }
