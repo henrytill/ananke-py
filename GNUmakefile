@@ -7,6 +7,8 @@ VENV = env
 VENV_TARGET = $(VENV)/pyvenv.cfg
 VENV_ACTIVATE = $(VENV)/bin/activate
 
+-include config.mk
+
 .PHONY: all
 all: check
 
