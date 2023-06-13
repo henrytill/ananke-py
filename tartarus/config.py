@@ -242,6 +242,26 @@ class Config:
         return self.data_dir / 'db' / 'data.json'
 
 
+def get_config_dir(os_family: OsFamily, env: Mapping[str, str]) -> Path:
+    """Returns the path to the configuration directory.
+
+    Args:
+        os_family: The operating system family.
+        env: An environment. Typically, this is `os.environ`.
+
+    Returns:
+        The path to the configuration directory.
+    """
+    if os_family == OsFamily.NT:
+        app_data = env.get('APPDATA')
+        config_home = Path(app_data) if app_data else Path.home() / 'AppData' / 'Roaming'
+    else:
+        xdg_config_home = env.get('XDG_CONFIG_HOME')
+        config_home = Path(xdg_config_home) if xdg_config_home else Path.home() / '.config'
+
+    return config_home
+
+
 def get_config_file(os_family: OsFamily, env: Mapping[str, str]) -> Path:
     """Returns the path to the configuration file.
 
@@ -252,11 +272,5 @@ def get_config_file(os_family: OsFamily, env: Mapping[str, str]) -> Path:
     Returns:
         The path to the configuration file.
     """
-    if os_family == OsFamily.NT:
-        app_data = env.get('APPDATA')
-        config_home = Path(app_data) if app_data else Path.home() / 'AppData' / 'Roaming'
-    else:
-        xdg_config_home = env.get('XDG_CONFIG_HOME')
-        config_home = Path(xdg_config_home) if xdg_config_home else Path.home() / '.config'
-
+    config_home = get_config_dir(os_family, env)
     return config_home / 'tartarus' / 'tartarus.ini'
