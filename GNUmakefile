@@ -1,35 +1,40 @@
 .SUFFIXES:
+.ONESHELL:
 
 SHELL = /bin/bash
 
-PYTHON3 = python3
-
 VENV = env
+VENV_TARGET = $(VENV)/pyvenv.cfg
+VENV_ACTIVATE = $(VENV)/bin/activate
 
 .PHONY: all
-all:
+all: check
 
-$(VENV)/pyvenv.cfg: pyproject.toml
-	$(PYTHON3) -m venv $(VENV)
-	$(VENV)/bin/python -m pip install --upgrade pip
-	$(VENV)/bin/python -m pip install -e .[test]
+$(VENV_TARGET): pyproject.toml
+	python3 -m venv $(VENV)
+	source $(VENV_ACTIVATE)
+	which python
+	python -m pip install --upgrade pip
+	python -m pip install -e .[test,dev]
 
 .PHONY: venv
-venv: $(VENV)/pyvenv.cfg
+venv: $(VENV_TARGET)
 
-.PHONY: test
-test:
-	$(PYTHON3) -m unittest discover -v -s tests
+.PHONY: check
+check: $(VENV_TARGET)
+	source $(VENV_ACTIVATE)
+	python -m unittest discover -v -s tests
 
 .PHONY: coverage
-coverage:
-	$(PYTHON3) -m coverage run -m unittest discover -v -s tests
-	$(PYTHON3) -m coverage xml
+coverage: $(VENV_TARGET)
+	source $(VENV_ACTIVATE)
+	python -m coverage run -m unittest discover -v -s tests
+	python -m coverage xml
 
 .PHONY: clean
 clean:
 	rm -rf $(VENV)
-	find . -type d -name '__pycache__' -exec rm -r {} +
-	rm -rf tartarus.egg-info
+	rm -rf *.egg-info
 	rm -f .coverage
 	rm -f coverage.xml
+	find . -type d -name '__pycache__' -exec rm -r {} +

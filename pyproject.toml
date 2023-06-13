@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=52.0"]         # debian bullseye version
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "tartarus"
 version = "0.1.0"
@@ -6,12 +10,12 @@ authors = [{ name = "Henry Till", email = "henrytill@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.9"
 
-[build-system]
-requires = ["setuptools>=52.0"]         # debian bullseye version
-build-backend = "setuptools.build_meta"
-
 [project.optional-dependencies]
+dev = ["flake8>=6.0.0", "black>=23.3.0", "pylint>=2.17"]
 test = ["coverage>=5.1"]
+
+[project.scripts]
+tartarus = "tartarus.__main__:main"
 
 [tool.black]
 line-length = 120
