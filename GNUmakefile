@@ -2,6 +2,7 @@
 .ONESHELL:
 
 SHELL = /bin/bash
+.SHELLFLAGS += -e
 
 VENV = env
 VENV_TARGET = $(VENV)/pyvenv.cfg
