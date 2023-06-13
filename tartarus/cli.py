@@ -1,12 +1,14 @@
 """The command line interface."""
 import argparse
+import json
 import os
 from enum import Enum
 from typing import Optional
 
 from .codec import GpgCodec
 from .config import Config, ConfigBuilder, OsFamily
-from .data import Description, Entries, Identity, Plaintext
+from .data import Description, Entry, Identity, Plaintext
+from .store import InMemoryStore, Query
 
 
 class Verbosity(Enum):
@@ -36,13 +38,18 @@ def lookup(
     """
     del verbosity  # Unused.
 
-    codec = GpgCodec(config.key_id)
-
     with open(config.data_file, 'r', encoding='utf-8') as file:
         data = file.read()
-        entries = Entries.from_json(data)
 
-    return [codec.decode(result.ciphertext) for result in entries.lookup(description, maybe_identity)]
+    entries: list[Entry] = [Entry.from_dict(entry) for entry in json.loads(data)]
+
+    store = InMemoryStore.from_entries(entries)
+
+    codec = GpgCodec(config.key_id)
+
+    query = Query(description=description, identity=maybe_identity)
+
+    return [codec.decode(result.ciphertext) for result in store.query(query)]
 
 
 def handle_lookup(args: argparse.Namespace) -> int:

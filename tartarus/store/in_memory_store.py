@@ -69,6 +69,14 @@ class InMemoryStore(AbstractStore):
     def __init__(self):
         self._storage = EntryMap()
 
+    @classmethod
+    def from_entries(cls, entries: list[Entry]) -> 'InMemoryStore':
+        """Creates an in-memory store from a list of entries."""
+        store = cls()
+        for entry in entries:
+            store.put(entry)
+        return store
+
     def put(self, entry: Entry) -> None:
         self._storage.add(entry)
 

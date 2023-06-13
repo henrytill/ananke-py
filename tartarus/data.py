@@ -1,9 +1,7 @@
 """Core data structures and related functions."""
 import base64
-import json
-from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, NewType, Optional
+from typing import Any, Dict, NewType, Optional, TypedDict
 
 KeyId = NewType('KeyId', str)
 """Represents a GPG Key Id."""
@@ -19,6 +17,10 @@ Identity = NewType('Identity', str)
 
 Ciphertext = NewType('Ciphertext', bytes)
 """Holds the encrypted value of an 'Entry'."""
+
+Plaintext = NewType('Plaintext', str)
+"""Holds a plaintext value."""
+
 
 Metadata = NewType('Metadata', str)
 """Contains additional non-specific information for an 'Entry'."""
@@ -85,6 +87,18 @@ def parse_timestamp(timestamp: str) -> datetime:
     return datetime.strptime(timestamp_str, fmt)
 
 
+class EntryDict(TypedDict):
+    """An 'Entry' represented as a dictionary."""
+
+    Id: str
+    KeyId: str
+    Timestamp: str
+    Description: str
+    Identity: Optional[str]
+    Ciphertext: str
+    Meta: Optional[str]
+
+
 class Entry:
     """A record that stores an encrypted value along with associated information.
 
@@ -129,7 +143,7 @@ class Entry:
         return hash(self.entry_id)
 
     @classmethod
-    def from_dict(cls, data: Dict[Any, Any]) -> Optional['Entry']:
+    def from_dict(cls, data: EntryDict) -> 'Entry':
         """Creates an 'Entry' from a dictionary.
 
         Args:
@@ -138,19 +152,18 @@ class Entry:
         Returns:
             The created 'Entry'.
         """
-        data = {k.lower(): v for k, v in data.items()}
-        try:
-            return cls(
-                entry_id=EntryId(data['id']),
-                key_id=KeyId(data['keyid']),
-                timestamp=parse_timestamp(data['timestamp']),
-                description=Description(data['description']),
-                identity=Identity(data['identity']) if 'identity' in data else None,
-                ciphertext=Ciphertext(base64.b64decode(data['ciphertext'])),
-                meta=Metadata(data['meta']) if 'meta' in data else None,
-            )
-        except KeyError:
-            return None
+        maybe_identity = data.get('Identity')
+        maybe_meta = data.get('Meta')
+
+        return cls(
+            entry_id=EntryId(data['Id']),
+            key_id=KeyId(data['KeyId']),
+            timestamp=parse_timestamp(data['Timestamp']),
+            description=Description(data['Description']),
+            identity=Identity(maybe_identity) if maybe_identity else None,
+            ciphertext=Ciphertext(base64.b64decode(data['Ciphertext'])),
+            meta=Metadata(maybe_meta) if maybe_meta else None,
+        )
 
     def to_ordered_dict(self) -> Dict[str, Any]:
         """Converts the 'Entry' to an ordered dictionary.
@@ -167,62 +180,3 @@ class Entry:
             'ciphertext': self.ciphertext,
             'meta': self.meta,
         }
-
-
-@dataclass
-class Entries:
-    """A collection of 'Entry' objects.
-
-    Attributes:
-        entries: The collection of entries.
-    """
-
-    entries: list[Entry]
-
-    @classmethod
-    def from_json(cls, data: str) -> 'Entries':
-        """Creates an 'Entries' object from a JSON string.
-
-        Args:
-            data: The JSON string to create the 'Entries' object from.
-
-        Returns:
-            The created 'Entries' object.
-        """
-        raw_entries: list[Dict[str, Any]] = json.loads(data)
-
-        ret: list[Entry] = []
-
-        for item in raw_entries:
-            maybe_entry = Entry.from_dict(item)
-            if maybe_entry is not None:
-                ret.append(maybe_entry)
-
-        return cls(ret)
-
-    def sort(self) -> None:
-        """Sorts the entries by timestamp."""
-        self.entries.sort(key=lambda entry: entry.timestamp, reverse=True)
-
-    def lookup(self, description: Description, identity: Optional[Identity] = None) -> list[Entry]:
-        """Searches for entries that match the provided description and identity.
-
-        Matching is fuzzy and case-insensitive.
-
-        Args:
-            description: The description to search for.
-            identity: Optional identity to search for.
-
-        Returns:
-            A list of entries that match the provided description and identity.
-        """
-        return [
-            entry
-            for entry in self.entries
-            if description.lower() in entry.description.lower()
-            and (identity is None or (entry.identity is not None and identity.lower() in entry.identity.lower()))
-        ]
-
-
-Plaintext = NewType('Plaintext', str)
-"""Holds a plaintext value."""
