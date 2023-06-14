@@ -1,5 +1,4 @@
 """Tests for the 'in_memory_store' module."""
-import datetime
 import unittest
 
 from tartarus.data import (
@@ -10,6 +9,7 @@ from tartarus.data import (
     Identity,
     KeyId,
     Metadata,
+    Timestamp,
 )
 from tartarus.store import InMemoryStore, Query
 
@@ -25,7 +25,7 @@ class TestInMemoryStore(unittest.TestCase):
         entry = Entry(
             entry_id=EntryId('1'),
             description=Description('test'),
-            timestamp=datetime.datetime.now(),
+            timestamp=Timestamp.now(),
             identity=Identity('test'),
             meta=Metadata('test'),
             ciphertext=Ciphertext(b'test'),

@@ -5,6 +5,7 @@ import os
 from enum import Enum
 from typing import Optional
 
+from . import data
 from .codec import AbstractCodec, GpgCodec
 from .config import ConfigBuilder, OsFamily
 from .data import Description, Entry, Identity, Plaintext
@@ -64,9 +65,9 @@ def handle_lookup(args: argparse.Namespace) -> int:
     config = ConfigBuilder().with_defaults(host_os, env).with_env(env).build()
 
     with open(config.data_file, 'r', encoding='utf-8') as file:
-        data = file.read()
+        json_data = file.read()
 
-    entries: list[Entry] = [Entry.from_dict(entry) for entry in json.loads(data)]
+    entries = [Entry.from_dict(entry) for entry in json.loads(json_data, object_hook=data.keys_to_snake_case)]
 
     store = InMemoryStore.from_entries(entries)
 

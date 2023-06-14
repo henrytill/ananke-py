@@ -31,10 +31,10 @@ class GpgCodec(AbstractCodec):
         self._key_id = key_id
 
     def encode(self, plaintext: Plaintext) -> Ciphertext:
-        input_bytes: bytes = plaintext.encode('utf-8')
+        input_bytes = plaintext.encode('utf-8')
         cmd = ['gpg', '--batch', '--encrypt', '--recipient', self.key_id]
         try:
-            output_bytes: bytes = subprocess.run(cmd, input=input_bytes, capture_output=True, check=True).stdout
+            output_bytes = subprocess.run(cmd, input=input_bytes, capture_output=True, check=True).stdout
         except subprocess.CalledProcessError as exc:
             raise ValueError(f'Could not encode Plaintext: {exc.stderr.decode("utf-8")}') from exc
         return Ciphertext(output_bytes)
@@ -42,7 +42,7 @@ class GpgCodec(AbstractCodec):
     def decode(self, ciphertext: Ciphertext) -> Plaintext:
         cmd = ['gpg', '--batch', '--decrypt']
         try:
-            result: bytes = subprocess.run(cmd, input=ciphertext, capture_output=True, check=True).stdout
+            output_bytes = subprocess.run(cmd, input=ciphertext, capture_output=True, check=True).stdout
         except subprocess.CalledProcessError as exc:
             raise ValueError(f'Could not decode Ciphertext: {exc.stderr.decode("utf-8")}') from exc
-        return Plaintext(result.decode('utf-8'))
+        return Plaintext(output_bytes.decode('utf-8'))

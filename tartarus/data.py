@@ -217,8 +217,8 @@ class Entry:
             The created 'Entry'.
         """
         # Check required keys
-        check_keys = {'id', 'key_id', 'timestamp', 'description', 'ciphertext'}
-        for key in check_keys:
+        required_keys = ['id', 'key_id', 'timestamp', 'description', 'ciphertext']
+        for key in required_keys:
             if key not in data:
                 raise ValueError(f'Invalid entry format: missing required key "{key}"')
 
@@ -279,7 +279,7 @@ def convert_to_snake(name: str) -> str:
     return re.sub('([a-z0-9A-Z])([A-Z])', r'\1_\2', underscore_inserted).lower()
 
 
-def keys_to_snake_case(input_dict: Dict[Any, Any]) -> Dict[Any, Any]:
+def keys_to_snake_case(input_dict: Dict[str, Any]) -> Dict[str, Any]:
     """Converts all keys in a dictionary from CamelCase or snake_case to snake_case.
 
     Args:

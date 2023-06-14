@@ -251,8 +251,7 @@ class Config:
 
     @property
     def data_file(self) -> Path:
-        """
-        Returns the path to the data file.
+        """Returns the path to the data file.
 
         Returns:
             The path to the data file.
