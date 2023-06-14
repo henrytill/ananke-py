@@ -1,10 +1,14 @@
 """Test the 'cli' module."""
+import json
 import os
 import unittest
+import unittest.mock
 
 from tartarus import cli
+from tartarus.codec import GpgCodec
 from tartarus.config import ConfigBuilder, OsFamily
-from tartarus.data import Description, Identity, Plaintext
+from tartarus.data import Description, Entry, Identity, Plaintext
+from tartarus.store import InMemoryStore
 
 
 class TestLookup(unittest.TestCase):
@@ -22,8 +26,17 @@ class TestLookup(unittest.TestCase):
         identity = Identity('quux')
         plaintext = Plaintext('ASecretPassword')
 
+        with open(config.data_file, 'r', encoding='utf-8') as file:
+            data = file.read()
+
+        entries: list[Entry] = [Entry.from_dict(entry) for entry in json.loads(data)]
+
+        store = InMemoryStore.from_entries(entries)
+
+        codec = GpgCodec(config.key_id)
+
         os.environ['GNUPGHOME'] = './example/gnupg'
-        self.assertEqual(cli.lookup(config, description, identity), [plaintext])
+        self.assertEqual(cli.lookup(store, codec, description, identity), [plaintext])
 
 
 if __name__ == '__main__':

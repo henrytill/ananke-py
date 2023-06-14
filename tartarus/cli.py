@@ -5,10 +5,10 @@ import os
 from enum import Enum
 from typing import Optional
 
-from .codec import GpgCodec
-from .config import Config, ConfigBuilder, OsFamily
+from .codec import AbstractCodec, GpgCodec
+from .config import ConfigBuilder, OsFamily
 from .data import Description, Entry, Identity, Plaintext
-from .store import InMemoryStore, Query
+from .store import AbstractStore, InMemoryStore, Query
 
 
 class Verbosity(Enum):
@@ -20,32 +20,26 @@ class Verbosity(Enum):
 
 
 def lookup(
-    config: Config,
+    store: AbstractStore,
+    codec: AbstractCodec,
     description: Description,
     maybe_identity: Optional[Identity] = None,
     verbosity: Verbosity = Verbosity.MEDIUM,
 ) -> list[Plaintext]:
-    """Searches for entries that match the provided description and identity, and
-    returns the plaintexts of the matching entries.
+    """Searches for entries that match the provided description and identity,
+    and returns the plaintexts of the matching entries.
 
     Args:
+        store: The store to search in.
+        codec: The codec to use to decrypt the ciphertexts.
         description: The description to search for.
         maybe_identity: The identity to search for.
         verbosity: The verbosity level of the output.
 
     Returns:
-        A list of plaintexts that match the provided description and identity.
+        The plaintexts of the matching entries.
     """
     del verbosity  # Unused.
-
-    with open(config.data_file, 'r', encoding='utf-8') as file:
-        data = file.read()
-
-    entries: list[Entry] = [Entry.from_dict(entry) for entry in json.loads(data)]
-
-    store = InMemoryStore.from_entries(entries)
-
-    codec = GpgCodec(config.key_id)
 
     query = Query(description=description, identity=maybe_identity)
 
@@ -69,7 +63,16 @@ def handle_lookup(args: argparse.Namespace) -> int:
     host_os = OsFamily.from_str(os.name)
     config = ConfigBuilder().with_defaults(host_os, env).with_env(env).build()
 
-    for plaintext in lookup(config, description, maybe_identity, verbosity):
+    with open(config.data_file, 'r', encoding='utf-8') as file:
+        data = file.read()
+
+    entries: list[Entry] = [Entry.from_dict(entry) for entry in json.loads(data)]
+
+    store = InMemoryStore.from_entries(entries)
+
+    codec = GpgCodec(config.key_id)
+
+    for plaintext in lookup(store, codec, description, maybe_identity, verbosity):
         print(plaintext)
 
     return 0
