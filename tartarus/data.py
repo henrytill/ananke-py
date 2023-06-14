@@ -1,7 +1,7 @@
 """Core data structures and related functions."""
 import base64
 import binascii
-import re
+import functools
 import secrets
 import string
 from datetime import datetime, timezone
@@ -266,26 +266,30 @@ class Entry:
         }
 
 
-def convert_to_snake(name: str) -> str:
-    """Converts a string from CamelCase or snake_case to snake_case.
+CAMEL_TO_SNAKE = {
+    "Timestamp": "timestamp",
+    "Id": "id",
+    "KeyId": "key_id",
+    "Description": "description",
+    "Identity": "identity",
+    "Ciphertext": "ciphertext",
+    "Meta": "meta",
+}
+
+
+def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
+    """Maps the keys of a dictionary to a new set of keys.
+
+    If a key is not present in the mapping, it is left unchanged.
 
     Args:
-        name: The string to convert.
+        mapping: A dictionary that maps the old keys to the new keys.
+        data: The dictionary to transform.
 
     Returns:
-        The converted string in snake_case.
+        A new dictionary where the keys have been replaced according to the mapping.
     """
-    underscore_inserted = re.sub('(.)([A-Z][a-z]*)', r'\1_\2', name)
-    return re.sub('([a-z0-9A-Z])([A-Z])', r'\1_\2', underscore_inserted).lower()
+    return {mapping.get(key, key): value for key, value in data.items()}
 
 
-def keys_to_snake_case(input_dict: Dict[str, Any]) -> Dict[str, Any]:
-    """Converts all keys in a dictionary from CamelCase or snake_case to snake_case.
-
-    Args:
-        d: The dictionary to convert.
-
-    Returns:
-        A new dictionary with all keys converted to snake_case.
-    """
-    return {convert_to_snake(k): v for k, v in input_dict.items()}
+remap_keys_camel_to_snake = functools.partial(remap_keys, CAMEL_TO_SNAKE)

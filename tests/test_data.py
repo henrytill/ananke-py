@@ -69,7 +69,7 @@ class TestEntryDict(unittest.TestCase):
             """
         )
 
-        entry_dict: EntryDict = json.loads(entry_json, object_hook=data.keys_to_snake_case)
+        entry_dict: EntryDict = json.loads(entry_json, object_hook=data.remap_keys_camel_to_snake)
 
         expected_output = {
             'timestamp': '2023-06-12T08:13:45.171872642Z',
@@ -101,7 +101,7 @@ class TestEntryDict(unittest.TestCase):
             """
         )
 
-        entry_dict: EntryDict = json.loads(entry_json, object_hook=data.keys_to_snake_case)
+        entry_dict: EntryDict = json.loads(entry_json, object_hook=data.remap_keys_camel_to_snake)
 
         expected_output = {
             'timestamp': '2023-06-12T08:13:45.171872642Z',
@@ -153,7 +153,7 @@ class TestEntryDict(unittest.TestCase):
             """
         )
 
-        entry_dicts: list[EntryDict] = json.loads(entries_json, object_hook=data.keys_to_snake_case)
+        entry_dicts: list[EntryDict] = json.loads(entries_json, object_hook=data.remap_keys_camel_to_snake)
 
         self.assertIsInstance(entry_dicts, list)
         self.assertEqual(len(entry_dicts), 3)
@@ -274,79 +274,41 @@ class TestEntry(unittest.TestCase):
 class TestKeyConversion(unittest.TestCase):
     """Unit tests for the key conversion functions."""
 
-    def test_camel_to_snake(self):
-        """Test that camel case strings are converted to snake case correctly."""
+    def test_remap_keys(self):
+        """Keys can be remapped in a dict."""
         test_cases = [
-            ('', ''),
-            ('a', 'a'),
-            ('A', 'a'),
-            ('aa', 'aa'),
-            ('aA', 'a_a'),
-            ('Aa', 'aa'),
-            ('AA', 'a_a'),
-            ('aaa', 'aaa'),
-            ('aAa', 'a_aa'),
-            ('aAA', 'a_a_a'),
-            ('Aaa', 'aaa'),
-            ('AAa', 'a_aa'),
-            ('AAA', 'a_a_a'),
-            ('aaaa', 'aaaa'),
-            ('aAaaa', 'a_aaaa'),
-            ('aAaAa', 'a_aa_aa'),
-            ('aAaAA', 'a_aa_a_a'),
-            ('aAaAaA', 'a_aa_aa_a'),
-            ('aAaAaAa', 'a_aa_aa_aa'),
-            ('aAaAaAaA', 'a_aa_aa_aa_a'),
-            ('Aaaa', 'aaaa'),
-            ('AaAaa', 'aa_aaa'),
-            ('AaAaAa', 'aa_aa_aa'),
-            ('AaAaAA', 'aa_aa_a_a'),
-            ('AaAaAaA', 'aa_aa_aa_a'),
-            ('AaAaAaAa', 'aa_aa_aa_aa'),
-            ('AaAaAaAaA', 'aa_aa_aa_aa_a'),
-            ('AAaaa', 'a_aaaa'),
-            ('AAaAa', 'a_aa_aa'),
-            ('AAaAAa', 'a_aa_a_aa'),
-            ('AAaAAaA', 'a_aa_a_aa_a'),
-            ('AAaAAaAa', 'a_aa_a_aa_aa'),
-            ('AAaAAaAaA', 'a_aa_a_aa_aa_a'),
-            ('AAaAAaAaAa', 'a_aa_a_aa_aa_aa'),
-            ('AAaAAaAaAaA', 'a_aa_a_aa_aa_aa_a'),
-            ('AaaaA', 'aaaa_a'),
-            ('AaaaAA', 'aaaa_a_a'),
-            ('AaaaAa', 'aaaa_aa'),
-            ('AaaaAaA', 'aaaa_aa_a'),
-            ('AaaaAaAa', 'aaaa_aa_aa'),
-            ('AaaaAaAaA', 'aaaa_aa_aa_a'),
-            ('AaaaAaAaAa', 'aaaa_aa_aa_aa'),
-            ('AaaaAaAaAaA', 'aaaa_aa_aa_aa_a'),
-            ('AaaaAaAaAaAa', 'aaaa_aa_aa_aa_aa'),
-            ('Camel', 'camel'),
-            ('CCase', 'c_case'),
-            ('CamelCase', 'camel_case'),
-            ('camelCase', 'camel_case'),
-            ('camel2Case', 'camel2_case'),
-            ('CamelCamelCamel', 'camel_camel_camel'),
-            ('Camel2Camel2Camel', 'camel2_camel2_camel'),
-            ('already', 'already'),
-            ('already2', 'already2'),
-            ('already_2', 'already_2'),
-            ('already_snake', 'already_snake'),
-            ('already_snake_case', 'already_snake_case'),
+            {
+                'key_map': {'foo': 'bar', 'baz': 'quux'},
+                'input_dict': {'foo': 'a', 'baz': 'b'},
+                'expected_output': {'bar': 'a', 'quux': 'b'},
+            },
+            {
+                'key_map': {'foo': 'bar', 'baz': 'quux'},
+                'input_dict': {},
+                'expected_output': {},
+            },
+            {
+                'key_map': {},
+                'input_dict': {'foo': 'a', 'baz': 'b'},
+                'expected_output': {'foo': 'a', 'baz': 'b'},
+            },
+            {
+                'key_map': {'foo': 'bar', 'baz': 'quux'},
+                'input_dict': {'foo': 'a'},
+                'expected_output': {'bar': 'a'},
+            },
+            {
+                'key_map': {'foo': 'bar', 'baz': 'quux'},
+                'input_dict': {'foo': 'a', 'baz': 'b', 'quux': 'c'},
+                'expected_output': {'bar': 'a', 'quux': 'c'},
+            },
         ]
-
-        for input_str, expected_output in test_cases:
-            with self.subTest(input_str=input_str):
-                self.assertEqual(data.convert_to_snake(input_str), expected_output)
-
-    def test_keys_to_snake_case(self):
-        """Test that dictionary keys are converted from camel case to snake case correctly."""
-        test_dict = {'CamelCase': 1, 'camelCase': 2, 'Camel2Camel2Camel': 3, 'already_snake_case': 4}
-        converted = data.keys_to_snake_case(test_dict)
-        # flake8: noqa: F601
-        # pylint: disable=duplicate-key
-        expected = {'camel_case': 1, 'camel_case': 2, 'camel2_camel2_camel': 3, 'already_snake_case': 4}
-        self.assertDictEqual(expected, converted)
+        for i, test_case in enumerate(test_cases):
+            with self.subTest(i=i):
+                key_map = test_case['key_map']
+                input_dict = test_case['input_dict']
+                expected_output = test_case['expected_output']
+                self.assertEqual(expected_output, data.remap_keys(key_map, input_dict))
 
 
 # pylint: disable=unused-argument, missing-function-docstring

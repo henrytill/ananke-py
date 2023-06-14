@@ -29,7 +29,9 @@ class TestLookup(unittest.TestCase):
         with open(config.data_file, 'r', encoding='utf-8') as file:
             json_data = file.read()
 
-        entries = [Entry.from_dict(entry) for entry in json.loads(json_data, object_hook=data.keys_to_snake_case)]
+        entries = [
+            Entry.from_dict(entry) for entry in json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
+        ]
 
         store = InMemoryStore.from_entries(entries)
 
