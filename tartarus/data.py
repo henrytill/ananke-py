@@ -4,7 +4,7 @@ import binascii
 import re
 import secrets
 import string
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, NewType, Optional, TypedDict
 
 KeyId = NewType('KeyId', str)
@@ -111,13 +111,13 @@ def parse_timestamp(timestamp: str) -> datetime:
 
     Examples:
         >>> parse_timestamp('2023-06-07T02:58:54.640805116Z')
-        datetime.datetime(2023, 6, 7, 2, 58, 54, 640805)
+        datetime.datetime(2023, 6, 7, 2, 58, 54, 640805, tzinfo=datetime.timezone.utc)
 
         >>> parse_timestamp('2023-06-07T02:58:54Z')
-        datetime.datetime(2023, 6, 7, 2, 58, 54)
+        datetime.datetime(2023, 6, 7, 2, 58, 54, tzinfo=datetime.timezone.utc)
 
         >>> parse_timestamp('2023-06-07T02:58Z')
-        datetime.datetime(2023, 6, 7, 2, 58)
+        datetime.datetime(2023, 6, 7, 2, 58, tzinfo=datetime.timezone.utc)
     """
     # Remove the Zulu indication
     timestamp = timestamp.rstrip('Z')
@@ -155,7 +155,7 @@ def parse_timestamp(timestamp: str) -> datetime:
             timestamp_str += f':{seconds}'
 
     # Parse the timestamp string into a datetime object
-    return datetime.strptime(timestamp_str, fmt)
+    return datetime.strptime(timestamp_str, fmt).replace(tzinfo=timezone.utc)
 
 
 class EntryDict(TypedDict):
@@ -276,7 +276,7 @@ class Entry:
             The converted 'Entry'.
         """
         return {
-            'timestamp': self.timestamp.isoformat(),
+            'timestamp': self.timestamp.isoformat().replace('+00:00', 'Z'),
             'id': self.entry_id,
             'key_id': self.key_id,
             'description': self.description,
