@@ -16,14 +16,15 @@ from tartarus.data import (
     Identity,
     KeyId,
     Metadata,
+    Timestamp,
 )
 
 
-class TestParseTimestamp(unittest.TestCase):
-    """Tests for the 'parse_timestamp' function."""
+class TestTimestamp(unittest.TestCase):
+    """Tests for the 'Timestamp' class."""
 
-    def test_parse_timestamp(self):
-        """Tests the 'parse_timestamp' function."""
+    def test_fromisoformat(self):
+        """Tests the 'fromisoformat' method."""
         test_cases = [
             ('2023-06-07T02:58:54.640805116Z', datetime(2023, 6, 7, 2, 58, 54, 640805)),
             ('2023-06-07T02:58:54.640Z', datetime(2023, 6, 7, 2, 58, 54, 640000)),
@@ -32,14 +33,21 @@ class TestParseTimestamp(unittest.TestCase):
         ]
         for timestamp, expected_output in test_cases:
             with self.subTest(timestamp=timestamp):
-                self.assertEqual(data.parse_timestamp(timestamp), expected_output.replace(tzinfo=timezone.utc))
+                self.assertEqual(
+                    data.Timestamp.fromisoformat(timestamp).value, expected_output.replace(tzinfo=timezone.utc)
+                )
 
-    def test_parse_timestamp_invalid_format(self):
-        """Tests the 'parse_timestamp' function with an invalid format."""
-        test_cases = ['2023-06-07T02:58:54:123Z', '2023-06-07T02:58:54.123.456Z', '2023-06-07T02Z']
+    def test_roundtrip_through_str(self):
+        """Tests that a 'Timestamp' object can be roundtripped through the 'str' function."""
+        test_cases = [
+            '2023-06-07T02:58:54.640805Z',
+            '2023-06-07T02:58:54.640000Z',
+            '2023-06-07T02:58:54Z',
+            '2023-06-07T02:58:00Z',
+        ]
         for timestamp in test_cases:
-            with self.subTest(timestamp=timestamp), self.assertRaises(ValueError):
-                data.parse_timestamp(timestamp)
+            with self.subTest(timestamp=timestamp):
+                self.assertEqual(data.Timestamp.fromisoformat(timestamp).isoformat(), timestamp)
 
 
 class TestEntryDict(unittest.TestCase):
@@ -160,7 +168,7 @@ class TestEntry(unittest.TestCase):
         }
 
         expected_entry = Entry(
-            timestamp=data.parse_timestamp(entry_dict['timestamp']),
+            timestamp=Timestamp.fromisoformat(entry_dict['timestamp']),
             entry_id=EntryId(entry_dict['id']),
             key_id=KeyId(entry_dict['key_id']),
             description=Description(entry_dict['description']),

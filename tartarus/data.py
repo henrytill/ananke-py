@@ -23,6 +23,47 @@ Metadata = NewType('Metadata', str)
 """Contains additional non-specific information for an 'Entry'."""
 
 
+class Timestamp:
+    """Represents a UTC timestamp."""
+
+    def __init__(self, timestamp: datetime):
+        self.timestamp = timestamp
+
+    @classmethod
+    def now(cls) -> 'Timestamp':
+        """Creates a Timestamp object with the current time."""
+        return cls(datetime.now(timezone.utc))
+
+    @classmethod
+    def fromisoformat(cls, timestamp: str) -> 'Timestamp':
+        """Creates a Timestamp object from an ISO 8601 string.
+
+        Args:
+            timestamp: The ISO 8601 string.
+
+        Returns:
+            The Timestamp object.
+
+        Raises:
+            ValueError: If the timestamp is in an invalid format.
+        """
+        return cls(datetime.fromisoformat(timestamp))
+
+    def isoformat(self) -> str:
+        """Returns the timestamp as an ISO 8601 string."""
+        return self.timestamp.isoformat().replace('+00:00', 'Z')
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Timestamp):
+            return False
+        return self.timestamp == value.timestamp
+
+    @property
+    def value(self) -> datetime:
+        """Returns the timestamp value."""
+        return self.timestamp
+
+
 class Ciphertext(bytes):
     """Holds the encrypted value of an 'Entry'."""
 
@@ -97,67 +138,6 @@ class Plaintext(str):
         return cls(''.join(secrets.choice(chars) for _ in range(length)))
 
 
-def parse_timestamp(timestamp: str) -> datetime:
-    """Parses a UTC ISO timestamp into a datetime object.
-
-    Args:
-        timestamp: The timestamp to parse.
-
-    Returns:
-        The parsed datetime object.
-
-    Raises:
-        ValueError: If the timestamp is in an invalid format.
-
-    Examples:
-        >>> parse_timestamp('2023-06-07T02:58:54.640805116Z')
-        datetime.datetime(2023, 6, 7, 2, 58, 54, 640805, tzinfo=datetime.timezone.utc)
-
-        >>> parse_timestamp('2023-06-07T02:58:54Z')
-        datetime.datetime(2023, 6, 7, 2, 58, 54, tzinfo=datetime.timezone.utc)
-
-        >>> parse_timestamp('2023-06-07T02:58Z')
-        datetime.datetime(2023, 6, 7, 2, 58, tzinfo=datetime.timezone.utc)
-    """
-    # Remove the Zulu indication
-    timestamp = timestamp.rstrip('Z')
-
-    # Separate date and time components
-    date, time = timestamp.split('T')
-
-    # Extract time components
-    time_components = time.split(':')
-    time_components_len = len(time_components)
-
-    if time_components_len not in (2, 3):
-        raise ValueError('Invalid timestamp format')
-
-    # Extract time components and update the format string and timestamp_str incrementally
-    hours = time_components[0]
-    minutes = time_components[1]
-    fmt = '%Y-%m-%dT%H:%M'
-    timestamp_str = f'{date}T{hours}:{minutes}'
-
-    if time_components_len == 3:  # seconds exist
-        seconds = time_components[2]
-        if '.' in seconds:
-            # seconds include fractional part
-            seconds_components = seconds.split('.')
-            if len(seconds_components) != 2:
-                raise ValueError('Invalid timestamp format')
-
-            seconds = seconds_components[0]
-            microseconds = seconds_components[1][:6]
-            fmt += ':%S.%f'
-            timestamp_str += f':{seconds}.{microseconds}'
-        else:
-            fmt += ':%S'
-            timestamp_str += f':{seconds}'
-
-    # Parse the timestamp string into a datetime object
-    return datetime.strptime(timestamp_str, fmt).replace(tzinfo=timezone.utc)
-
-
 class EntryDict(TypedDict):
     """An 'Entry' represented as a dictionary."""
 
@@ -185,7 +165,7 @@ class Entry:
 
     entry_id: EntryId
     key_id: KeyId
-    timestamp: datetime
+    timestamp: Timestamp
     description: Description
     identity: Optional[Identity]
     ciphertext: Ciphertext
@@ -196,7 +176,7 @@ class Entry:
         self,
         entry_id: EntryId,
         key_id: KeyId,
-        timestamp: datetime,
+        timestamp: Timestamp,
         description: Description,
         identity: Optional[Identity],
         ciphertext: Ciphertext,
@@ -245,7 +225,7 @@ class Entry:
         # Validate the timestamp
         timestamp_str = data['timestamp']
         try:
-            timestamp = parse_timestamp(timestamp_str)
+            timestamp = Timestamp.fromisoformat(timestamp_str)
         except ValueError as err:
             raise ValueError('Invalid timestamp format') from err
 
@@ -276,7 +256,7 @@ class Entry:
             The converted 'Entry'.
         """
         return {
-            'timestamp': self.timestamp.isoformat().replace('+00:00', 'Z'),
+            'timestamp': self.timestamp.isoformat(),
             'id': self.entry_id,
             'key_id': self.key_id,
             'description': self.description,

@@ -8,7 +8,7 @@ version = "0.1.0"
 description = ""
 authors = [{ name = "Henry Till", email = "henrytill@gmail.com" }]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = ["flake8>=6.0.0", "black>=23.3.0", "pylint>=2.17"]
