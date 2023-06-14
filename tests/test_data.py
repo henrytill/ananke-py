@@ -4,7 +4,9 @@ import json
 import textwrap
 import unittest
 from datetime import datetime, timezone
+from typing import List, Tuple, TypedDict
 from unittest import TestLoader, TestSuite
+from unittest.mock import MagicMock, patch
 
 from tartarus import data
 from tartarus.data import (
@@ -16,6 +18,7 @@ from tartarus.data import (
     Identity,
     KeyId,
     Metadata,
+    Plaintext,
     Timestamp,
 )
 
@@ -50,6 +53,98 @@ class TestTimestamp(unittest.TestCase):
         for timestamp in test_cases:
             with self.subTest(timestamp=timestamp):
                 self.assertEqual(Timestamp.fromisoformat(timestamp).isoformat(), timestamp)
+
+
+class TestCiphertext(unittest.TestCase):
+    """Tests for the 'Ciphertext' class."""
+
+    def test_from_base64(self):
+        """Tests the 'from_base64' method."""
+        test_cases = {
+            'aGVsbG8=': b'hello',
+            'aGVsbG8gZnJvbSB0ZXN0': b'hello from test',
+        }
+
+        for ciphertext, expected_output in test_cases.items():
+            with self.subTest(ciphertext=ciphertext):
+                actual_output = Ciphertext.from_base64(ciphertext)
+                self.assertEqual(expected_output, actual_output)
+
+    def test_to_base64(self):
+        """Tests the 'to_base64' method."""
+        test_cases = {
+            b'hello': 'aGVsbG8=',
+            b'hello from test': 'aGVsbG8gZnJvbSB0ZXN0',
+        }
+
+        for plaintext, expected_output in test_cases.items():
+            with self.subTest(plaintext=plaintext):
+                actual_output = Ciphertext(plaintext).to_base64()
+                self.assertEqual(expected_output, actual_output)
+
+    def test_roundtrip_through_str(self):
+        """Tests that a 'Ciphertext' object can be roundtripped through the 'str' function."""
+        test_cases = [
+            'aGVsbG8=',
+            'aGVsbG8gZnJvbSB0ZXN0',
+        ]
+
+        for ciphertext in test_cases:
+            with self.subTest(ciphertext=ciphertext):
+                self.assertEqual(Ciphertext.from_base64(ciphertext).to_base64(), ciphertext)
+
+
+class TestPlaintext(unittest.TestCase):
+    """Tests for the 'Plaintext' class."""
+
+    class RandomCase(TypedDict):
+        """Type hint class for a test case used in the 'random' method tests."""
+
+        args: Tuple[int, bool, bool, bool, bool]
+        mock_return: List[str]
+        expected: Plaintext
+
+    @patch('secrets.choice')
+    def test_random(self, mock_choice: MagicMock):
+        """Test the 'random' method of the 'Plaintext' class.
+
+        This method uses a MagicMock to replace 'secrets.choice' allowing
+        control over its returned values. The tests cases cover different
+        combinations of the boolean flags used in the 'random' method.
+        """
+        test_cases: List[TestPlaintext.RandomCase] = [
+            {
+                'args': (5, True, False, False, False),
+                'mock_return': ['a', 'b', 'c', 'd', 'e'],
+                'expected': Plaintext('abcde'),
+            },
+            {
+                'args': (5, False, True, False, False),
+                'mock_return': ['A', 'B', 'C', 'D', 'E'],
+                'expected': Plaintext('ABCDE'),
+            },
+            {
+                'args': (5, False, False, True, False),
+                'mock_return': ['1', '2', '3', '4', '5'],
+                'expected': Plaintext('12345'),
+            },
+            {
+                'args': (5, False, False, False, True),
+                'mock_return': ['!', '@', '#', '$', '%'],
+                'expected': Plaintext('!@#$%'),
+            },
+            {
+                'args': (5, True, True, True, True),
+                'mock_return': ['a', 'B', '3', '#', 'e'],
+                'expected': Plaintext('aB3#e'),
+            },
+        ]
+
+        for case in test_cases:
+            with self.subTest(case=case):
+                mock_choice.side_effect = case['mock_return']
+                actual_plaintext = Plaintext.random(*case['args'])
+                self.assertEqual(case['expected'], actual_plaintext)
 
 
 class TestEntryDict(unittest.TestCase):
