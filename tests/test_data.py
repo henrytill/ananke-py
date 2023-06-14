@@ -25,16 +25,18 @@ class TestTimestamp(unittest.TestCase):
 
     def test_fromisoformat(self):
         """Tests the 'fromisoformat' method."""
-        test_cases = [
-            ('2023-06-07T02:58:54.640805116Z', datetime(2023, 6, 7, 2, 58, 54, 640805)),
-            ('2023-06-07T02:58:54.640Z', datetime(2023, 6, 7, 2, 58, 54, 640000)),
-            ('2023-06-07T02:58:54Z', datetime(2023, 6, 7, 2, 58, 54)),
-            ('2023-06-07T02:58Z', datetime(2023, 6, 7, 2, 58)),
-        ]
+        test_cases = {
+            '2023-06-07T02:58:54.640805116Z': datetime(2023, 6, 7, 2, 58, 54, 640805),
+            '2023-06-07T02:58:54.640Z': datetime(2023, 6, 7, 2, 58, 54, 640000),
+            '2023-06-07T02:58:54Z': datetime(2023, 6, 7, 2, 58, 54),
+            '2023-06-07T02:58Z': datetime(2023, 6, 7, 2, 58),
+        }
 
-        for timestamp, expected_output in test_cases:
+        for timestamp, expected_output in test_cases.items():
             with self.subTest(timestamp=timestamp):
-                self.assertEqual(Timestamp.fromisoformat(timestamp).value, expected_output.replace(tzinfo=timezone.utc))
+                expected_output = expected_output.replace(tzinfo=timezone.utc)
+                actual_output = Timestamp.fromisoformat(timestamp).value
+                self.assertEqual(expected_output, actual_output)
 
     def test_roundtrip_through_str(self):
         """Tests that a 'Timestamp' object can be roundtripped through the 'str' function."""
