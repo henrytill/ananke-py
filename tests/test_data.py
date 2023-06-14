@@ -1,9 +1,9 @@
 """Tests for the 'data' module."""
-import datetime
 import doctest
 import json
 import textwrap
 import unittest
+from datetime import datetime, timezone
 from unittest import TestLoader, TestSuite
 
 from tartarus import data
@@ -24,42 +24,22 @@ class TestParseTimestamp(unittest.TestCase):
 
     def test_parse_timestamp(self):
         """Tests the 'parse_timestamp' function."""
-        self.assertEqual(
-            data.parse_timestamp('2023-06-07T02:58:54.640805116Z'),
-            datetime.datetime(2023, 6, 7, 2, 58, 54, 640805, tzinfo=datetime.timezone.utc),
-        )
-
-    def test_parse_timestamp_fewer_microseconds(self):
-        """Tests the 'parse_timestamp' function with fewer microseconds."""
-        self.assertEqual(
-            data.parse_timestamp('2023-06-07T02:58:54.640Z'),
-            datetime.datetime(2023, 6, 7, 2, 58, 54, 640000, tzinfo=datetime.timezone.utc),
-        )
-
-    def test_parse_timestamp_no_microseconds(self):
-        """Tests the 'parse_timestamp' function with no microseconds."""
-        self.assertEqual(
-            data.parse_timestamp('2023-06-07T02:58:54Z'),
-            datetime.datetime(2023, 6, 7, 2, 58, 54, tzinfo=datetime.timezone.utc),
-        )
-
-    def test_parse_timestamp_no_seconds(self):
-        """Tests the 'parse_timestamp' function with no seconds."""
-        self.assertEqual(
-            data.parse_timestamp('2023-06-07T02:58Z'),
-            datetime.datetime(2023, 6, 7, 2, 58, tzinfo=datetime.timezone.utc),
-        )
+        test_cases = [
+            ('2023-06-07T02:58:54.640805116Z', datetime(2023, 6, 7, 2, 58, 54, 640805)),
+            ('2023-06-07T02:58:54.640Z', datetime(2023, 6, 7, 2, 58, 54, 640000)),
+            ('2023-06-07T02:58:54Z', datetime(2023, 6, 7, 2, 58, 54)),
+            ('2023-06-07T02:58Z', datetime(2023, 6, 7, 2, 58)),
+        ]
+        for timestamp, expected_output in test_cases:
+            with self.subTest(timestamp=timestamp):
+                self.assertEqual(data.parse_timestamp(timestamp), expected_output.replace(tzinfo=timezone.utc))
 
     def test_parse_timestamp_invalid_format(self):
         """Tests the 'parse_timestamp' function with an invalid format."""
-        with self.assertRaises(ValueError):
-            data.parse_timestamp('2023-06-07T02:58:54:123Z')
-
-        with self.assertRaises(ValueError):
-            data.parse_timestamp('2023-06-07T02:58:54.123.456Z')
-
-        with self.assertRaises(ValueError):
-            data.parse_timestamp('2023-06-07T02Z')
+        test_cases = ['2023-06-07T02:58:54:123Z', '2023-06-07T02:58:54.123.456Z', '2023-06-07T02Z']
+        for timestamp in test_cases:
+            with self.subTest(timestamp=timestamp), self.assertRaises(ValueError):
+                data.parse_timestamp(timestamp)
 
 
 class TestEntryDict(unittest.TestCase):
@@ -158,14 +138,8 @@ class TestEntryDict(unittest.TestCase):
         self.assertIsInstance(entry_dicts[0], dict)
 
         for entry_dict in entry_dicts:
-            self.assertIsInstance(entry_dict, dict)
-            self.assertIn('timestamp', entry_dict)
-            self.assertIn('id', entry_dict)
-            self.assertIn('key_id', entry_dict)
-            self.assertIn('description', entry_dict)
-            self.assertIn('identity', entry_dict)
-            self.assertIn('ciphertext', entry_dict)
-            self.assertIn('meta', entry_dict)
+            for key in ['timestamp', 'id', 'key_id', 'description', 'identity', 'ciphertext', 'meta']:
+                self.assertIn(key, entry_dict)
 
 
 class TestEntry(unittest.TestCase):
@@ -348,9 +322,9 @@ class TestKeyConversion(unittest.TestCase):
             ('already_snake_case', 'already_snake_case'),
         ]
 
-        for input_str, expected_str in test_cases:
+        for input_str, expected_output in test_cases:
             with self.subTest(input_str=input_str):
-                self.assertEqual(data.convert_to_snake(input_str), expected_str)
+                self.assertEqual(data.convert_to_snake(input_str), expected_output)
 
     def test_keys_to_snake_case(self):
         """Test that dictionary keys are converted from camel case to snake case correctly."""
