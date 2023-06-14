@@ -295,8 +295,8 @@ def convert_to_snake(name: str) -> str:
     Returns:
         The converted string in snake_case.
     """
-    underscore_inserted = re.sub('([a-zA-Z])([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', underscore_inserted).lower()
+    underscore_inserted = re.sub('(.)([A-Z][a-z]*)', r'\1_\2', name)
+    return re.sub('([a-z0-9A-Z])([A-Z])', r'\1_\2', underscore_inserted).lower()
 
 
 def keys_to_snake_case(input_dict: Dict[Any, Any]) -> Dict[Any, Any]:

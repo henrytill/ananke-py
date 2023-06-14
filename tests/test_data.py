@@ -289,17 +289,68 @@ class TestKeyConversion(unittest.TestCase):
 
     def test_camel_to_snake(self):
         """Test that camel case strings are converted to snake case correctly."""
-        self.assertEqual(data.convert_to_snake('CCase'), 'c_case')
-        self.assertEqual(data.convert_to_snake('CamelCase'), 'camel_case')
-        self.assertEqual(data.convert_to_snake('camelCase'), 'camel_case')
-        self.assertEqual(data.convert_to_snake('camel2Case'), 'camel2_case')
-        self.assertEqual(data.convert_to_snake('CamelCamelCamel'), 'camel_camel_camel')
-        self.assertEqual(data.convert_to_snake('Camel2Camel2Camel'), 'camel2_camel2_camel')
-        self.assertEqual(data.convert_to_snake('already'), 'already')
-        self.assertEqual(data.convert_to_snake('already2'), 'already2')
-        self.assertEqual(data.convert_to_snake('already_2'), 'already_2')
-        self.assertEqual(data.convert_to_snake('already_snake'), 'already_snake')
-        self.assertEqual(data.convert_to_snake('already_snake_case'), 'already_snake_case')
+        test_cases = [
+            ('', ''),
+            ('a', 'a'),
+            ('A', 'a'),
+            ('aa', 'aa'),
+            ('aA', 'a_a'),
+            ('Aa', 'aa'),
+            ('AA', 'a_a'),
+            ('aaa', 'aaa'),
+            ('aAa', 'a_aa'),
+            ('aAA', 'a_a_a'),
+            ('Aaa', 'aaa'),
+            ('AAa', 'a_aa'),
+            ('AAA', 'a_a_a'),
+            ('aaaa', 'aaaa'),
+            ('aAaaa', 'a_aaaa'),
+            ('aAaAa', 'a_aa_aa'),
+            ('aAaAA', 'a_aa_a_a'),
+            ('aAaAaA', 'a_aa_aa_a'),
+            ('aAaAaAa', 'a_aa_aa_aa'),
+            ('aAaAaAaA', 'a_aa_aa_aa_a'),
+            ('Aaaa', 'aaaa'),
+            ('AaAaa', 'aa_aaa'),
+            ('AaAaAa', 'aa_aa_aa'),
+            ('AaAaAA', 'aa_aa_a_a'),
+            ('AaAaAaA', 'aa_aa_aa_a'),
+            ('AaAaAaAa', 'aa_aa_aa_aa'),
+            ('AaAaAaAaA', 'aa_aa_aa_aa_a'),
+            ('AAaaa', 'a_aaaa'),
+            ('AAaAa', 'a_aa_aa'),
+            ('AAaAAa', 'a_aa_a_aa'),
+            ('AAaAAaA', 'a_aa_a_aa_a'),
+            ('AAaAAaAa', 'a_aa_a_aa_aa'),
+            ('AAaAAaAaA', 'a_aa_a_aa_aa_a'),
+            ('AAaAAaAaAa', 'a_aa_a_aa_aa_aa'),
+            ('AAaAAaAaAaA', 'a_aa_a_aa_aa_aa_a'),
+            ('AaaaA', 'aaaa_a'),
+            ('AaaaAA', 'aaaa_a_a'),
+            ('AaaaAa', 'aaaa_aa'),
+            ('AaaaAaA', 'aaaa_aa_a'),
+            ('AaaaAaAa', 'aaaa_aa_aa'),
+            ('AaaaAaAaA', 'aaaa_aa_aa_a'),
+            ('AaaaAaAaAa', 'aaaa_aa_aa_aa'),
+            ('AaaaAaAaAaA', 'aaaa_aa_aa_aa_a'),
+            ('AaaaAaAaAaAa', 'aaaa_aa_aa_aa_aa'),
+            ('Camel', 'camel'),
+            ('CCase', 'c_case'),
+            ('CamelCase', 'camel_case'),
+            ('camelCase', 'camel_case'),
+            ('camel2Case', 'camel2_case'),
+            ('CamelCamelCamel', 'camel_camel_camel'),
+            ('Camel2Camel2Camel', 'camel2_camel2_camel'),
+            ('already', 'already'),
+            ('already2', 'already2'),
+            ('already_2', 'already_2'),
+            ('already_snake', 'already_snake'),
+            ('already_snake_case', 'already_snake_case'),
+        ]
+
+        for input_str, expected_str in test_cases:
+            with self.subTest(input_str=input_str):
+                self.assertEqual(data.convert_to_snake(input_str), expected_str)
 
     def test_keys_to_snake_case(self):
         """Test that dictionary keys are converted from camel case to snake case correctly."""
