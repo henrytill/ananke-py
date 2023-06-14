@@ -4,41 +4,53 @@
 SHELL = /bin/bash
 .SHELLFLAGS += -e
 
+BUILD_ENV = host
+
 VENV = env
-VENV_TARGET = $(VENV)/pyvenv.cfg
-VENV_ACTIVATE = $(VENV)/bin/activate
 
 -include config.mk
+
+ifeq ($(BUILD_ENV), venv)
+ENV_TARGET = $(VENV)/pyvenv.cfg
+ACTIVATE = source $(VENV)/bin/activate
+else
+ENV_TARGET = /dev/null
+ACTIVATE = which python3
+endif
 
 .PHONY: all
 all: check
 
-$(VENV_TARGET): pyproject.toml
+ifeq ($(BUILD_ENV), venv)
+$(ENV_TARGET): pyproject.toml
 	python3 -m venv $(VENV)
-	source $(VENV_ACTIVATE)
-	which python
-	python -m pip install --upgrade pip
-	python -m pip install -e .[test,dev]
+	$(ACTIVATE)
+	which python3
+	python3 -m pip install --upgrade pip
+	python3 -m pip install -e .[test,dev]
+else
+$(ENV_TARGET):
+endif
 
 .PHONY: venv
-venv: $(VENV_TARGET)
+venv: $(ENV_TARGET)
 
 .PHONY: check
-check: $(VENV_TARGET)
-	source $(VENV_ACTIVATE)
-	python -m unittest discover -v -s tests
+check: $(ENV_TARGET)
+	$(ACTIVATE)
+	python3 -m unittest discover -v -s tests
 
 .PHONY: coverage
-coverage: $(VENV_TARGET)
-	source $(VENV_ACTIVATE)
-	python -m coverage run -m unittest discover -v -s tests
-	python -m coverage xml
+coverage: $(ENV_TARGET)
+	$(ACTIVATE)
+	python3 -m coverage run -m unittest discover -v -s tests
+	python3 -m coverage xml
 
 .PHONY: lint
-lint: $(VENV_TARGET)
-	source $(VENV_ACTIVATE)
-	python -m flake8 --config .flake8
-	python -m pylint tartarus tests
+lint: $(ENV_TARGET)
+	$(ACTIVATE)
+	python3 -m flake8 --config .flake8
+	python3 -m pylint tartarus tests
 
 .PHONY: clean
 clean:

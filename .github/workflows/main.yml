@@ -19,6 +19,12 @@ jobs:
         with:
           python-version: "3.9"
           cache: "pip"
+      - name: configure
+        run: |
+          cat <<EOF >config.mk
+          BUILD_ENV = venv
+          EOF
+          cat config.mk
       - name: Install project dependencies
         run: |
           make venv
