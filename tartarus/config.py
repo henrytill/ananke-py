@@ -1,12 +1,30 @@
 """Configuration."""
 import configparser
 from dataclasses import dataclass
-from distutils import util
 from enum import Enum
 from pathlib import Path
 from typing import Mapping, Optional
 
 from .data import KeyId
+
+
+def strtobool(bool_str: str) -> bool:
+    """Converts a string to a boolean.
+
+    Args:
+        bool_str: The string to convert.
+
+    Returns:
+        The converted boolean.
+
+    Raises:
+        ValueError: If the string is not a valid boolean.
+    """
+    if bool_str.lower() in {'true', 'yes', 'on', '1'}:
+        return True
+    if bool_str.lower() in {'false', 'no', 'off', '0'}:
+        return False
+    raise ValueError(f'Invalid boolean string: {bool_str}')
 
 
 # pylint: disable=too-few-public-methods
@@ -121,7 +139,7 @@ class ConfigBuilder:
         allow_multiple_keys = env.get(Env.ALLOW_MULTIPLE_KEYS)
         if allow_multiple_keys is not None:
             try:
-                self._allow_multiple_keys = bool(util.strtobool(allow_multiple_keys))
+                self._allow_multiple_keys = bool(strtobool(allow_multiple_keys))
             except ValueError:
                 self._allow_multiple_keys = False
 
