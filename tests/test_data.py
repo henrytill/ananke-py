@@ -54,6 +54,10 @@ class TestTimestamp(unittest.TestCase):
             with self.subTest(timestamp=timestamp):
                 self.assertEqual(Timestamp.fromisoformat(timestamp).isoformat(), timestamp)
 
+    def test_inequality_with_non_timestamp(self):
+        """Tests that a 'Timestamp' object is not equal to a non-'Timestamp' object."""
+        self.assertNotEqual(Timestamp.now(), {})
+
 
 class TestCiphertext(unittest.TestCase):
     """Tests for the 'Ciphertext' class."""
@@ -366,6 +370,47 @@ class TestEntry(unittest.TestCase):
         }
 
         self.assertEqual(entry_dict, Entry.from_dict(entry_dict).to_dict())
+
+    def test_inequality(self):
+        """Two Entries are unequal if any of their attributes are unequal."""
+        entry_dict: EntryDict = {
+            'timestamp': '2023-06-12T08:12:08.528402Z',
+            'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
+            'key_id': '371C136C',
+            'description': 'https://www.foomail.com',
+            'identity': 'quux',
+            'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
+            'meta': None,
+        }
+
+        test_cases: EntryDict = {
+            'timestamp': '2023-06-12T08:12:08.528401Z',
+            'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295f',
+            'key_id': '371C136D',
+            'description': 'https://www.foomail.net',
+            'identity': 'qux',
+            'ciphertext': 'hQEMAzc/TVLd4/C8AQgAjAWcRoFoTI6k62fHtArOe6uCyEp6TDlLY5NhGKCRWKxDqggZByPDY59KzX/IqE6UgrQmvRM1yrEGvWVSM8lq43a5m8zDLNLIWVgEv0eUH50oYeB9I2vnL04L6bMPLkCwb19oFD1PUFQ9KqsmTQXyMDHkcXhAXk3mHcki1Ven38edw38Tf6xwrf/ISCSC/wDkgse6E+1+dbsEo5aWy3WWxzAFV+kARu10Mje3U+yGMBSs0Se6E/Z+iRSkCJhwOor//7W//Y0KuKzNrc3S6D4yXXIQ7lQJ33vNPAPCC5FGMwsw/StLRShNH6DHVbAp6Ws42J/9OTexwFitGY08UAX0ENJTAXhUTUGyQ23CIVfDRcWAOdsiikE7Ss37lXjrkJM86PTGrEMmY0psSrfpahkfvnmC2BsLaVTbSqz20t8J3tl5C8nlamu7AoATtDInOJcew+XcqMo=',
+            'meta': 'This is some metadata',
+        }
+
+        for key, value in test_cases.items():
+            with self.subTest(key=key):
+                modified_entry_dict = entry_dict.copy()
+                modified_entry_dict[key] = value
+                self.assertNotEqual(Entry.from_dict(entry_dict), Entry.from_dict(modified_entry_dict))
+
+    def test_inequality_with_non_entry(self):
+        """An Entry is unequal to a non-Entry."""
+        entry_dict: EntryDict = {
+            'timestamp': '2023-06-12T08:12:08.528402Z',
+            'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
+            'key_id': '371C136C',
+            'description': 'https://www.foomail.com',
+            'identity': 'quux',
+            'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
+            'meta': None,
+        }
+        self.assertNotEqual(Entry.from_dict(entry_dict), {})
 
 
 class TestKeyConversion(unittest.TestCase):
