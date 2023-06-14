@@ -1,7 +1,7 @@
 """Core data structures and related functions."""
 import base64
 from datetime import datetime
-from typing import Any, Dict, NewType, Optional, TypedDict
+from typing import NewType, Optional, TypedDict
 
 KeyId = NewType('KeyId', str)
 """Represents a GPG Key Id."""
@@ -154,29 +154,30 @@ class Entry:
         """
         maybe_identity = data.get('Identity')
         maybe_meta = data.get('Meta')
-
+        ciphertext: bytes = base64.b64decode(data['Ciphertext'].encode(encoding='ascii'))
         return cls(
             entry_id=EntryId(data['Id']),
             key_id=KeyId(data['KeyId']),
             timestamp=parse_timestamp(data['Timestamp']),
             description=Description(data['Description']),
             identity=Identity(maybe_identity) if maybe_identity else None,
-            ciphertext=Ciphertext(base64.b64decode(data['Ciphertext'])),
+            ciphertext=Ciphertext(ciphertext),
             meta=Metadata(maybe_meta) if maybe_meta else None,
         )
 
-    def to_ordered_dict(self) -> Dict[str, Any]:
-        """Converts the 'Entry' to an ordered dictionary.
+    def to_dict(self) -> EntryDict:
+        """Converts the 'Entry' to a dictionary.
 
         Returns:
             The converted 'Entry'.
         """
+        ciphertext: str = base64.b64encode(self.ciphertext).decode(encoding='ascii')
         return {
-            'timestamp': self.timestamp.isoformat(),
-            'id': self.entry_id,
-            'keyid': self.key_id,
-            'description': self.description,
-            'identity': self.identity,
-            'ciphertext': self.ciphertext,
-            'meta': self.meta,
+            'Timestamp': self.timestamp.isoformat(),
+            'Id': self.entry_id,
+            'KeyId': self.key_id,
+            'Description': self.description,
+            'Identity': self.identity,
+            'Ciphertext': ciphertext,
+            'Meta': self.meta,
         }
