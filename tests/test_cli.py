@@ -4,7 +4,7 @@ import os
 import unittest
 import unittest.mock
 
-from tartarus import cli
+from tartarus import cli, data
 from tartarus.codec import GpgCodec
 from tartarus.config import ConfigBuilder, OsFamily
 from tartarus.data import Description, Entry, Identity, Plaintext
@@ -27,9 +27,11 @@ class TestLookup(unittest.TestCase):
         plaintext = Plaintext('ASecretPassword')
 
         with open(config.data_file, 'r', encoding='utf-8') as file:
-            data = file.read()
+            json_data = file.read()
 
-        entries: list[Entry] = [Entry.from_dict(entry) for entry in json.loads(data)]
+        entries: list[Entry] = [
+            Entry.from_dict(entry) for entry in json.loads(json_data, object_hook=data.keys_to_snake_case)
+        ]
 
         store = InMemoryStore.from_entries(entries)
 

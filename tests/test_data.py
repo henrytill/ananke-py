@@ -82,13 +82,38 @@ class TestEntryDict(unittest.TestCase):
             }
             """
         )
-        entry_dict: EntryDict = json.loads(entry_json)
-        self.assertEqual(entry_dict['Timestamp'], '2023-06-12T08:13:45.171872642Z')
-        self.assertEqual(entry_dict['Id'], '4de5e12a13844ff0685b2bd51381c5501ea69b6d')
-        self.assertEqual(entry_dict['KeyId'], '371C136C')
-        self.assertEqual(entry_dict['Description'], 'https://www.foomail.com')
-        self.assertEqual(entry_dict['Identity'], 'quux')
-        self.assertEqual(entry_dict.get('Meta'), None)
+        entry_dict: EntryDict = json.loads(entry_json, object_hook=data.keys_to_snake_case)
+        self.assertEqual(entry_dict['timestamp'], '2023-06-12T08:13:45.171872642Z')
+        self.assertEqual(entry_dict['id'], '4de5e12a13844ff0685b2bd51381c5501ea69b6d')
+        self.assertEqual(entry_dict['key_id'], '371C136C')
+        self.assertEqual(entry_dict['description'], 'https://www.foomail.com')
+        self.assertEqual(entry_dict['identity'], 'quux')
+        self.assertEqual(entry_dict.get('meta'), None)
+
+    def test_json_loads_snake_case(self):
+        """An appropriate JSON object can be deserialized into an 'EntryDict' object."""
+        # flake8: noqa: E501
+        # pylint: disable=line-too-long
+        entry_json = textwrap.dedent(
+            """\
+            {
+                "timestamp": "2023-06-12T08:13:45.171872642Z",
+                "id": "4de5e12a13844ff0685b2bd51381c5501ea69b6d",
+                "key_id": "371C136C",
+                "description": "https://www.foomail.com",
+                "identity": "quux",
+                "ciphertext": "hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=",
+                "meta": null
+            }
+            """
+        )
+        entry_dict: EntryDict = json.loads(entry_json, object_hook=data.keys_to_snake_case)
+        self.assertEqual(entry_dict['timestamp'], '2023-06-12T08:13:45.171872642Z')
+        self.assertEqual(entry_dict['id'], '4de5e12a13844ff0685b2bd51381c5501ea69b6d')
+        self.assertEqual(entry_dict['key_id'], '371C136C')
+        self.assertEqual(entry_dict['description'], 'https://www.foomail.com')
+        self.assertEqual(entry_dict['identity'], 'quux')
+        self.assertEqual(entry_dict.get('meta'), None)
 
     def test_json_loads_list(self):
         """A list of appropriate JSON objects can be deserialized into a list of 'EntryDict' objects."""
@@ -127,20 +152,20 @@ class TestEntryDict(unittest.TestCase):
             ]
             """
         )
-        entry_dicts: list[EntryDict] = json.loads(entries_json)
+        entry_dicts: list[EntryDict] = json.loads(entries_json, object_hook=data.keys_to_snake_case)
         self.assertIsInstance(entry_dicts, list)
         self.assertEqual(len(entry_dicts), 3)
         self.assertIsInstance(entry_dicts[0], dict)
 
         for entry_dict in entry_dicts:
             self.assertIsInstance(entry_dict, dict)
-            self.assertIn('Timestamp', entry_dict)
-            self.assertIn('Id', entry_dict)
-            self.assertIn('KeyId', entry_dict)
-            self.assertIn('Description', entry_dict)
-            self.assertIn('Identity', entry_dict)
-            self.assertIn('Ciphertext', entry_dict)
-            self.assertIn('Meta', entry_dict)
+            self.assertIn('timestamp', entry_dict)
+            self.assertIn('id', entry_dict)
+            self.assertIn('key_id', entry_dict)
+            self.assertIn('description', entry_dict)
+            self.assertIn('identity', entry_dict)
+            self.assertIn('ciphertext', entry_dict)
+            self.assertIn('meta', entry_dict)
 
 
 class TestEntry(unittest.TestCase):
@@ -151,23 +176,23 @@ class TestEntry(unittest.TestCase):
         # flake8: noqa: E501
         # pylint: disable=line-too-long
         entry_dict: EntryDict = {
-            'Timestamp': '2023-06-12T08:12:08.528402975Z',
-            'Id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
-            'KeyId': '371C136C',
-            'Description': 'https://www.foomail.com',
-            'Identity': 'quux',
-            'Ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'Meta': None,
+            'timestamp': '2023-06-12T08:12:08.528402975Z',
+            'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
+            'key_id': '371C136C',
+            'description': 'https://www.foomail.com',
+            'identity': 'quux',
+            'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
+            'meta': None,
         }
 
         expected_entry = Entry(
-            timestamp=data.parse_timestamp(entry_dict['Timestamp']),
-            entry_id=EntryId(entry_dict['Id']),
-            key_id=KeyId(entry_dict['KeyId']),
-            description=Description(entry_dict['Description']),
-            identity=Identity(entry_dict['Identity']) if entry_dict['Identity'] is not None else None,
-            ciphertext=Ciphertext.from_base64(entry_dict['Ciphertext']),
-            meta=Metadata(entry_dict['Meta']) if entry_dict['Meta'] is not None else None,
+            timestamp=data.parse_timestamp(entry_dict['timestamp']),
+            entry_id=EntryId(entry_dict['id']),
+            key_id=KeyId(entry_dict['key_id']),
+            description=Description(entry_dict['description']),
+            identity=Identity(entry_dict['identity']) if entry_dict['identity'] is not None else None,
+            ciphertext=Ciphertext.from_base64(entry_dict['ciphertext']),
+            meta=Metadata(entry_dict['meta']) if entry_dict['meta'] is not None else None,
         )
 
         actual_entry = Entry.from_dict(entry_dict)
@@ -184,13 +209,13 @@ class TestEntry(unittest.TestCase):
         # flake8: noqa: E501
         # pylint: disable=line-too-long
         entry_dict: EntryDict = {
-            'Timestamp': '2023-06-12T',
-            'Id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
-            'KeyId': '371C136C',
-            'Description': 'https://www.foomail.com',
-            'Identity': 'quux',
-            'Ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'Meta': None,
+            'timestamp': '2023-06-12T',
+            'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
+            'key_id': '371C136C',
+            'description': 'https://www.foomail.com',
+            'identity': 'quux',
+            'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
+            'meta': None,
         }
 
         with self.assertRaises(ValueError) as context:
@@ -201,13 +226,13 @@ class TestEntry(unittest.TestCase):
     def test_from_dict_with_invalid_ciphertext(self):
         """An Entry cannot be created from a dict with an invalid ciphertext."""
         entry_dict: EntryDict = {
-            'Timestamp': '2023-06-12T08:12:08.528402975Z',
-            'Id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
-            'KeyId': '371C136C',
-            'Description': 'https://www.foomail.com',
-            'Identity': 'quux',
-            'Ciphertext': 'zzzzzz',
-            'Meta': None,
+            'timestamp': '2023-06-12T08:12:08.528402975Z',
+            'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
+            'key_id': '371C136C',
+            'description': 'https://www.foomail.com',
+            'identity': 'quux',
+            'ciphertext': 'zzzzzz',
+            'meta': None,
         }
 
         with self.assertRaises(ValueError) as context:
@@ -220,16 +245,16 @@ class TestEntry(unittest.TestCase):
         # flake8: noqa: E501
         # pylint: disable=line-too-long
         base_dict = {
-            'Timestamp': '2023-06-12T08:12:08.528402975Z',
-            'Id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
-            'KeyId': '371C136C',
-            'Description': 'https://www.foomail.com',
-            'Identity': 'quux',
-            'Ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'Meta': None,
+            'timestamp': '2023-06-12T08:12:08.528402975Z',
+            'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
+            'key_id': '371C136C',
+            'description': 'https://www.foomail.com',
+            'identity': 'quux',
+            'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
+            'meta': None,
         }
 
-        required_keys = ['Timestamp', 'Id', 'KeyId', 'Description', 'Ciphertext']
+        required_keys = ['timestamp', 'id', 'key_id', 'description', 'ciphertext']
 
         for key in required_keys:
             with self.subTest(missing_key=key):
@@ -240,6 +265,32 @@ class TestEntry(unittest.TestCase):
                     Entry.from_dict(entry_dict)  # type: ignore
 
                 self.assertEqual(f'Invalid entry format: missing required key "{key}"', str(context.exception))
+
+
+class TestKeyConversion(unittest.TestCase):
+    """Unit tests for the key conversion functions."""
+
+    def test_camel_to_snake(self):
+        """Test that camel case strings are converted to snake case correctly."""
+        self.assertEqual(data.convert_to_snake('CCase'), 'c_case')
+        self.assertEqual(data.convert_to_snake('CamelCase'), 'camel_case')
+        self.assertEqual(data.convert_to_snake('camelCase'), 'camel_case')
+        self.assertEqual(data.convert_to_snake('camel2Case'), 'camel2_case')
+        self.assertEqual(data.convert_to_snake('CamelCamelCamel'), 'camel_camel_camel')
+        self.assertEqual(data.convert_to_snake('Camel2Camel2Camel'), 'camel2_camel2_camel')
+        self.assertEqual(data.convert_to_snake('already'), 'already')
+        self.assertEqual(data.convert_to_snake('already2'), 'already2')
+        self.assertEqual(data.convert_to_snake('already_2'), 'already_2')
+        self.assertEqual(data.convert_to_snake('already_snake'), 'already_snake')
+        self.assertEqual(data.convert_to_snake('already_snake_case'), 'already_snake_case')
+
+    def test_keys_to_snake_case(self):
+        """Test that dictionary keys are converted from camel case to snake case correctly."""
+        test_dict = {'CamelCase': 1, 'camelCase': 2, 'Camel2Camel2Camel': 3, 'already_snake_case': 4}
+        converted = data.keys_to_snake_case(test_dict)
+        # pylint: disable=duplicate-key
+        expected = {'camel_case': 1, 'camel_case': 2, 'camel2_camel2_camel': 3, 'already_snake_case': 4}
+        self.assertDictEqual(converted, expected)
 
 
 # pylint: disable=unused-argument, missing-function-docstring
