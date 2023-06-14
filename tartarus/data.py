@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, NewType, Optional, TypedDict
 
 KeyId = NewType('KeyId', str)
-"""Represents a GPG Key Id."""
+"""A GPG Key Id."""
 
 EntryId = NewType('EntryId', str)
 """Uniquely identifies an 'Entry'."""
@@ -17,14 +17,14 @@ Description = NewType('Description', str)
 """Describes an 'Entry'. Can be a URI or a descriptive name."""
 
 Identity = NewType('Identity', str)
-"""Represents an identifying value, such as the username in a username/password pair."""
+"""An identifying value, such as the username in a username/password pair."""
 
 Metadata = NewType('Metadata', str)
 """Contains additional non-specific information for an 'Entry'."""
 
 
 class Timestamp:
-    """Represents a UTC timestamp."""
+    """A UTC timestamp."""
 
     def __init__(self, timestamp: datetime):
         self.timestamp = timestamp
@@ -65,7 +65,7 @@ class Timestamp:
 
 
 class Ciphertext(bytes):
-    """Holds the encrypted value of an 'Entry'."""
+    """An encrypted value of an 'Entry'."""
 
     def __new__(cls, value: bytes):
         return super().__new__(cls, value)
@@ -98,7 +98,7 @@ class Ciphertext(bytes):
 
 
 class Plaintext(str):
-    """Holds a plaintext value."""
+    """A plaintext value."""
 
     def __new__(cls, value: str) -> 'Plaintext':
         return super().__new__(cls, value)
