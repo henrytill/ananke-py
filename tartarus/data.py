@@ -142,6 +142,19 @@ class Entry:
     def __hash__(self) -> int:
         return hash(self.entry_id)
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Entry):
+            return NotImplemented
+        return (
+            self.timestamp == other.timestamp
+            and self.entry_id == other.entry_id
+            and self.key_id == other.key_id
+            and self.description == other.description
+            and self.identity == other.identity
+            and self.ciphertext == other.ciphertext
+            and self.meta == other.meta
+        )
+
     @classmethod
     def from_dict(cls, data: EntryDict) -> 'Entry':
         """Creates an 'Entry' from a dictionary.
@@ -152,13 +165,33 @@ class Entry:
         Returns:
             The created 'Entry'.
         """
+        # Check required keys
+        check_keys = {'Id', 'KeyId', 'Timestamp', 'Description', 'Ciphertext'}
+        for key in check_keys:
+            if key not in data:
+                raise ValueError(f'Invalid entry format: missing required key "{key}"')
+
+        # Validate the timestamp
+        timestamp_str = data['Timestamp']
+        try:
+            timestamp = parse_timestamp(timestamp_str)
+        except ValueError as err:
+            raise ValueError('Invalid timestamp format') from err
+
+        # Validate the ciphertext
+        ciphertext_str = data['Ciphertext']
+        try:
+            ciphertext = base64.b64decode(ciphertext_str.encode(encoding='ascii'))
+        except ValueError as err:
+            raise ValueError('Invalid ciphertext format') from err
+
         maybe_identity = data.get('Identity')
         maybe_meta = data.get('Meta')
-        ciphertext: bytes = base64.b64decode(data['Ciphertext'].encode(encoding='ascii'))
+
         return cls(
             entry_id=EntryId(data['Id']),
             key_id=KeyId(data['KeyId']),
-            timestamp=parse_timestamp(data['Timestamp']),
+            timestamp=timestamp,
             description=Description(data['Description']),
             identity=Identity(maybe_identity) if maybe_identity else None,
             ciphertext=Ciphertext(ciphertext),
