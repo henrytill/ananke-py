@@ -245,7 +245,7 @@ class Entry:
             timestamp=timestamp,
             description=Description(data['description']),
             identity=Identity(maybe_identity) if maybe_identity else None,
-            ciphertext=Ciphertext(ciphertext),
+            ciphertext=ciphertext,
             meta=Metadata(maybe_meta) if maybe_meta else None,
         )
 
