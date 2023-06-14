@@ -1,5 +1,4 @@
 """Tests for the 'data' module."""
-import base64
 import datetime
 import doctest
 import json
@@ -167,7 +166,7 @@ class TestEntry(unittest.TestCase):
             key_id=KeyId(entry_dict['KeyId']),
             description=Description(entry_dict['Description']),
             identity=Identity(entry_dict['Identity']) if entry_dict['Identity'] is not None else None,
-            ciphertext=Ciphertext(base64.b64decode(entry_dict['Ciphertext'])),
+            ciphertext=Ciphertext.from_base64(entry_dict['Ciphertext']),
             meta=Metadata(entry_dict['Meta']) if entry_dict['Meta'] is not None else None,
         )
 

@@ -1,5 +1,8 @@
 """Core data structures and related functions."""
 import base64
+import binascii
+import secrets
+import string
 from datetime import datetime
 from typing import NewType, Optional, TypedDict
 
@@ -15,15 +18,82 @@ Description = NewType('Description', str)
 Identity = NewType('Identity', str)
 """Represents an identifying value, such as the username in a username/password pair."""
 
-Ciphertext = NewType('Ciphertext', bytes)
-"""Holds the encrypted value of an 'Entry'."""
-
-Plaintext = NewType('Plaintext', str)
-"""Holds a plaintext value."""
-
-
 Metadata = NewType('Metadata', str)
 """Contains additional non-specific information for an 'Entry'."""
+
+
+class Ciphertext(bytes):
+    """Holds the encrypted value of an 'Entry'."""
+
+    def __new__(cls, value: bytes):
+        return super().__new__(cls, value)
+
+    @classmethod
+    def from_base64(cls, value: str) -> 'Ciphertext':
+        """Creates a Ciphertext object from a base64 encoded string.
+
+        Args:
+            value: The base64 encoded string.
+
+        Returns:
+            The Ciphertext object.
+
+        Raises:
+            ValueError: If the value is not a valid base64 encoded string.
+        """
+        try:
+            return cls(base64.b64decode(value.encode('ascii')))
+        except binascii.Error as exc:
+            raise ValueError("Invalid base64 string") from exc
+
+    def to_base64(self) -> str:
+        """Encodes the Ciphertext object as a base64 string.
+
+        Returns:
+            The base64 encoded string.
+        """
+        return base64.b64encode(self).decode('ascii')
+
+
+class Plaintext(str):
+    """Holds a plaintext value."""
+
+    def __new__(cls, value: str) -> 'Plaintext':
+        return super().__new__(cls, value)
+
+    # pylint: disable=too-many-arguments
+    @classmethod
+    def random(
+        cls,
+        length: int,
+        use_lowercase: bool = True,
+        use_uppercase: bool = True,
+        use_digits: bool = True,
+        use_punctuation: bool = False,
+    ) -> 'Plaintext':
+        """Generates a random Plaintext of a given length.
+
+        Args:
+            length: The length of the generated string.
+            use_lowercase: Whether to use lowercase letters.
+            use_uppercase: Whether to use uppercase letters.
+            use_digits: Whether to use digits.
+            use_punctuation: Whether to use punctuation.
+
+        Returns:
+            A random Plaintext of the specified length.
+        """
+        chars = ""
+        if use_lowercase:
+            chars += string.ascii_lowercase
+        if use_uppercase:
+            chars += string.ascii_uppercase
+        if use_digits:
+            chars += string.digits
+        if use_punctuation:
+            chars += string.punctuation
+
+        return cls(''.join(secrets.choice(chars) for _ in range(length)))
 
 
 def parse_timestamp(timestamp: str) -> datetime:
@@ -181,7 +251,7 @@ class Entry:
         # Validate the ciphertext
         ciphertext_str = data['Ciphertext']
         try:
-            ciphertext = base64.b64decode(ciphertext_str.encode(encoding='ascii'))
+            ciphertext = Ciphertext.from_base64(ciphertext_str)
         except ValueError as err:
             raise ValueError('Invalid ciphertext format') from err
 
@@ -204,13 +274,12 @@ class Entry:
         Returns:
             The converted 'Entry'.
         """
-        ciphertext: str = base64.b64encode(self.ciphertext).decode(encoding='ascii')
         return {
             'Timestamp': self.timestamp.isoformat(),
             'Id': self.entry_id,
             'KeyId': self.key_id,
             'Description': self.description,
             'Identity': self.identity,
-            'Ciphertext': ciphertext,
+            'Ciphertext': self.ciphertext.to_base64(),
             'Meta': self.meta,
         }
