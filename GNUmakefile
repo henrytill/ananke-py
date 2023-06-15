@@ -4,6 +4,8 @@
 SHELL = /bin/bash
 .SHELLFLAGS += -e
 
+PYTHON = python3
+
 BUILD_ENV = host
 
 VENV = env
@@ -15,7 +17,7 @@ ENV_TARGET = $(VENV)/pyvenv.cfg
 ACTIVATE = source $(VENV)/bin/activate
 else
 ENV_TARGET = /dev/null
-ACTIVATE = which python3
+ACTIVATE = which $(PYTHON)
 endif
 
 .PHONY: all
@@ -23,11 +25,11 @@ all: check
 
 ifeq ($(BUILD_ENV), venv)
 $(ENV_TARGET): pyproject.toml
-	python3 -m venv $(VENV)
+	$(PYTHON) -m venv $(VENV)
 	$(ACTIVATE)
-	which python3
-	python3 -m pip install --upgrade pip
-	python3 -m pip install -e .[test,dev]
+	which $(PYTHON)
+	$(PYTHON) -m pip install --upgrade pip
+	$(PYTHON) -m pip install -e .[test,dev]
 else
 $(ENV_TARGET):
 endif
@@ -38,19 +40,19 @@ venv: $(ENV_TARGET)
 .PHONY: check
 check: $(ENV_TARGET)
 	$(ACTIVATE)
-	python3 -m unittest discover -v -s tests
+	$(PYTHON) -m unittest discover -v -s tests
 
 .PHONY: coverage
 coverage: $(ENV_TARGET)
 	$(ACTIVATE)
-	python3 -m coverage run -m unittest discover -v -s tests
-	python3 -m coverage xml
+	$(PYTHON) -m coverage run -m unittest discover -v -s tests
+	$(PYTHON) -m coverage xml
 
 .PHONY: lint
 lint: $(ENV_TARGET)
 	$(ACTIVATE)
-	python3 -m flake8 --config .flake8
-	python3 -m pylint tartarus tests
+	$(PYTHON) -m flake8 --config .flake8
+	$(PYTHON) -m pylint tartarus tests
 
 .PHONY: clean
 clean:
