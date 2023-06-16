@@ -18,6 +18,7 @@ ACTIVATE = source $(VENV)/bin/activate
 else
 ENV_TARGET = /dev/null
 ACTIVATE = which $(PYTHON)
+BUILD_FLAGS = --no-isolation
 endif
 
 .PHONY: all
@@ -54,9 +55,13 @@ lint: $(ENV_TARGET)
 	$(PYTHON) -m flake8 --config .flake8
 	$(PYTHON) -m pylint tartarus tests
 
+dist:
+	$(PYTHON) -m build $(BUILD_FLAGS)
+
 .PHONY: clean
 clean:
 	rm -rf $(VENV)
+	rm -rf dist
 	rm -rf *.egg-info
 	rm -f .coverage
 	rm -f coverage.xml
