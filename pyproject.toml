@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=52.0"]         # debian bullseye version
+requires = ["setuptools>=52.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,8 +11,8 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
-dev = ["flake8>=6.0.0", "black>=23.3.0", "pylint>=2.17"]
-test = ["coverage>=5.1"]
+dev = ["flake8>=5.0.4", "black>=23.1.0", "pylint>=2.16.2"]
+test = ["coverage>=6.5.0"]
 
 [project.scripts]
 tartarus = "tartarus.__main__:main"
