@@ -108,7 +108,6 @@ class Plaintext(str):
     def random(
         cls,
         length: int,
-        use_lowercase: bool = True,
         use_uppercase: bool = True,
         use_digits: bool = True,
         use_punctuation: bool = False,
@@ -125,9 +124,7 @@ class Plaintext(str):
         Returns:
             A random Plaintext of the specified length.
         """
-        chars = ""
-        if use_lowercase:
-            chars += string.ascii_lowercase
+        chars = string.ascii_lowercase
         if use_uppercase:
             chars += string.ascii_uppercase
         if use_digits:
@@ -135,7 +132,9 @@ class Plaintext(str):
         if use_punctuation:
             chars += string.punctuation
 
-        return cls(''.join(secrets.choice(chars) for _ in range(length)))
+        ret = cls(''.join(secrets.choice(chars) for _ in range(length)))
+
+        return cls(ret)
 
 
 class EntryDict(TypedDict):

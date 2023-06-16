@@ -1,90 +1,101 @@
 """Tests for the GpgCodec class."""
-import subprocess
+import os
+import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
+from pathlib import Path
+from typing import Tuple
 
 from tartarus.codec import GpgCodec
 from tartarus.data import Ciphertext, KeyId, Plaintext
 
 
 class TestGpgCodec(unittest.TestCase):
-    """Test cases for the GpgCodec class.
+    """Test cases for the GpgCodec class."""
 
-    These tests use the unittest.mock.patch function to replace the subprocess.run
-    function with a mock, allowing the tests to run without actually invoking GPG.
-    """
+    def setUp(self) -> None:
+        self.key_id = KeyId('371C136C')
+        self.codec = GpgCodec(self.key_id)
+        os.environ['GNUPGHOME'] = str(Path.cwd() / 'example' / 'gnupg')
 
-    @patch('subprocess.run')
-    def test_encode(self, mock_run: MagicMock):
-        """Tests the encode method.
+    def test_encode_decode(self):
+        """Tests the encode and decode methods."""
+        test_cases = [
+            "ASecretPassword",
+            "AnotherSecretPassword",
+            "YetAnotherSecretPassword",
+        ]
 
-        This test checks that the encode method correctly calls subprocess.run with the
-        expected arguments and correctly creates a Ciphertext object from the output.
-        """
-        mock_run.return_value.stdout = b'encoded_text'
+        for test_case in test_cases:
+            with self.subTest(test_case=test_case):
+                plaintext = Plaintext(test_case)
+                ciphertext = self.codec.encode(plaintext)
+                self.assertIsInstance(ciphertext, Ciphertext)
+                decoded_plaintext = self.codec.decode(ciphertext)
+                self.assertEqual(decoded_plaintext, plaintext)
 
-        codec = GpgCodec(KeyId('key_id'))
-        result = codec.encode(Plaintext('hello'))
+    def test_encode_decode_random(self):
+        """Tests the encode and decode methods with random data."""
+        test_cases: list[Tuple[int, bool, bool, bool]] = [
+            (24, True, True, True),
+            (24, True, True, False),
+            (24, True, False, True),
+            (24, True, False, False),
+            (24, False, True, True),
+            (24, False, True, False),
+            (24, False, False, True),
+            (24, False, False, False),
+            (24, True, True, True),
+            (24, True, True, False),
+            (24, True, False, True),
+            (24, True, False, False),
+            (24, False, True, True),
+            (24, False, True, False),
+            (24, False, False, True),
+            (24, False, False, False),
+            (48, True, True, True),
+            (48, True, True, False),
+            (48, True, False, True),
+            (48, True, False, False),
+            (48, False, True, True),
+            (48, False, True, False),
+            (48, False, False, True),
+            (48, False, False, False),
+            (48, True, True, True),
+            (48, True, True, False),
+            (48, True, False, True),
+            (48, True, False, False),
+            (48, False, True, True),
+            (48, False, True, False),
+            (48, False, False, True),
+            (48, False, False, False),
+        ]
 
-        self.assertEqual(result, Ciphertext(b'encoded_text'))
-        mock_run.assert_called_once_with(
-            ['gpg', '--batch', '--encrypt', '--recipient', 'key_id'], input=b'hello', capture_output=True, check=True
-        )
+        for test_case in test_cases:
+            with self.subTest(test_case=test_case):
+                plaintext = Plaintext.random(*test_case)
+                ciphertext = self.codec.encode(plaintext)
+                self.assertIsInstance(ciphertext, Ciphertext)
+                decoded_plaintext = self.codec.decode(ciphertext)
+                self.assertEqual(decoded_plaintext, plaintext)
 
-    @patch('subprocess.run')
-    def test_decode(self, mock_run: MagicMock):
-        """Tests the decode method.
+    def test_encode_failure(self):
+        """Tests the encode method with a bogus GNUPGHOME environment variable."""
+        os.environ['GNUPGHOME'] = tempfile.mkdtemp()
+        with self.assertRaises(ValueError):
+            self.codec.encode(Plaintext('test'))
 
-        This test checks that the decode method correctly calls subprocess.run with the
-        expected arguments and correctly creates a Plaintext object from the output.
-        """
-        mock_run.return_value.stdout = b'decoded_text'
-
-        codec = GpgCodec(KeyId('key_id'))
-        result = codec.decode(Ciphertext(b'hello'))
-
-        self.assertEqual(result, Plaintext('decoded_text'))
-        mock_run.assert_called_once_with(
-            ['gpg', '--batch', '--decrypt'], input=b'hello', capture_output=True, check=True
-        )
-
-    @patch('subprocess.run')
-    def test_encode_failure(self, mock_run: MagicMock):
-        """Tests the encode method when subprocess.run raises an exception.
-
-        This test checks that the encode method raises a ValueError with the expected
-        message when subprocess.run raises a CalledProcessError.
-        """
-        mock_run.side_effect = subprocess.CalledProcessError(1, 'cmd', stderr=b'error_message')
-
-        codec = GpgCodec(KeyId('key_id'))
-        with self.assertRaises(ValueError) as context:
-            codec.encode(Plaintext('hello'))
-
-        self.assertEqual(str(context.exception), 'Could not encode Plaintext: error_message')
-
-    @patch('subprocess.run')
-    def test_decode_failure(self, mock_run: MagicMock):
-        """Tests the decode method when subprocess.run raises an exception.
-
-        This test checks that the decode method raises a ValueError with the expected
-        message when subprocess.run raises a CalledProcessError.
-        """
-        mock_run.side_effect = subprocess.CalledProcessError(1, 'cmd', stderr=b'error_message')
-
-        codec = GpgCodec(KeyId('key_id'))
-        with self.assertRaises(ValueError) as context:
-            codec.decode(Ciphertext(b'hello'))
-
-        self.assertEqual(str(context.exception), 'Could not decode Ciphertext: error_message')
+    def test_decode_failure(self):
+        """Tests the decode method with a bogus GNUPGHOME environment variable."""
+        os.environ['GNUPGHOME'] = tempfile.mkdtemp()
+        with self.assertRaises(ValueError):
+            self.codec.decode(Ciphertext(b'test'))
 
     def test_key_id_getter(self) -> None:
         """Tests the key_id getter.
 
         This test checks that the getter of the key_id property returns the correct KeyId.
         """
-        codec = GpgCodec(KeyId('original_key_id'))
-        self.assertEqual(codec.key_id, KeyId('original_key_id'))
+        self.assertEqual(self.codec.key_id, self.key_id)
 
     def test_key_id_setter(self) -> None:
         """Tests the key_id setter.
