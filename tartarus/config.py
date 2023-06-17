@@ -94,6 +94,12 @@ class Backend(Enum):
         except KeyError as exc:
             raise ValueError(f'Invalid Backend string: {backend_str}') from exc
 
+    def __str__(self) -> str:
+        return {
+            self.SQLITE: 'sqlite',
+            self.JSON: 'json',
+        }[self]
+
 
 class ConfigBuilder:
     """A configuration builder."""

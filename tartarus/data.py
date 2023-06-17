@@ -2,16 +2,14 @@
 import base64
 import binascii
 import functools
+import hashlib
 import secrets
 import string
 from datetime import datetime, timezone
 from typing import Any, Dict, NewType, Optional, TypedDict
 
 KeyId = NewType('KeyId', str)
-"""A GPG Key Id."""
-
-EntryId = NewType('EntryId', str)
-"""Uniquely identifies an 'Entry'."""
+"""A Cryptographic Key Id."""
 
 Description = NewType('Description', str)
 """Describes an 'Entry'. Can be a URI or a descriptive name."""
@@ -58,10 +56,47 @@ class Timestamp:
             return False
         return self.timestamp == value.timestamp
 
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, Timestamp):
+            raise TypeError(f"'<' not supported between instances of 'Timestamp' and '{type(other).__name__}'")
+        return self.timestamp < other.timestamp
+
     @property
     def value(self) -> datetime:
         """Returns the timestamp value."""
         return self.timestamp
+
+
+class EntryId(str):
+    """Uniquely identifies an 'Entry'."""
+
+    def __new__(cls, value: str):
+        return super().__new__(cls, value)
+
+    @classmethod
+    def generate(
+        cls,
+        key_id: KeyId,
+        timestamp: Timestamp,
+        description: Description,
+        maybe_identity: Optional[Identity] = None,
+    ) -> 'EntryId':
+        """Generates an EntryId from the given values.
+
+        Args:
+            key_id: The GPG Key Id used for encryption.
+            timestamp: The time the entry was created or updated.
+            description: Description of the entry. Can be a URI or a descriptive name.
+            maybe_identity: Optional identifying value, such as a username.
+
+        Returns:
+            The generated EntryId.
+        """
+        input_str = f'{key_id}{timestamp.isoformat()}{description}'
+        if maybe_identity:
+            input_str += maybe_identity
+        sha_signature = hashlib.sha1(input_str.encode()).hexdigest()
+        return cls(sha_signature)
 
 
 class Ciphertext(bytes):

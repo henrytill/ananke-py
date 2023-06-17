@@ -1,8 +1,11 @@
 """The InMemoryStore class."""
+import json
 from collections import defaultdict
+from pathlib import Path
 
-from ..data import Description, Entry, KeyId
-from .abstract_store import AbstractStore, Query
+from .. import data
+from ..data import Description, Entry, EntryDict, KeyId
+from .abstract_store import AbstractReader, AbstractStore, AbstractWriter, Query
 
 
 class EntryMap(defaultdict[Description, set[Entry]]):
@@ -65,23 +68,23 @@ class InMemoryStore(AbstractStore):
     """
 
     _storage: EntryMap
+    _dirty: bool
 
     def __init__(self):
         self._storage = EntryMap()
+        self._dirty = False
 
-    @classmethod
-    def from_entries(cls, entries: list[Entry]) -> 'InMemoryStore':
-        """Creates an in-memory store from a list of entries."""
-        store = cls()
-        for entry in entries:
-            store.put(entry)
-        return store
+    def init(self, reader: AbstractReader) -> None:
+        for entry in reader.read():
+            self._storage.add(entry)
 
     def put(self, entry: Entry) -> None:
         self._storage.add(entry)
+        self._dirty = True
 
     def remove(self, entry: Entry) -> None:
         self._storage.discard(entry)
+        self._dirty = True
 
     def query(self, query: Query) -> list[Entry]:
         query = InMemoryQuery(query)
@@ -101,3 +104,40 @@ class InMemoryStore(AbstractStore):
 
     def get_count_of_key_id(self, key_id: KeyId) -> int:
         return sum(entry.key_id == key_id for entries in self._storage.values() for entry in entries)
+
+    def sync(self, writer: AbstractWriter) -> None:
+        if self._dirty:
+            entries = self.select_all()
+            writer.write(entries)
+            self._dirty = False
+
+
+# pylint: disable=too-few-public-methods
+class JsonFileReader(AbstractReader):
+    """A JSON file reader."""
+
+    def __init__(self, file: Path):
+        self._file = file
+
+    def read(self) -> list[Entry]:
+        """Reads entries from a JSON file"""
+        with open(self._file, 'r', encoding='utf-8') as file:
+            json_data = file.read()
+            dicts = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
+            return [Entry.from_dict(d) for d in dicts]
+
+
+# pylint: disable=too-few-public-methods
+class JsonFileWriter(AbstractWriter):
+    """A JSON file writer."""
+
+    def __init__(self, file: Path):
+        self._file = file
+
+    def write(self, entries: list[Entry]) -> None:
+        """Writes entries to a JSON file"""
+        entries.sort(key=lambda entry: entry.timestamp)
+        dicts: list[EntryDict] = [entry.to_dict() for entry in entries]
+        with open(self._file, 'w', encoding='utf-8') as file:
+            json_str = json.dumps(dicts, indent=4)
+            file.write(json_str)

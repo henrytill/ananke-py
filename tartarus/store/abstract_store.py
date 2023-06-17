@@ -57,8 +57,30 @@ class Query:
         return self.__meta
 
 
+# pylint: disable=too-few-public-methods
+class AbstractReader(ABC):
+    """An abstract reader."""
+
+    @abstractmethod
+    def read(self) -> list[Entry]:
+        """Reads."""
+
+
+# pylint: disable=too-few-public-methods
+class AbstractWriter(ABC):
+    """An abstract writer."""
+
+    @abstractmethod
+    def write(self, entries: list[Entry]) -> None:
+        """Writes."""
+
+
 class AbstractStore(ABC):
     """An abstract store."""
+
+    @abstractmethod
+    def init(self, reader: AbstractReader) -> None:
+        """Initializes the store."""
 
     @abstractmethod
     def put(self, entry: Entry) -> None:
@@ -83,6 +105,10 @@ class AbstractStore(ABC):
     @abstractmethod
     def get_count_of_key_id(self, key_id: KeyId) -> int:
         """Returns the count of entries for a specific key id."""
+
+    @abstractmethod
+    def sync(self, writer: AbstractWriter) -> None:
+        """Synchronizes the store."""
 
 
 SchemaVersion = NewType('SchemaVersion', int)

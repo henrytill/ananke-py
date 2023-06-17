@@ -1,14 +1,24 @@
 """An abstract codec."""
 from abc import ABC, abstractmethod
 
-from ..data import Ciphertext, Plaintext
+from ..data import Ciphertext, KeyId, Plaintext
 
 
 class AbstractCodec(ABC):
     """An abstract codec.
 
-    This class is used to encode Plaintexts and decode Ciphertexts.
+    This class is used to cryptographically encode Plaintexts and decode Ciphertexts.
     """
+
+    @property
+    @abstractmethod
+    def key_id(self) -> KeyId:
+        """Returns the cryptographic key used by the codec"""
+
+    @key_id.setter
+    @abstractmethod
+    def key_id(self, key_id: KeyId) -> None:
+        """Sets the cryptographic key used by the codec"""
 
     @abstractmethod
     def encode(self, plaintext: Plaintext) -> Ciphertext:
