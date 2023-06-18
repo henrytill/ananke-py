@@ -3,7 +3,7 @@ import configparser
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Mapping, Optional
+from typing import Mapping, Optional, Self
 
 from .data import KeyId
 
@@ -101,6 +101,32 @@ class Backend(Enum):
         }[self]
 
 
+@dataclass(frozen=True)
+class Config:
+    """A configuration object.
+
+    Attributes:
+        data_dir: The directory where the data is stored.
+        backend: The backend used to store the data.
+        key_id: The key ID used to encrypt the data.
+        allow_multiple_keys: Whether multiple keys are allowed to encrypt the data.
+    """
+
+    data_dir: Path
+    backend: Backend
+    key_id: KeyId
+    allow_multiple_keys: bool
+
+    @property
+    def data_file(self) -> Path:
+        """Returns the path to the data file.
+
+        Returns:
+            The path to the data file.
+        """
+        return self.data_dir / 'db' / 'data.json'
+
+
 class ConfigBuilder:
     """A configuration builder."""
 
@@ -121,7 +147,7 @@ class ConfigBuilder:
         self._key_id = key_id
         self._allow_multiple_keys = allow_multiple_keys
 
-    def with_env(self, env: Mapping[str, str]) -> 'ConfigBuilder':
+    def with_env(self, env: Mapping[str, str]) -> Self:
         """Updates unset attributes from environment variables.
 
         Args:
@@ -151,7 +177,7 @@ class ConfigBuilder:
 
         return self
 
-    def with_config(self, config: str) -> 'ConfigBuilder':
+    def with_config(self, config: str) -> Self:
         """Updates unset attributes from the string representation of a configuration file.
 
         Args:
@@ -181,7 +207,7 @@ class ConfigBuilder:
 
         return self
 
-    def with_defaults(self, os_family: OsFamily, env: Mapping[str, str]) -> 'ConfigBuilder':
+    def with_defaults(self, os_family: OsFamily, env: Mapping[str, str]) -> Self:
         """Updates unset attributes with default values.
 
         Args:
@@ -209,7 +235,7 @@ class ConfigBuilder:
 
         return self
 
-    def build(self) -> 'Config':
+    def build(self) -> Config:
         """Builds a configuration object.
 
         Returns:
@@ -237,32 +263,6 @@ class ConfigBuilder:
 
         # Return the configuration
         return config
-
-
-@dataclass(frozen=True)
-class Config:
-    """A configuration object.
-
-    Attributes:
-        data_dir: The directory where the data is stored.
-        backend: The backend used to store the data.
-        key_id: The key ID used to encrypt the data.
-        allow_multiple_keys: Whether multiple keys are allowed to encrypt the data.
-    """
-
-    data_dir: Path
-    backend: Backend
-    key_id: KeyId
-    allow_multiple_keys: bool
-
-    @property
-    def data_file(self) -> Path:
-        """Returns the path to the data file.
-
-        Returns:
-            The path to the data file.
-        """
-        return self.data_dir / 'db' / 'data.json'
 
 
 def get_config_dir(os_family: OsFamily, env: Mapping[str, str]) -> Path:

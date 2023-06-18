@@ -1,7 +1,7 @@
 """The main application module."""
 from contextlib import AbstractContextManager
 from types import TracebackType
-from typing import Optional, Tuple, Type
+from typing import Optional, Self, Tuple, Type
 
 from .codec import AbstractCodec
 from .data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
@@ -23,7 +23,7 @@ class Application(AbstractContextManager['Application']):
         self._writer = writer
         self._codec = codec
 
-    def __enter__(self) -> 'Application':
+    def __enter__(self) -> Self:
         self.init()
         return self
 
@@ -33,11 +33,15 @@ class Application(AbstractContextManager['Application']):
         _exc_value: Optional[BaseException],
         _traceback: Optional[TracebackType],
     ) -> None:
-        self._store.sync(self._writer)
+        self.sync()
 
     def init(self) -> None:
         """Initialize the store."""
         self._store.init(self._reader)
+
+    def sync(self) -> None:
+        """Synchronize the store."""
+        self._store.sync(self._writer)
 
     def add(
         self,

@@ -6,7 +6,7 @@ import hashlib
 import secrets
 import string
 from datetime import datetime, timezone
-from typing import Any, Dict, NewType, Optional, TypedDict
+from typing import Any, Dict, NewType, Optional, Self, TypedDict
 
 KeyId = NewType('KeyId', str)
 """A Cryptographic Key Id."""
@@ -28,12 +28,12 @@ class Timestamp:
         self.timestamp = timestamp
 
     @classmethod
-    def now(cls) -> 'Timestamp':
+    def now(cls) -> Self:
         """Creates a Timestamp object with the current time."""
         return cls(datetime.now(timezone.utc))
 
     @classmethod
-    def fromisoformat(cls, timestamp: str) -> 'Timestamp':
+    def fromisoformat(cls, timestamp: str) -> Self:
         """Creates a Timestamp object from an ISO 8601 string.
 
         Args:
@@ -80,7 +80,7 @@ class EntryId(str):
         timestamp: Timestamp,
         description: Description,
         maybe_identity: Optional[Identity] = None,
-    ) -> 'EntryId':
+    ) -> Self:
         """Generates an EntryId from the given values.
 
         Args:
@@ -106,7 +106,7 @@ class Ciphertext(bytes):
         return super().__new__(cls, value)
 
     @classmethod
-    def from_base64(cls, value: str) -> 'Ciphertext':
+    def from_base64(cls, value: str) -> Self:
         """Creates a Ciphertext object from a base64 encoded string.
 
         Args:
@@ -135,7 +135,7 @@ class Ciphertext(bytes):
 class Plaintext(str):
     """A plaintext value."""
 
-    def __new__(cls, value: str) -> 'Plaintext':
+    def __new__(cls, value: str) -> Self:
         return super().__new__(cls, value)
 
     # pylint: disable=too-many-arguments
@@ -146,7 +146,7 @@ class Plaintext(str):
         use_uppercase: bool = True,
         use_digits: bool = True,
         use_punctuation: bool = False,
-    ) -> 'Plaintext':
+    ) -> Self:
         """Generates a random Plaintext of a given length.
 
         Args:
@@ -241,7 +241,7 @@ class Entry:
         )
 
     @classmethod
-    def from_dict(cls, data: EntryDict) -> 'Entry':
+    def from_dict(cls, data: EntryDict) -> Self:
         """Creates an 'Entry' from a dictionary.
 
         Args:

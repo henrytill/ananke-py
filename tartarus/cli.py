@@ -14,7 +14,7 @@ from .store import InMemoryStore, JsonFileReader, JsonFileWriter
 def setup_application(
     host_os: OsFamily,
     env: Mapping[str, str],
-) -> 'Application':
+) -> Application:
     """Sets up the application with necessary dependencies.
 
     This includes setting up an in-memory store, creating a configuration object
