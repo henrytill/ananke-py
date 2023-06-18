@@ -304,6 +304,7 @@ class TestApplication(unittest.TestCase):
         test_cases: list[Description | EntryId] = [
             Description('https://www.foomail.com'),
             Description('https://www.bazbank.com'),
+            Description('https://www.barphone.com'),
         ]
 
         with self.application as app:
