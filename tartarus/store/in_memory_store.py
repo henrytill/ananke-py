@@ -91,12 +91,9 @@ class InMemoryStore(AbstractStore):
         return [
             entry
             for description, entries in self._storage.items()
-            if (query.match_description(description) if query.description is not None else True)
+            if query.match_description(description)
             for entry in entries
-            if (query.match_id(entry) if query.entry_id is not None else True)
-            and query.match_id(entry)
-            and query.match_identity(entry)
-            and query.match_meta(entry)
+            if query.match_id(entry) and query.match_identity(entry) and query.match_meta(entry)
         ]
 
     def select_all(self) -> list[Entry]:
