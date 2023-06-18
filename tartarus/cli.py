@@ -7,7 +7,7 @@ from . import config
 from .app import Application
 from .codec import GpgCodec
 from .config import Backend, ConfigBuilder, OsFamily
-from .data import Description, Entry, Identity, Plaintext
+from .data import Description, Entry, EntryId, Identity, Plaintext
 from .store import InMemoryStore, JsonFileReader, JsonFileWriter
 
 
@@ -41,6 +41,22 @@ def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
 
     codec = GpgCodec(cfg.key_id)
     return Application(store, reader, writer, codec)
+
+
+def handle_add(args: argparse.Namespace) -> int:
+    """Handles the 'add' command.
+
+    Args:
+        args: The command line arguments.
+
+    Returns:
+        The exit code of the application.
+    """
+    os_family = OsFamily.from_str(os.name)
+    with setup_application(os_family, os.environ) as app:
+        user_plaintext = Plaintext(input('Enter plaintext: '))
+        app.add(args.description, user_plaintext, args.identity, args.meta)
+    return 0
 
 
 def format_verbose(entry: Entry, plaintext: Plaintext) -> str:
@@ -103,6 +119,39 @@ def handle_lookup(args: argparse.Namespace) -> int:
     return 0
 
 
+def handle_modify(args: argparse.Namespace) -> int:
+    """Handles the 'modify' command.
+
+    Args:
+        args: The command line arguments.
+
+    Returns:
+        The exit code of the application.
+    """
+    os_family = OsFamily.from_str(os.name)
+    with setup_application(os_family, os.environ) as app:
+        target = args.description if args.description is not None else args.entry_id
+        maybe_plaintext = Plaintext(input('Enter plaintext: ')) if args.plaintext else None
+        app.modify(target, None, args.identity, maybe_plaintext, args.meta)
+    return 0
+
+
+def handle_remove(args: argparse.Namespace) -> int:
+    """Handles the 'remove' command.
+
+    Args:
+        args: The command line arguments.
+
+    Returns:
+        The exit code of the application.
+    """
+    os_family = OsFamily.from_str(os.name)
+    with setup_application(os_family, os.environ) as app:
+        target = args.description if args.description is not None else args.entry_id
+        app.remove(target)
+    return 0
+
+
 def main() -> int:
     """The main entry point of the application.
 
@@ -115,11 +164,32 @@ def main() -> int:
     parser = argparse.ArgumentParser(description='A minimal password manager.')
     subparsers = parser.add_subparsers(help='Commands')
 
-    parser_lookup = subparsers.add_parser('lookup')
+    parser_add = subparsers.add_parser('add', help='add an entry')
+    parser_add.add_argument('description', type=Description, help='URL or description')
+    parser_add.add_argument('-i', '--identity', type=Identity, help='username or email address')
+    parser_add.add_argument('-m', '--meta', type=str, help='additional metadata')
+    parser_add.set_defaults(func=handle_add)
+
+    parser_lookup = subparsers.add_parser('lookup', help='lookup an entry')
     parser_lookup.add_argument('description', type=Description, help='URL or description')
     parser_lookup.add_argument('-i', '--identity', type=Identity, help='username or email address')
     parser_lookup.add_argument('-v', '--verbose', action='store_true', help='enable verbose output')
     parser_lookup.set_defaults(func=handle_lookup)
+
+    parser_modify = subparsers.add_parser('modify', help='modify an entry')
+    parser_modify_group = parser_modify.add_mutually_exclusive_group(required=True)
+    parser_modify_group.add_argument('-d', '--description', type=Description, help='URL or description')
+    parser_modify_group.add_argument('-e', '--entry-id', type=EntryId, help='entry ID')
+    parser_modify.add_argument('-i', '--identity', type=Identity, help='username or email address')
+    parser_modify.add_argument('-m', '--meta', type=str, help='additional metadata')
+    parser_modify.add_argument('-p', '--plaintext', action='store_true', help='modify plaintext')
+    parser_modify.set_defaults(func=handle_modify)
+
+    parser_remove = subparsers.add_parser('remove', help='remove an entry')
+    parser_remove_group = parser_remove.add_mutually_exclusive_group(required=True)
+    parser_remove_group.add_argument('-d', '--description', type=Description, help='URL or description')
+    parser_remove_group.add_argument('-e', '--entry-id', type=EntryId, help='entry ID')
+    parser_remove.set_defaults(func=handle_remove)
 
     args = parser.parse_args()
 
