@@ -141,7 +141,7 @@ class ConfigBuilder:
         backend: Optional[Backend] = None,
         key_id: Optional[KeyId] = None,
         allow_multiple_keys: Optional[bool] = None,
-    ):
+    ) -> None:
         self._data_dir = data_dir
         self._backend = backend
         self._key_id = key_id

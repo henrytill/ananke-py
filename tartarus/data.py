@@ -24,7 +24,7 @@ Metadata = NewType('Metadata', str)
 class Timestamp:
     """A UTC timestamp."""
 
-    def __init__(self, timestamp: datetime):
+    def __init__(self, timestamp: datetime) -> None:
         self.timestamp = timestamp
 
     @classmethod
@@ -70,7 +70,7 @@ class Timestamp:
 class EntryId(str):
     """Uniquely identifies an 'Entry'."""
 
-    def __new__(cls, value: str):
+    def __new__(cls, value: str) -> Self:
         return super().__new__(cls, value)
 
     @classmethod
@@ -102,7 +102,7 @@ class EntryId(str):
 class Ciphertext(bytes):
     """An encrypted value of an 'Entry'."""
 
-    def __new__(cls, value: bytes):
+    def __new__(cls, value: bytes) -> Self:
         return super().__new__(cls, value)
 
     @classmethod
@@ -215,7 +215,7 @@ class Entry:
         identity: Optional[Identity],
         ciphertext: Ciphertext,
         meta: Optional[Metadata],
-    ):
+    ) -> None:
         self.entry_id = entry_id
         self.key_id = key_id
         self.timestamp = timestamp

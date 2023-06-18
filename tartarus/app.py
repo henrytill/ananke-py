@@ -49,7 +49,7 @@ class Application(AbstractContextManager['Application']):
         plaintext: Plaintext,
         maybe_identity: Optional[Identity],
         maybe_meta: Optional[Metadata],
-    ):
+    ) -> None:
         """Add a new entry.
 
         Args:

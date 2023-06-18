@@ -30,7 +30,7 @@ class Query:
         description: Optional[Description] = None,
         identity: Optional[Identity] = None,
         meta: Optional[Metadata] = None,
-    ):
+    ) -> None:
         self.__entry_id = entry_id
         self.__description = description
         self.__identity = identity

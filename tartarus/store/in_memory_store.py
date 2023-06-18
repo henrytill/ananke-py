@@ -11,7 +11,7 @@ from .abstract_store import AbstractReader, AbstractStore, AbstractWriter, Query
 class EntryMap(defaultdict[Description, set[Entry]]):
     """A map of Description to a set of Entry."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(set)
 
     def add(self, entry: Entry) -> None:
@@ -29,7 +29,7 @@ class InMemoryQuery(Query):
     This class is used to filter entries in an in-memory store.
     """
 
-    def __init__(self, query: Query):
+    def __init__(self, query: Query) -> None:
         super().__init__(query.entry_id, query.description, query.identity, query.meta)
 
     def match_id(self, entry: Entry) -> bool:
@@ -70,7 +70,7 @@ class InMemoryStore(AbstractStore):
     _storage: EntryMap
     _dirty: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._storage = EntryMap()
         self._dirty = False
 
@@ -116,7 +116,7 @@ class InMemoryStore(AbstractStore):
 class JsonFileReader(AbstractReader):
     """A JSON file reader."""
 
-    def __init__(self, file: Path):
+    def __init__(self, file: Path) -> None:
         self._file = file
 
     def read(self) -> list[Entry]:
@@ -131,7 +131,7 @@ class JsonFileReader(AbstractReader):
 class JsonFileWriter(AbstractWriter):
     """A JSON file writer."""
 
-    def __init__(self, file: Path):
+    def __init__(self, file: Path) -> None:
         self._file = file
 
     def write(self, writes: list[Entry]) -> None:

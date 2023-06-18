@@ -13,7 +13,7 @@ class GpgCodec(AbstractCodec):
 
     _key_id: KeyId
 
-    def __init__(self, key_id: KeyId):
+    def __init__(self, key_id: KeyId) -> None:
         """Creates a new GpgCodec with the given KeyId.
 
         Args:
