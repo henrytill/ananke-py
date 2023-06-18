@@ -1,6 +1,6 @@
 """An abstract store."""
 from abc import ABC, abstractmethod
-from typing import NewType, Optional
+from typing import Any, NewType, Optional
 
 from ..data import Description, Entry, EntryId, Identity, KeyId, Metadata
 
@@ -62,7 +62,7 @@ class AbstractReader(ABC):
     """An abstract reader."""
 
     @abstractmethod
-    def read(self) -> list[Entry]:
+    def read(self) -> Any:
         """Reads."""
 
 
@@ -71,7 +71,7 @@ class AbstractWriter(ABC):
     """An abstract writer."""
 
     @abstractmethod
-    def write(self, entries: list[Entry]) -> None:
+    def write(self, writes: Any) -> None:
         """Writes."""
 
 

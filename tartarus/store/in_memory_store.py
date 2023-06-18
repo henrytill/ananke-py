@@ -134,10 +134,10 @@ class JsonFileWriter(AbstractWriter):
     def __init__(self, file: Path):
         self._file = file
 
-    def write(self, entries: list[Entry]) -> None:
+    def write(self, writes: list[Entry]) -> None:
         """Writes entries to a JSON file"""
-        entries.sort(key=lambda entry: entry.timestamp)
-        dicts: list[EntryDict] = [entry.to_dict() for entry in entries]
+        writes.sort(key=lambda entry: entry.timestamp)
+        dicts: list[EntryDict] = [entry.to_dict() for entry in writes]
         with open(self._file, 'w', encoding='utf-8') as file:
             json_str = json.dumps(dicts, indent=4)
             file.write(json_str)
