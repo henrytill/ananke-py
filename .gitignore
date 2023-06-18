@@ -1,5 +1,6 @@
 /*env/
 /*.egg-info/
+/build/
 /dist/
 __pycache__/
 example/gnupg/random_seed
