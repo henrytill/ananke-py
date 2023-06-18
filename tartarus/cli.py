@@ -11,10 +11,7 @@ from .data import Description, Entry, Identity, Plaintext
 from .store import InMemoryStore, JsonFileReader, JsonFileWriter
 
 
-def setup_application(
-    host_os: OsFamily,
-    env: Mapping[str, str],
-) -> Application:
+def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
     """Sets up the application with necessary dependencies.
 
     This includes setting up an in-memory store, creating a configuration object
@@ -35,7 +32,7 @@ def setup_application(
 
     cfg = ConfigBuilder().with_defaults(host_os, env).with_config(config_str).with_env(env).build()
 
-    if cfg.backend == Backend.JSON:
+    if cfg.backend is Backend.JSON:
         store = InMemoryStore()
         reader = JsonFileReader(cfg.data_file)
         writer = JsonFileWriter(cfg.data_file)

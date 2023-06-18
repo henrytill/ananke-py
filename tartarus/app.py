@@ -58,9 +58,9 @@ class Application(AbstractContextManager['Application']):
             maybe_identity: The identity of the entry.
             maybe_meta: The metadata of the entry.
         """
-        ciphertext = self._codec.encode(plaintext)
         timestamp = Timestamp.now()
         entry_id = EntryId.generate(self._codec.key_id, timestamp, description, maybe_identity)
+        ciphertext = self._codec.encode(plaintext)
         entry = Entry(
             entry_id=entry_id,
             key_id=self._codec.key_id,

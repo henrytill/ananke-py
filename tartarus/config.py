@@ -43,12 +43,6 @@ class OsFamily(Enum):
     POSIX = 1
     NT = 2
 
-    def __str__(self) -> str:
-        return {
-            self.POSIX: 'posix',
-            self.NT: 'nt',
-        }[self]
-
     @staticmethod
     def from_str(os_family_str: str) -> 'OsFamily':
         """Creates an OsFamily from a string.
@@ -67,6 +61,12 @@ class OsFamily(Enum):
             return match[os_family_str]
         except KeyError as exc:
             raise ValueError(f'Invalid OsFamily string: {os_family_str}') from exc
+
+    def __str__(self) -> str:
+        return {
+            self.POSIX: 'posix',
+            self.NT: 'nt',
+        }[self]
 
 
 class Backend(Enum):
@@ -218,7 +218,7 @@ class ConfigBuilder:
             The updated configuration.
         """
         if self._data_dir is None:
-            if os_family == OsFamily.NT:
+            if os_family is OsFamily.NT:
                 local_app_data = env.get("LOCALAPPDATA")
                 data_home = Path(local_app_data) if local_app_data else Path.home() / 'AppData' / 'Local'
             else:
@@ -275,7 +275,7 @@ def get_config_dir(os_family: OsFamily, env: Mapping[str, str]) -> Path:
     Returns:
         The path to the configuration directory.
     """
-    if os_family == OsFamily.NT:
+    if os_family is OsFamily.NT:
         app_data = env.get('APPDATA')
         config_home = Path(app_data) if app_data else Path.home() / 'AppData' / 'Roaming'
     else:
