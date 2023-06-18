@@ -3,6 +3,7 @@ import argparse
 import os
 from typing import Mapping, Tuple
 
+from . import config
 from .app import Application
 from .codec import GpgCodec
 from .config import Backend, ConfigBuilder, OsFamily
@@ -11,8 +12,8 @@ from .store import InMemoryStore, JsonFileReader, JsonFileWriter
 
 
 def setup_application(
+    host_os: OsFamily,
     env: Mapping[str, str],
-    host_os: OsFamily = OsFamily.from_str(os.name),
 ) -> 'Application':
     """Sets up the application with necessary dependencies.
 
@@ -21,22 +22,27 @@ def setup_application(
     setting up a GPG codec for encryption and decryption.
 
     Args:
-        env: The environment variables to be used for configuration.
         host_os: The host operating system, defaulting to the current OS.
+        env: The environment variables to be used for configuration.
 
     Returns:
         The configured Application instance ready for use.
     """
-    config = ConfigBuilder().with_defaults(host_os, env).with_env(env).build()
+    config_file = config.get_config_file(host_os, env)
 
-    if config.backend != Backend.JSON:
+    with open(config_file, encoding='ascii') as file:
+        config_str = file.read()
+
+    cfg = ConfigBuilder().with_defaults(host_os, env).with_config(config_str).with_env(env).build()
+
+    if cfg.backend == Backend.JSON:
         store = InMemoryStore()
-        reader = JsonFileReader(config.data_file)
-        writer = JsonFileWriter(config.data_file)
+        reader = JsonFileReader(cfg.data_file)
+        writer = JsonFileWriter(cfg.data_file)
     else:
-        raise NotImplementedError(f'Backend {config.backend} is not supported')
+        raise NotImplementedError(f'Backend {cfg.backend} is not supported')
 
-    codec = GpgCodec(config.key_id)
+    codec = GpgCodec(cfg.key_id)
     return Application(store, reader, writer, codec)
 
 
@@ -93,7 +99,8 @@ def handle_lookup(args: argparse.Namespace) -> int:
     Returns:
         The exit code of the application.
     """
-    with setup_application(os.environ) as app:
+    os_family = OsFamily.from_str(os.name)
+    with setup_application(os_family, os.environ) as app:
         results = app.lookup(args.description, args.identity)
         print(format_results(results, args.verbose))
     return 0
