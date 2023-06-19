@@ -29,9 +29,9 @@ class TestGpgCodec(unittest.TestCase):
     def test_encode_decode(self):
         """Tests the encode and decode methods."""
         test_cases = [
-            "ASecretPassword",
-            "AnotherSecretPassword",
-            "YetAnotherSecretPassword",
+            'ASecretPassword',
+            'AnotherSecretPassword',
+            'YetAnotherSecretPassword',
         ]
 
         for test_case in test_cases:
@@ -45,22 +45,22 @@ class TestGpgCodec(unittest.TestCase):
     def test_encode_decode_random(self):
         """Tests the encode and decode methods with random data."""
         test_cases: list[RandomArgs] = [
-            {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": True},
-            {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": False},
-            {"length": 24, "use_uppercase": True, "use_digits": False, "use_punctuation": True},
-            {"length": 24, "use_uppercase": True, "use_digits": False, "use_punctuation": False},
-            {"length": 24, "use_uppercase": False, "use_digits": True, "use_punctuation": True},
-            {"length": 24, "use_uppercase": False, "use_digits": True, "use_punctuation": False},
-            {"length": 24, "use_uppercase": False, "use_digits": False, "use_punctuation": True},
-            {"length": 24, "use_uppercase": False, "use_digits": False, "use_punctuation": False},
-            {"length": 48, "use_uppercase": True, "use_digits": True, "use_punctuation": True},
-            {"length": 48, "use_uppercase": True, "use_digits": True, "use_punctuation": False},
-            {"length": 48, "use_uppercase": True, "use_digits": False, "use_punctuation": True},
-            {"length": 48, "use_uppercase": True, "use_digits": False, "use_punctuation": False},
-            {"length": 48, "use_uppercase": False, "use_digits": True, "use_punctuation": True},
-            {"length": 48, "use_uppercase": False, "use_digits": True, "use_punctuation": False},
-            {"length": 48, "use_uppercase": False, "use_digits": False, "use_punctuation": True},
-            {"length": 48, "use_uppercase": False, "use_digits": False, "use_punctuation": False},
+            {'length': 24, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': True},
+            {'length': 24, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': False},
+            {'length': 24, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': True},
+            {'length': 24, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': False},
+            {'length': 24, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': True},
+            {'length': 24, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': False},
+            {'length': 24, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': True},
+            {'length': 24, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': False},
+            {'length': 48, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': True},
+            {'length': 48, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': False},
+            {'length': 48, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': True},
+            {'length': 48, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': False},
+            {'length': 48, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': True},
+            {'length': 48, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': False},
+            {'length': 48, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': True},
+            {'length': 48, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': False},
         ]
 
         for test_case in test_cases:

@@ -301,13 +301,13 @@ class Entry:
 
 
 CAMEL_TO_SNAKE = {
-    "Timestamp": "timestamp",
-    "Id": "id",
-    "KeyId": "key_id",
-    "Description": "description",
-    "Identity": "identity",
-    "Ciphertext": "ciphertext",
-    "Meta": "meta",
+    'Timestamp': 'timestamp',
+    'Id': 'id',
+    'KeyId': 'key_id',
+    'Description': 'description',
+    'Identity': 'identity',
+    'Ciphertext': 'ciphertext',
+    'Meta': 'meta',
 }
 
 

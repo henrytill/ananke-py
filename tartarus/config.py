@@ -219,7 +219,7 @@ class ConfigBuilder:
         """
         if self._data_dir is None:
             if os_family is OsFamily.NT:
-                local_app_data = env.get("LOCALAPPDATA")
+                local_app_data = env.get('LOCALAPPDATA')
                 data_home = Path(local_app_data) if local_app_data else Path.home() / 'AppData' / 'Local'
             else:
                 xdg_data_home = env.get('XDG_DATA_HOME')
