@@ -3,10 +3,19 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
-from typing import Tuple
+from typing import TypedDict
 
 from tartarus.codec import GpgCodec
 from tartarus.data import Ciphertext, KeyId, Plaintext
+
+
+class RandomArgs(TypedDict):
+    """Type hint class for the 'test_random' method."""
+
+    length: int
+    use_uppercase: bool
+    use_digits: bool
+    use_punctuation: bool
 
 
 class TestGpgCodec(unittest.TestCase):
@@ -35,44 +44,28 @@ class TestGpgCodec(unittest.TestCase):
 
     def test_encode_decode_random(self):
         """Tests the encode and decode methods with random data."""
-        test_cases: list[Tuple[int, bool, bool, bool]] = [
-            (24, True, True, True),
-            (24, True, True, False),
-            (24, True, False, True),
-            (24, True, False, False),
-            (24, False, True, True),
-            (24, False, True, False),
-            (24, False, False, True),
-            (24, False, False, False),
-            (24, True, True, True),
-            (24, True, True, False),
-            (24, True, False, True),
-            (24, True, False, False),
-            (24, False, True, True),
-            (24, False, True, False),
-            (24, False, False, True),
-            (24, False, False, False),
-            (48, True, True, True),
-            (48, True, True, False),
-            (48, True, False, True),
-            (48, True, False, False),
-            (48, False, True, True),
-            (48, False, True, False),
-            (48, False, False, True),
-            (48, False, False, False),
-            (48, True, True, True),
-            (48, True, True, False),
-            (48, True, False, True),
-            (48, True, False, False),
-            (48, False, True, True),
-            (48, False, True, False),
-            (48, False, False, True),
-            (48, False, False, False),
+        test_cases: list[RandomArgs] = [
+            {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": True},
+            {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": False},
+            {"length": 24, "use_uppercase": True, "use_digits": False, "use_punctuation": True},
+            {"length": 24, "use_uppercase": True, "use_digits": False, "use_punctuation": False},
+            {"length": 24, "use_uppercase": False, "use_digits": True, "use_punctuation": True},
+            {"length": 24, "use_uppercase": False, "use_digits": True, "use_punctuation": False},
+            {"length": 24, "use_uppercase": False, "use_digits": False, "use_punctuation": True},
+            {"length": 24, "use_uppercase": False, "use_digits": False, "use_punctuation": False},
+            {"length": 48, "use_uppercase": True, "use_digits": True, "use_punctuation": True},
+            {"length": 48, "use_uppercase": True, "use_digits": True, "use_punctuation": False},
+            {"length": 48, "use_uppercase": True, "use_digits": False, "use_punctuation": True},
+            {"length": 48, "use_uppercase": True, "use_digits": False, "use_punctuation": False},
+            {"length": 48, "use_uppercase": False, "use_digits": True, "use_punctuation": True},
+            {"length": 48, "use_uppercase": False, "use_digits": True, "use_punctuation": False},
+            {"length": 48, "use_uppercase": False, "use_digits": False, "use_punctuation": True},
+            {"length": 48, "use_uppercase": False, "use_digits": False, "use_punctuation": False},
         ]
 
         for test_case in test_cases:
             with self.subTest(test_case=test_case):
-                plaintext = Plaintext.random(*test_case)
+                plaintext = Plaintext.random(**test_case)
                 ciphertext = self.codec.encode(plaintext)
                 self.assertIsInstance(ciphertext, Ciphertext)
                 decoded_plaintext = self.codec.decode(ciphertext)

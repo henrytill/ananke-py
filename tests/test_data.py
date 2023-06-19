@@ -5,7 +5,7 @@ import string
 import textwrap
 import unittest
 from datetime import datetime, timezone
-from typing import List, LiteralString, Tuple, TypedDict
+from typing import List, LiteralString, TypedDict
 from unittest import TestLoader, TestSuite
 
 from tartarus import data
@@ -21,6 +21,22 @@ from tartarus.data import (
     Plaintext,
     Timestamp,
 )
+
+
+class RandomArgs(TypedDict):
+    """Type hint class for the 'test_random' method."""
+
+    length: int
+    use_uppercase: bool
+    use_digits: bool
+    use_punctuation: bool
+
+
+class RandomTestCase(TypedDict):
+    """Type hint class for the 'test_random' method."""
+
+    args: RandomArgs
+    char_set: LiteralString
 
 
 class TestTimestamp(unittest.TestCase):
@@ -101,44 +117,38 @@ class TestCiphertext(unittest.TestCase):
 class TestPlaintext(unittest.TestCase):
     """Tests for the 'Plaintext' class."""
 
-    class RandomCase(TypedDict):
-        """Type hint class for the 'test_random' method."""
-
-        args: Tuple[int, bool, bool, bool]
-        char_set: LiteralString
-
     def test_random(self):
         """Test the 'random' method of the 'Plaintext' class."""
-        test_cases: List[TestPlaintext.RandomCase] = [
+        test_cases: List[RandomTestCase] = [
             {
-                'args': (24, False, False, False),
+                'args': {'length': 24, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': False},
                 'char_set': string.ascii_lowercase,
             },
             {
-                'args': (24, True, False, False),
+                'args': {'length': 24, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': False},
                 'char_set': string.ascii_lowercase + string.ascii_uppercase,
             },
             {
-                'args': (24, False, True, False),
+                'args': {'length': 24, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': False},
                 'char_set': string.ascii_lowercase + string.digits,
             },
             {
-                'args': (24, False, False, True),
+                'args': {'length': 24, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': True},
                 'char_set': string.ascii_lowercase + string.punctuation,
             },
             {
-                'args': (24, True, True, True),
+                'args': {'length': 24, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': False},
                 'char_set': string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation,
             },
             {
-                'args': (24, True, False, True),
+                'args': {'length': 24, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': True},
                 'char_set': string.ascii_lowercase + string.ascii_uppercase + string.punctuation,
             },
         ]
 
         for case in test_cases:
             with self.subTest(case=case):
-                actual_plaintext = Plaintext.random(*case['args'])
+                actual_plaintext = Plaintext.random(**case['args'])
                 for char in actual_plaintext:
                     self.assertIn(char, case['char_set'])
 

@@ -1,7 +1,7 @@
 """Test the 'app' module."""
 import os
 import unittest
-from typing import Optional, Tuple, TypedDict
+from typing import Optional, TypedDict
 from unittest.mock import Mock
 
 from tartarus.app import Application
@@ -18,6 +18,33 @@ from tartarus.data import (
     Timestamp,
 )
 from tartarus.store import InMemoryStore, JsonFileReader
+
+
+class LookupTestCase(TypedDict):
+    """A type hint class for testing lookup."""
+
+    description: Description
+    identity: Optional[Identity]
+    plaintexts: list[Plaintext]
+
+
+class AddArgs(TypedDict):
+    """A type hint class for testing add."""
+
+    description: Description
+    plaintext: Plaintext
+    maybe_identity: Optional[Identity]
+    maybe_meta: Optional[Metadata]
+
+
+class ModifyArgs(TypedDict):
+    """A type hint class for testing modify."""
+
+    target: EntryId | Description
+    maybe_description: Optional[Description]
+    maybe_identity: Optional[Identity]
+    maybe_plaintext: Optional[Plaintext]
+    maybe_meta: Optional[Metadata]
 
 
 class TestApplication(unittest.TestCase):
@@ -39,18 +66,11 @@ class TestApplication(unittest.TestCase):
 
         os.environ['GNUPGHOME'] = './example/gnupg'
 
-    class Lookup(TypedDict):
-        """A type hint class for the test data."""
-
-        description: Description
-        identity: Optional[Identity]
-        plaintexts: list[Plaintext]
-
     def test_lookup(self):
         """Test the lookup method against the example data."""
 
         # see example/data.json for the test data
-        test_cases: list[TestApplication.Lookup] = [
+        test_cases: list[LookupTestCase] = [
             {
                 'description': Description('https://www.foomail.com'),
                 'identity': Identity('quux'),
@@ -109,131 +129,119 @@ class TestApplication(unittest.TestCase):
                     ]
                     self.assertEqual(test_case['plaintexts'], plaintexts)
 
-    class Add(TypedDict):
-        """A type hint class for the test data."""
-
-        description: Description
-        identity: Optional[Identity]
-        plaintext: Plaintext
-        meta: Optional[Metadata]
-
     def test_add(self):
         """Test the add method against the example data."""
 
-        test_cases: list[TestApplication.Add] = [
+        test_cases: list[AddArgs] = [
             {
                 'description': Description('https://www.foonews.com'),
-                'identity': Identity('quux@foomail.com'),
                 'plaintext': Plaintext('FooNewsSecretPassword'),
-                'meta': None,
+                'maybe_identity': Identity('quux@foomail.com'),
+                'maybe_meta': None,
             },
             {
                 'description': Description('https://www.bazblog.com'),
-                'identity': Identity('quux@foomail.com'),
                 'plaintext': Plaintext('BazBlogSecretPassword'),
-                'meta': Metadata('{ "foo": "bar" }'),
+                'maybe_identity': Identity('quux@foomail.com'),
+                'maybe_meta': Metadata('{ "foo": "bar" }'),
             },
             {
                 'description': Description('https://www.barsounds.com'),
-                'identity': None,
                 'plaintext': Plaintext('BarSoundsSecretPassword'),
-                'meta': None,
+                'maybe_identity': None,
+                'maybe_meta': None,
             },
             {
                 'description': Description('https://www.fooblog.com'),
-                'identity': None,
                 'plaintext': Plaintext('FooBlogSecretPassword'),
-                'meta': Metadata('{ "foo": "bar" }'),
+                'maybe_identity': None,
+                'maybe_meta': Metadata('{ "foo": "bar" }'),
             },
         ]
 
         with self.application as app:
             for test_case in test_cases:
                 with self.subTest(test_case=test_case):
-                    app.add(test_case['description'], test_case['plaintext'], test_case['identity'], test_case['meta'])
-                    results = app.lookup(test_case['description'], test_case['identity'])
+                    app.add(**test_case)
+                    results = app.lookup(test_case['description'], test_case['maybe_identity'])
                     self.assertEqual(1, len(results))
                     entry, plaintext = results[0]
                     self.assertEqual(self.config.key_id, entry.key_id)
                     self.assertEqual(test_case['description'], entry.description)
-                    self.assertEqual(test_case['identity'], entry.identity)
+                    self.assertEqual(test_case['maybe_identity'], entry.identity)
                     self.assertEqual(test_case['plaintext'], plaintext)
-                    self.assertEqual(test_case['meta'], entry.meta)
-
-    ModifyArgs = Tuple[
-        EntryId | Description,
-        Optional[Description],
-        Optional[Identity],
-        Optional[Plaintext],
-        Optional[Metadata],
-    ]
+                    self.assertEqual(test_case['maybe_meta'], entry.meta)
 
     def test_modify(self):
         """Test the modify method against the example data."""
 
-        test_cases: list[TestApplication.ModifyArgs] = [
-            (
-                Description('https://www.foomail.com'),
-                None,
-                Identity('quuxotic'),
-                None,
-                None,
-            ),
-            (
-                Description('https://www.foomail.com'),
-                None,
-                None,
-                Plaintext('ANewSecretPasswordForFooMail'),
-                None,
-            ),
-            (
-                Description('https://www.foomail.com'),
-                None,
-                None,
-                None,
-                Metadata('{ "foo": "bar" }'),
-            ),
-            (
-                Description('https://www.foomail.com'),
-                Description('https://www.foomail.net'),
-                None,
-                None,
-                None,
-            ),
-            (
-                Description('https://www.bazbank.com'),
-                None,
-                Identity('quuxotic'),
-                None,
-                None,
-            ),
-            (
-                Description('https://www.bazbank.com'),
-                None,
-                None,
-                Plaintext('ANewSecretPasswordForBazBank'),
-                None,
-            ),
-            (
-                Description('https://www.bazbank.com'),
-                None,
-                None,
-                None,
-                Metadata('{ "foo": "bar" }'),
-            ),
-            (
-                Description('https://www.bazbank.com'),
-                Description('https://www.bazbank.net'),
-                None,
-                None,
-                None,
-            ),
+        test_cases: list[ModifyArgs] = [
+            {
+                'target': Description('https://www.foomail.com'),
+                'maybe_description': None,
+                'maybe_identity': Identity('quuxotic'),
+                'maybe_plaintext': None,
+                'maybe_meta': None,
+            },
+            {
+                'target': Description('https://www.foomail.com'),
+                'maybe_description': None,
+                'maybe_identity': None,
+                'maybe_plaintext': Plaintext('ANewSecretPasswordForFooMail'),
+                'maybe_meta': None,
+            },
+            {
+                'target': Description('https://www.foomail.com'),
+                'maybe_description': None,
+                'maybe_identity': None,
+                'maybe_plaintext': None,
+                'maybe_meta': Metadata('{ "foo": "bar" }'),
+            },
+            {
+                'target': Description('https://www.foomail.com'),
+                'maybe_description': Description('https://www.foonews.com'),
+                'maybe_identity': None,
+                'maybe_plaintext': None,
+                'maybe_meta': None,
+            },
+            {
+                'target': Description('https://www.bazbank.com'),
+                'maybe_description': None,
+                'maybe_identity': Identity('quuxotic'),
+                'maybe_plaintext': None,
+                'maybe_meta': None,
+            },
+            {
+                'target': Description('https://www.bazbank.com'),
+                'maybe_description': None,
+                'maybe_identity': None,
+                'maybe_plaintext': Plaintext('ANewSecretPasswordForBazBank'),
+                'maybe_meta': None,
+            },
+            {
+                'target': Description('https://www.bazbank.com'),
+                'maybe_description': None,
+                'maybe_identity': None,
+                'maybe_plaintext': None,
+                'maybe_meta': Metadata('{ "foo": "bar" }'),
+            },
+            {
+                'target': Description('https://www.bazbank.com'),
+                'maybe_description': Description('https://www.bazblog.com'),
+                'maybe_identity': None,
+                'maybe_plaintext': None,
+                'maybe_meta': None,
+            },
         ]
 
         with self.application as app:
             for test_case in test_cases:
                 with self.subTest(test_case=test_case):
-                    target, maybe_description, maybe_identity, maybe_plaintext, maybe_meta = test_case
+                    target = test_case['target']
+                    maybe_description = test_case['maybe_description']
+                    maybe_identity = test_case['maybe_identity']
+                    maybe_plaintext = test_case['maybe_plaintext']
+                    maybe_meta = test_case['maybe_meta']
 
                     if isinstance(target, EntryId):
                         raise NotImplementedError
@@ -242,7 +250,7 @@ class TestApplication(unittest.TestCase):
                     self.assertEqual(1, len(results))
                     entry, plaintext = results[0]
 
-                    app.modify(*test_case)
+                    app.modify(**test_case)
 
                     updated_results = app.lookup(
                         maybe_description if maybe_description is not None else target,

@@ -8,6 +8,28 @@ from tartarus.config import Backend, ConfigBuilder, Env, OsFamily
 from tartarus.data import KeyId
 
 
+# pylint: disable=too-few-public-methods
+class ConfigFile:
+    """A configuration file."""
+
+    BACKEND = 'sqlite'
+    DATA_DIR = '/tmp/data'
+    KEY_ID = 'alice_file@example.com'
+    ALLOW_MULTIPLE_KEYS = 'true'
+
+    def __str__(self) -> str:
+        return textwrap.dedent(
+            f"""\
+            [data]
+            backend={self.BACKEND}
+            dir={self.DATA_DIR}
+            [gpg]
+            key_id={self.KEY_ID}
+            allow_multiple_keys={self.ALLOW_MULTIPLE_KEYS}
+            """
+        )
+
+
 class TestOsFamily(unittest.TestCase):
     """Tests for the 'OsFamily' enum."""
 
@@ -37,28 +59,6 @@ class TestBackend(unittest.TestCase):
     def test_from_str_with_invalid_backend(self):
         """Tests the 'from_str' method with an invalid backend."""
         self.assertRaises(ValueError, Backend.from_str, 'invalid')
-
-
-# pylint: disable=too-few-public-methods
-class ConfigFile:
-    """A configuration file."""
-
-    BACKEND = 'sqlite'
-    DATA_DIR = '/tmp/data'
-    KEY_ID = 'alice_file@example.com'
-    ALLOW_MULTIPLE_KEYS = 'true'
-
-    def __str__(self) -> str:
-        return textwrap.dedent(
-            f"""\
-            [data]
-            backend={self.BACKEND}
-            dir={self.DATA_DIR}
-            [gpg]
-            key_id={self.KEY_ID}
-            allow_multiple_keys={self.ALLOW_MULTIPLE_KEYS}
-            """
-        )
 
 
 class TestConfigBuilder(unittest.TestCase):
