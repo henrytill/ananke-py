@@ -6,7 +6,7 @@ import hashlib
 import secrets
 import string
 from datetime import datetime, timezone
-from typing import Any, Dict, NewType, Optional, Self, TypedDict
+from typing import Any, Dict, NewType, Optional, Self
 
 KeyId = NewType('KeyId', str)
 """A Cryptographic Key Id."""
@@ -172,18 +172,6 @@ class Plaintext(str):
         return cls(ret)
 
 
-class EntryDict(TypedDict):
-    """An 'Entry' represented as a dictionary."""
-
-    id: str
-    key_id: str
-    timestamp: str
-    description: str
-    identity: Optional[str]
-    ciphertext: str
-    meta: Optional[str]
-
-
 class Entry:
     """A record that stores an encrypted value along with associated information.
 
@@ -241,7 +229,7 @@ class Entry:
         )
 
     @classmethod
-    def from_dict(cls, data: EntryDict) -> Self:
+    def from_dict(cls, data: dict[Any, Any]) -> Self:
         """Creates an 'Entry' from a dictionary.
 
         Args:
@@ -251,27 +239,49 @@ class Entry:
             The created 'Entry'.
         """
         # Check required keys
-        required_keys = ['id', 'key_id', 'timestamp', 'description', 'ciphertext']
-        for key in required_keys:
+        required_keys = {
+            'id': str,
+            'key_id': str,
+            'timestamp': str,
+            'description': str,
+            'ciphertext': str,
+        }
+
+        for key, value_type in required_keys.items():
             if key not in data:
                 raise ValueError(f'Invalid entry format: missing required key "{key}"')
+            if not isinstance(data[key], value_type):
+                raise ValueError(f'Invalid {key} format')
 
-        # Validate the timestamp
+        # Check optional keys
+        optional_keys = {
+            'identity': str,
+            'meta': str,
+        }
+
+        for key, value_type in optional_keys.items():
+            maybe_value = data.get(key)
+            if maybe_value is None:
+                continue
+            if not isinstance(maybe_value, value_type):
+                raise ValueError(f'Invalid {key} format')
+
+        maybe_identity = data.get('identity')
+        maybe_meta = data.get('meta')
+
+        # Validate timestamp
         timestamp_str = data['timestamp']
         try:
             timestamp = Timestamp.fromisoformat(timestamp_str)
         except ValueError as err:
             raise ValueError('Invalid timestamp format') from err
 
-        # Validate the ciphertext
+        # Validate ciphertext
         ciphertext_str = data['ciphertext']
         try:
             ciphertext = Ciphertext.from_base64(ciphertext_str)
         except ValueError as err:
             raise ValueError('Invalid ciphertext format') from err
-
-        maybe_identity = data.get('identity')
-        maybe_meta = data.get('meta')
 
         return cls(
             entry_id=EntryId(data['id']),
@@ -283,21 +293,24 @@ class Entry:
             meta=Metadata(maybe_meta) if maybe_meta else None,
         )
 
-    def to_dict(self) -> EntryDict:
+    def to_dict(self) -> dict[str, str]:
         """Converts the 'Entry' to a dictionary.
 
         Returns:
             The converted 'Entry'.
         """
-        return {
+        ret = {
             'timestamp': self.timestamp.isoformat(),
             'id': self.entry_id,
             'key_id': self.key_id,
             'description': self.description,
-            'identity': self.identity,
             'ciphertext': self.ciphertext.to_base64(),
-            'meta': self.meta,
         }
+        if self.identity is not None:
+            ret['identity'] = self.identity
+        if self.meta is not None:
+            ret['meta'] = self.meta
+        return ret
 
 
 CAMEL_TO_SNAKE = {

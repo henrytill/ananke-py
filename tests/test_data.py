@@ -1,8 +1,6 @@
 """Tests for the 'data' module."""
 import doctest
-import json
 import string
-import textwrap
 import unittest
 from datetime import datetime, timezone
 from typing import List, LiteralString, TypedDict
@@ -13,11 +11,9 @@ from tartarus.data import (
     Ciphertext,
     Description,
     Entry,
-    EntryDict,
     EntryId,
     Identity,
     KeyId,
-    Metadata,
     Plaintext,
     Timestamp,
 )
@@ -169,133 +165,18 @@ class TestPlaintext(unittest.TestCase):
                 self.assertEqual(len(Plaintext.random(length)), length)
 
 
-class TestEntryDict(unittest.TestCase):
-    """Tests for the 'EntryDict' type."""
-
-    def test_json_loads(self):
-        """An appropriate JSON object can be deserialized into an 'EntryDict' object."""
-        entry_json = textwrap.dedent(
-            """\
-            {
-                "Timestamp": "2023-06-12T08:13:45.171872642Z",
-                "Id": "4de5e12a13844ff0685b2bd51381c5501ea69b6d",
-                "KeyId": "371C136C",
-                "Description": "https://www.foomail.com",
-                "Identity": "quux",
-                "Ciphertext": "hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=",
-                "Meta": null
-            }
-            """
-        )
-
-        entry_dict: EntryDict = json.loads(entry_json, object_hook=data.remap_keys_camel_to_snake)
-
-        expected_output = {
-            'timestamp': '2023-06-12T08:13:45.171872642Z',
-            'id': '4de5e12a13844ff0685b2bd51381c5501ea69b6d',
-            'key_id': '371C136C',
-            'description': 'https://www.foomail.com',
-            'identity': 'quux',
-            'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'meta': None,
-        }
-
-        for key, expected_value in expected_output.items():
-            with self.subTest(key=key):
-                self.assertEqual(expected_value, entry_dict[key])
-
-    def test_json_loads_snake_case(self):
-        """An appropriate JSON object can be deserialized into an 'EntryDict' object."""
-        entry_json = textwrap.dedent(
-            """\
-            {
-                "timestamp": "2023-06-12T08:13:45.171872642Z",
-                "id": "4de5e12a13844ff0685b2bd51381c5501ea69b6d",
-                "key_id": "371C136C",
-                "description": "https://www.foomail.com",
-                "identity": "quux",
-                "ciphertext": "hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=",
-                "meta": null
-            }
-            """
-        )
-
-        entry_dict: EntryDict = json.loads(entry_json, object_hook=data.remap_keys_camel_to_snake)
-
-        expected_output = {
-            'timestamp': '2023-06-12T08:13:45.171872642Z',
-            'id': '4de5e12a13844ff0685b2bd51381c5501ea69b6d',
-            'key_id': '371C136C',
-            'description': 'https://www.foomail.com',
-            'identity': 'quux',
-            'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'meta': None,
-        }
-
-        for key, expected_value in expected_output.items():
-            with self.subTest(key=key):
-                self.assertEqual(expected_value, entry_dict[key])
-
-    def test_json_loads_list(self):
-        """A list of appropriate JSON objects can be deserialized into a list of 'EntryDict' objects."""
-        entries_json = textwrap.dedent(
-            """\
-            [
-                {
-                    "Timestamp": "2023-06-12T08:13:45.171872642Z",
-                    "Id": "4de5e12a13844ff0685b2bd51381c5501ea69b6d",
-                    "KeyId": "371C136C",
-                    "Description": "https://www.foomail.com",
-                    "Identity": "quux",
-                    "Ciphertext": "hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=",
-                    "Meta": null
-                },
-                {
-                    "Timestamp": "2023-06-12T08:14:19.928402975Z",
-                    "Id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
-                    "KeyId": "371C136C",
-                    "Description": "https://www.bazbank.com",
-                    "Identity": "quux",
-                    "Ciphertext": "hQEMAzc/TVLd4/C8AQf/QRz4kazJvOmtlUY/raQIqDMS0raFf6Pc8dfilAHnTilxfEFP4t+/l0bLbo3yncG7iDXnlMltxqJrHxQQKbhRj2M8t214I8t26QOZ55Hw0CYs2iyh2APMZGO+CWkps7hst1WB653CSNCTEyARrhTPSkJRTpzox9I8gNHcd3Fp7QvCKOTeDaSxvmJymlsJc4cNAbC/rX3z9n39QrfZmWgeffZ3DQC72rs+Let8OHrTKUMhpyeBWaA6/Lv1X9DObOseAk9zyxVgiH76hdhE9ssMgUHMURwr0Sspw1XDVagqqQlJjNbXjQI/aQ/aW2WbSMTnzJTTUPah4fn0acmNgTYMYtJQAZeTkdpCzLLrBvhXnzmagPF+bVDJY+YtUHOZclSow3gNxPq60VA4Fpy411fA/WjI+Iwnnxsyr2Ue0/qkZTO2s1p7TWNWBl7BBkhCOUL2CX8=",
-                    "Meta": null
-                },
-                {
-                    "Timestamp": "2023-06-12T08:16:30.985240519Z",
-                    "Id": "39d8363eda9253a779c7719997b1a2656af19af7",
-                    "KeyId": "371C136C",
-                    "Description": "https://www.barphone.com",
-                    "Identity": "quux",
-                    "Ciphertext": "hQEMAzc/TVLd4/C8AQgAjAWcRoFoTI6k62fHtArOe6uCyEp6TDlLY5NhGKCRWKxDqggZByPDY59KzX/IqE6UgrQmvRM1yrEGvWVSM8lq43a5m8zDLNLIWVgEv0eUH50oYeB9I2vnL04L6bMPLkCwb19oFD1PUFQ9KqsmTQXyMDHkcXhAXk3mHcki1Ven38edw38Tf6xwrf/ISCSC/wDkgse6E+1+dbsEo5aWy3WWxzAFV+kARu10Mje3U+yGMBSs0Se6E/Z+iRSkCJhwOor//7W//Y0KuKzNrc3S6D4yXXIQ7lQJ33vNPAPCC5FGMwsw/StLRShNH6DHVbAp6Ws42J/9OTexwFitGY08UAX0ENJTAXhUTUGyQ23CIVfDRcWAOdsiikE7Ss37lXjrkJM86PTGrEMmY0psSrfpahkfvnmC2BsLaVTbSqz20t8J3tl5C8nlamu7AoATtDInOJcew+XcqMo=",
-                    "Meta": null
-                }
-            ]
-            """
-        )
-
-        entry_dicts: list[EntryDict] = json.loads(entries_json, object_hook=data.remap_keys_camel_to_snake)
-
-        self.assertIsInstance(entry_dicts, list)
-        self.assertEqual(len(entry_dicts), 3)
-        self.assertIsInstance(entry_dicts[0], dict)
-
-        for entry_dict in entry_dicts:
-            for key in ['timestamp', 'id', 'key_id', 'description', 'identity', 'ciphertext', 'meta']:
-                self.assertIn(key, entry_dict)
-
-
 class TestEntry(unittest.TestCase):
     """Tests for the Entry class."""
 
     def test_from_dict(self):
         """An Entry can be created from a dict."""
-        entry_dict: EntryDict = {
+        entry_dict = {
             'timestamp': '2023-06-12T08:12:08.528402975Z',
             'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
             'key_id': '371C136C',
             'description': 'https://www.foomail.com',
             'identity': 'quux',
             'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'meta': None,
         }
 
         expected_entry = Entry(
@@ -303,9 +184,9 @@ class TestEntry(unittest.TestCase):
             entry_id=EntryId(entry_dict['id']),
             key_id=KeyId(entry_dict['key_id']),
             description=Description(entry_dict['description']),
-            identity=Identity(entry_dict['identity']) if entry_dict['identity'] is not None else None,
+            identity=Identity(entry_dict['identity']),
             ciphertext=Ciphertext.from_base64(entry_dict['ciphertext']),
-            meta=Metadata(entry_dict['meta']) if entry_dict['meta'] is not None else None,
+            meta=None,
         )
 
         actual_entry = Entry.from_dict(entry_dict)
@@ -315,18 +196,17 @@ class TestEntry(unittest.TestCase):
     def test_from_dict_with_invalid_dict(self):
         """An Entry cannot be created from an invalid dict."""
         with self.assertRaises(ValueError, msg='Invalid dict'):
-            Entry.from_dict({})  # type: ignore
+            Entry.from_dict({})
 
     def test_from_dict_with_invalid_timestamp(self):
         """An Entry cannot be created from a dict with an invalid timestamp."""
-        entry_dict: EntryDict = {
+        entry_dict = {
             'timestamp': '2023-06-12T',
             'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
             'key_id': '371C136C',
             'description': 'https://www.foomail.com',
             'identity': 'quux',
             'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'meta': None,
         }
 
         with self.assertRaises(ValueError) as context:
@@ -336,14 +216,13 @@ class TestEntry(unittest.TestCase):
 
     def test_from_dict_with_invalid_ciphertext(self):
         """An Entry cannot be created from a dict with an invalid ciphertext."""
-        entry_dict: EntryDict = {
+        entry_dict = {
             'timestamp': '2023-06-12T08:12:08.528402975Z',
             'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
             'key_id': '371C136C',
             'description': 'https://www.foomail.com',
             'identity': 'quux',
             'ciphertext': 'zzzzzz',
-            'meta': None,
         }
 
         with self.assertRaises(ValueError) as context:
@@ -371,37 +250,35 @@ class TestEntry(unittest.TestCase):
                 del entry_dict[key]
 
                 with self.assertRaises(ValueError) as context:
-                    Entry.from_dict(entry_dict)  # type: ignore
+                    Entry.from_dict(entry_dict)
 
                 self.assertEqual(f'Invalid entry format: missing required key "{key}"', str(context.exception))
 
     def test_round_trip_through_dict(self):
         """An Entry can be created from a dict and converted back to a dict."""
-        entry_dict: EntryDict = {
+        entry_dict = {
             'timestamp': '2023-06-12T08:12:08.528402Z',
             'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
             'key_id': '371C136C',
             'description': 'https://www.foomail.com',
             'identity': 'quux',
             'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'meta': None,
         }
 
         self.assertEqual(entry_dict, Entry.from_dict(entry_dict).to_dict())
 
     def test_inequality(self):
         """Two Entries are unequal if any of their attributes are unequal."""
-        entry_dict: EntryDict = {
+        entry_dict = {
             'timestamp': '2023-06-12T08:12:08.528402Z',
             'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
             'key_id': '371C136C',
             'description': 'https://www.foomail.com',
             'identity': 'quux',
             'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'meta': None,
         }
 
-        test_cases: EntryDict = {
+        test_cases = {
             'timestamp': '2023-06-12T08:12:08.528401Z',
             'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295f',
             'key_id': '371C136D',
@@ -419,14 +296,13 @@ class TestEntry(unittest.TestCase):
 
     def test_inequality_with_non_entry(self):
         """An Entry is unequal to a non-Entry."""
-        entry_dict: EntryDict = {
+        entry_dict = {
             'timestamp': '2023-06-12T08:12:08.528402Z',
             'id': 'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
             'key_id': '371C136C',
             'description': 'https://www.foomail.com',
             'identity': 'quux',
             'ciphertext': 'hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=',
-            'meta': None,
         }
         self.assertNotEqual(Entry.from_dict(entry_dict), {})
 

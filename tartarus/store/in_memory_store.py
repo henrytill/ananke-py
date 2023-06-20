@@ -4,7 +4,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from .. import data
-from ..data import Description, Entry, EntryDict, KeyId
+from ..data import Description, Entry, KeyId
 from .abstract_store import AbstractReader, AbstractStore, AbstractWriter, Query
 
 
@@ -123,8 +123,16 @@ class JsonFileReader(AbstractReader):
         """Reads entries from a JSON file"""
         with open(self._file, 'r', encoding='utf-8') as file:
             json_data = file.read()
-            dicts = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
-            return [Entry.from_dict(d) for d in dicts]
+
+        parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
+        if not isinstance(parsed, list):
+            raise ValueError('Expected a list')
+        ret: list[Entry] = []
+        for item in parsed:  # type: ignore
+            if not isinstance(item, dict):
+                raise ValueError('Expected a dictionary')
+            ret.append(Entry.from_dict(item))  # type: ignore
+        return ret
 
 
 # pylint: disable=too-few-public-methods
@@ -137,7 +145,7 @@ class JsonFileWriter(AbstractWriter):
     def write(self, writes: list[Entry]) -> None:
         """Writes entries to a JSON file"""
         writes.sort(key=lambda entry: entry.timestamp)
-        dicts: list[EntryDict] = [entry.to_dict() for entry in writes]
+        dicts: list[dict[str, str]] = [entry.to_dict() for entry in writes]
         with open(self._file, 'w', encoding='utf-8') as file:
             json_str = json.dumps(dicts, indent=4)
             file.write(json_str)
