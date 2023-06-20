@@ -121,12 +121,24 @@ class TestPlaintext(unittest.TestCase):
         """Test the 'random' method of the 'Plaintext' class."""
         test_cases: List[RandomTestCase] = [
             {
-                'args': {'length': 24, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': False},
-                'char_set': string.ascii_lowercase,
+                'args': {'length': 24, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': True},
+                'char_set': string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation,
+            },
+            {
+                'args': {'length': 24, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': False},
+                'char_set': string.ascii_lowercase + string.ascii_uppercase + string.digits,
+            },
+            {
+                'args': {'length': 24, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': True},
+                'char_set': string.ascii_lowercase + string.ascii_uppercase + string.punctuation,
             },
             {
                 'args': {'length': 24, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': False},
                 'char_set': string.ascii_lowercase + string.ascii_uppercase,
+            },
+            {
+                'args': {'length': 24, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': True},
+                'char_set': string.ascii_lowercase + string.digits + string.punctuation,
             },
             {
                 'args': {'length': 24, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': False},
@@ -137,12 +149,8 @@ class TestPlaintext(unittest.TestCase):
                 'char_set': string.ascii_lowercase + string.punctuation,
             },
             {
-                'args': {'length': 24, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': False},
-                'char_set': string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation,
-            },
-            {
-                'args': {'length': 24, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': True},
-                'char_set': string.ascii_lowercase + string.ascii_uppercase + string.punctuation,
+                'args': {'length': 24, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': False},
+                'char_set': string.ascii_lowercase,
             },
         ]
 
