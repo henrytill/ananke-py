@@ -20,11 +20,17 @@ from tartarus.data import (
 from tartarus.store import InMemoryStore, JsonFileReader
 
 
-class LookupTestCase(TypedDict):
+class LookupArgs(TypedDict):
     """A type hint class for testing lookup."""
 
     description: Description
-    identity: Optional[Identity]
+    maybe_identity: Optional[Identity]
+
+
+class LookupTestCase(TypedDict):
+    """A type hint class for testing lookup."""
+
+    args: LookupArgs
     plaintexts: list[Plaintext]
 
 
@@ -72,38 +78,31 @@ class TestApplication(unittest.TestCase):
         # see example/data.json for the test data
         test_cases: list[LookupTestCase] = [
             {
-                'description': Description('https://www.foomail.com'),
-                'identity': Identity('quux'),
+                'args': {'description': Description('https://www.foomail.com'), 'maybe_identity': Identity('quux')},
                 'plaintexts': [Plaintext('ASecretPassword')],
             },
             {
-                'description': Description('https://www.foomail.com'),
-                'identity': None,
+                'args': {'description': Description('https://www.foomail.com'), 'maybe_identity': None},
                 'plaintexts': [Plaintext('ASecretPassword')],
             },
             {
-                'description': Description('https://www.bazbank.com'),
-                'identity': Identity('quux'),
+                'args': {'description': Description('https://www.bazbank.com'), 'maybe_identity': Identity('quux')},
                 'plaintexts': [Plaintext('AnotherSecretPassword')],
             },
             {
-                'description': Description('https://www.bazbank.com'),
-                'identity': None,
+                'args': {'description': Description('https://www.bazbank.com'), 'maybe_identity': None},
                 'plaintexts': [Plaintext('AnotherSecretPassword')],
             },
             {
-                'description': Description('https://www.barphone.com'),
-                'identity': Identity('quux'),
+                'args': {'description': Description('https://www.barphone.com'), 'maybe_identity': Identity('quux')},
                 'plaintexts': [Plaintext('YetAnotherSecretPassword')],
             },
             {
-                'description': Description('https://www.barphone.com'),
-                'identity': None,
+                'args': {'description': Description('https://www.barphone.com'), 'maybe_identity': None},
                 'plaintexts': [Plaintext('YetAnotherSecretPassword')],
             },
             {
-                'description': Description('www'),
-                'identity': Identity('quux'),
+                'args': {'description': Description('www'), 'maybe_identity': Identity('quux')},
                 'plaintexts': [
                     Plaintext('ASecretPassword'),
                     Plaintext('AnotherSecretPassword'),
@@ -111,8 +110,7 @@ class TestApplication(unittest.TestCase):
                 ],
             },
             {
-                'description': Description('www'),
-                'identity': None,
+                'args': {'description': Description('www'), 'maybe_identity': None},
                 'plaintexts': [
                     Plaintext('ASecretPassword'),
                     Plaintext('AnotherSecretPassword'),
@@ -124,9 +122,7 @@ class TestApplication(unittest.TestCase):
         with self.application as app:
             for test_case in test_cases:
                 with self.subTest(test_case=test_case):
-                    plaintexts = [
-                        plaintext for _, plaintext in app.lookup(test_case['description'], test_case['identity'])
-                    ]
+                    plaintexts = [plaintext for _, plaintext in app.lookup(**test_case['args'])]
                     self.assertEqual(test_case['plaintexts'], plaintexts)
 
     def test_add(self):
