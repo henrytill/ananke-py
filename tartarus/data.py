@@ -138,7 +138,6 @@ class Plaintext(str):
     def __new__(cls, value: str) -> Self:
         return super().__new__(cls, value)
 
-    # pylint: disable=too-many-arguments
     @classmethod
     def random(
         cls,
@@ -176,7 +175,7 @@ class Entry:
     """A record that stores an encrypted value along with associated information.
 
     Attributes:
-        id: Uniquely identifies the entry.
+        entry_id: Uniquely identifies the entry.
         key_id: Represents the GPG Key Id used for encryption.
         timestamp: The time the entry was created.
         description: Description of the entry. Can be a URI or a descriptive name.
