@@ -23,7 +23,8 @@ ACTIVATE = which $(PYTHON)
 BUILD_FLAGS = --no-isolation
 endif
 
-GENERATED = tartarus/version.py
+GENERATED = \
+	tartarus/version.py
 
 .PHONY: all
 all: generate
@@ -63,14 +64,14 @@ lint: $(ENV_TARGET)
 	$(PYTHON) -m pylint tartarus tests
 
 tartarus/version.py: FORCE
-	cat << EOF > $@
+	cat <<EOF >$@
 	"""This module contains version information."""
 	# This file is auto-generated, do not edit by hand
 	__version__ = $(VERSION)
 	EOF
 
 .git/hooks/post-commit: FORCE
-	cat << EOF > $@
+	cat <<EOF >$@
 	#!/bin/sh
 	echo "Generating version.py..."
 	make tartarus/version.py >/dev/null
@@ -82,10 +83,10 @@ dist: generate
 
 .PHONY: clean
 clean:
-	rm -f tartarus/version.py
 	rm -rf $(VENV)
 	rm -rf dist
 	rm -rf *.egg-info
+	rm -f $(GENERATED)
 	rm -f .coverage
 	rm -f coverage.xml
 	find . -type d -name '__pycache__' -exec rm -r {} +
