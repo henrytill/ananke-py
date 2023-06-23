@@ -10,7 +10,7 @@ BUILD_ENV = host
 
 VENV = env
 
-VERSION = "0.1.0+$(shell git describe --always)"
+VERSION = "0.1.0+$(shell git rev-parse --short HEAD)"
 
 -include config.mk
 
