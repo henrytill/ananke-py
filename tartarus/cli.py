@@ -3,12 +3,17 @@ import argparse
 import os
 from typing import Mapping, Tuple
 
-from . import config
+from . import config, version
 from .app import Application
 from .codec import GpgCodec
 from .config import Backend, ConfigBuilder, OsFamily
 from .data import Description, Entry, EntryId, Identity, Plaintext
 from .store import InMemoryStore, JsonFileReader, JsonFileWriter
+
+
+def get_version() -> str:
+    """Returns the version of the application."""
+    return version.__version__
 
 
 def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
@@ -162,6 +167,7 @@ def main() -> int:
         The exit code of the application.
     """
     parser = argparse.ArgumentParser(description='A minimal password manager.')
+    parser.add_argument('--version', action='version', version=f'%(prog)s {get_version()}')
     subparsers = parser.add_subparsers(help='Commands')
 
     parser_add = subparsers.add_parser('add', help='add an entry')

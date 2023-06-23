@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tartarus"
-version = "0.1.0"
+dynamic = ["version"]
 description = ""
 authors = [{ name = "Henry Till", email = "henrytill@gmail.com" }]
 readme = "README.md"
@@ -16,6 +16,9 @@ test = ["coverage>=6.5.0"]
 
 [project.scripts]
 tartarus = "tartarus.__main__:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "tartarus.version.__version__" }
 
 [tool.black]
 line-length = 120

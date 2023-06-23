@@ -26,6 +26,9 @@ jobs:
           BUILD_ENV = venv
           EOF
           cat config.mk
+      - name: Generate code
+        run: |
+          make generate
       - name: Install project dependencies
         run: |
           make venv
