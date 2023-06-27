@@ -1,60 +1,9 @@
 """An abstract store."""
 from abc import ABC, abstractmethod
-from typing import Any, NewType, Optional
+from typing import Any, NewType
 
-from ..data import Description, Entry, EntryId, Identity, KeyId, Metadata
-
-
-class Query:
-    """A query for filtering entries.
-
-    This class is used to filter entries in a store.
-
-    It may be subclassed to add additional filtering capabilities.
-
-    Attributes:
-        entry_id: The entry id to filter by.
-        description: The description to filter by.
-        identity: The identity to filter by.
-        meta: The metadata to filter by.
-    """
-
-    __entry_id: Optional[EntryId]
-    __description: Optional[Description]
-    __identity: Optional[Identity]
-    __meta: Optional[Metadata]
-
-    def __init__(
-        self,
-        entry_id: Optional[EntryId] = None,
-        description: Optional[Description] = None,
-        identity: Optional[Identity] = None,
-        meta: Optional[Metadata] = None,
-    ) -> None:
-        self.__entry_id = entry_id
-        self.__description = description
-        self.__identity = identity
-        self.__meta = meta
-
-    @property
-    def entry_id(self) -> Optional[EntryId]:
-        """Returns the entry id."""
-        return self.__entry_id
-
-    @property
-    def description(self) -> Optional[Description]:
-        """Returns the description."""
-        return self.__description
-
-    @property
-    def identity(self) -> Optional[Identity]:
-        """Returns the identity."""
-        return self.__identity
-
-    @property
-    def meta(self) -> Optional[Metadata]:
-        """Returns the metadata."""
-        return self.__meta
+from ..data import Entry, KeyId
+from .store import Query
 
 
 # pylint: disable=too-few-public-methods
