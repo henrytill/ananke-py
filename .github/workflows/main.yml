@@ -32,10 +32,6 @@ jobs:
       - name: Install project dependencies
         run: |
           make venv
-      - name: Test with coverage
+      - name: Test
         run: |
-          make coverage
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          make check
