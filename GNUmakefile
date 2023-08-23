@@ -14,6 +14,18 @@ VERSION = "0.1.0+$(shell git rev-parse --short HEAD)"
 
 -include config.mk
 
+define VERSION_PY =
+\"\"\"This module contains version information.\"\"\"
+# This file is auto-generated, do not edit by hand
+__version__ = \"$(VERSION)\"
+endef
+
+define POST_COMMIT =
+#!/bin/sh
+echo "Generating version.py..."
+make tartarus/version.py >/dev/null
+endef
+
 ifeq ($(BUILD_ENV), venv)
 ENV_TARGET = $(VENV)/pyvenv.cfg
 ACTIVATE = source $(VENV)/bin/activate
@@ -64,18 +76,10 @@ lint: $(ENV_TARGET)
 	$(PYTHON) -m pylint tartarus tests
 
 tartarus/version.py: FORCE
-	cat <<EOF >$@
-	"""This module contains version information."""
-	# This file is auto-generated, do not edit by hand
-	__version__ = $(VERSION)
-	EOF
+	@echo "$(VERSION_PY)" > $@
 
 .git/hooks/post-commit: FORCE
-	cat <<EOF >$@
-	#!/bin/sh
-	echo "Generating version.py..."
-	make tartarus/version.py >/dev/null
-	EOF
+	@echo "$(POST_COMMIT)" > $@
 	chmod +x $@
 
 dist: generate
