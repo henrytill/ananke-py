@@ -313,6 +313,15 @@ class Entry:
 
 
 CAMEL_TO_SNAKE = {
+    # camelCase
+    'timestamp': 'timestamp',
+    'id': 'id',
+    'keyId': 'key_id',
+    'description': 'description',
+    'identity': 'identity',
+    'ciphertext': 'ciphertext',
+    'meta': 'meta',
+    # PascalCase
     'Timestamp': 'timestamp',
     'Id': 'id',
     'KeyId': 'key_id',
@@ -320,6 +329,16 @@ CAMEL_TO_SNAKE = {
     'Identity': 'identity',
     'Ciphertext': 'ciphertext',
     'Meta': 'meta',
+}
+
+SNAKE_TO_CAMEL = {
+    'timestamp': 'timestamp',
+    'id': 'id',
+    'key_id': 'keyId',
+    'description': 'description',
+    'identity': 'identity',
+    'ciphertext': 'ciphertext',
+    'meta': 'meta',
 }
 
 
@@ -339,3 +358,4 @@ def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 remap_keys_camel_to_snake = functools.partial(remap_keys, CAMEL_TO_SNAKE)
+remap_keys_snake_to_camel = functools.partial(remap_keys, SNAKE_TO_CAMEL)

@@ -145,7 +145,7 @@ class JsonFileWriter(AbstractWriter):
     def write(self, writes: list[Entry]) -> None:
         """Writes entries to a JSON file"""
         writes.sort(key=lambda entry: entry.timestamp)
-        dicts: list[dict[str, str]] = [entry.to_dict() for entry in writes]
+        dicts: list[dict[str, str]] = [data.remap_keys_snake_to_camel(entry.to_dict()) for entry in writes]
         with open(self._file, 'w', encoding='utf-8') as file:
             json_str = json.dumps(dicts, indent=4)
             file.write(json_str)
