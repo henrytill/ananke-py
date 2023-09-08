@@ -23,18 +23,18 @@ class TestInMemoryStore(unittest.TestCase):
     def test_put(self):
         """Tests the 'put' method."""
         entry = Entry(
-            entry_id=EntryId('1'),
-            description=Description('test'),
+            entry_id=EntryId("1"),
+            description=Description("test"),
             timestamp=Timestamp.now(),
-            identity=Identity('test'),
-            meta=Metadata('test'),
-            ciphertext=Ciphertext(b'test'),
-            key_id=KeyId('test'),
+            identity=Identity("test"),
+            meta=Metadata("test"),
+            ciphertext=Ciphertext(b"test"),
+            key_id=KeyId("test"),
         )
         query = Query(description=entry.description)
         self.store.put(entry)
         self.assertEqual(self.store.query(query), [entry])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

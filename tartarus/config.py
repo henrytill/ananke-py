@@ -20,21 +20,21 @@ def strtobool(bool_str: str) -> bool:
     Raises:
         ValueError: If the string is not a valid boolean.
     """
-    if bool_str.lower() in {'true', 'yes', 'on', '1'}:
+    if bool_str.lower() in {"true", "yes", "on", "1"}:
         return True
-    if bool_str.lower() in {'false', 'no', 'off', '0'}:
+    if bool_str.lower() in {"false", "no", "off", "0"}:
         return False
-    raise ValueError(f'Invalid boolean string: {bool_str}')
+    raise ValueError(f"Invalid boolean string: {bool_str}")
 
 
 # pylint: disable=too-few-public-methods
 class Env:
     """Environment variables used for configuration."""
 
-    DATA_DIR: str = 'TARTARUS_DATA_DIR'
-    BACKEND: str = 'TARTARUS_BACKEND'
-    KEY_ID: str = 'TARTARUS_KEY_ID'
-    ALLOW_MULTIPLE_KEYS: str = 'TARTARUS_ALLOW_MULTIPLE_KEYS'
+    DATA_DIR: str = "TARTARUS_DATA_DIR"
+    BACKEND: str = "TARTARUS_BACKEND"
+    KEY_ID: str = "TARTARUS_KEY_ID"
+    ALLOW_MULTIPLE_KEYS: str = "TARTARUS_ALLOW_MULTIPLE_KEYS"
 
 
 class OsFamily(Enum):
@@ -44,7 +44,7 @@ class OsFamily(Enum):
     NT = 2
 
     @staticmethod
-    def from_str(os_family_str: str) -> 'OsFamily':
+    def from_str(os_family_str: str) -> "OsFamily":
         """Creates an OsFamily from a string.
 
         Args:
@@ -54,18 +54,18 @@ class OsFamily(Enum):
             The created OsFamily.
         """
         match = {
-            'posix': OsFamily.POSIX,
-            'nt': OsFamily.NT,
+            "posix": OsFamily.POSIX,
+            "nt": OsFamily.NT,
         }
         try:
             return match[os_family_str]
         except KeyError as exc:
-            raise ValueError(f'Invalid OsFamily string: {os_family_str}') from exc
+            raise ValueError(f"Invalid OsFamily string: {os_family_str}") from exc
 
     def __str__(self) -> str:
         return {
-            self.POSIX: 'posix',
-            self.NT: 'nt',
+            self.POSIX: "posix",
+            self.NT: "nt",
         }[self]
 
 
@@ -76,7 +76,7 @@ class Backend(Enum):
     JSON = 2
 
     @staticmethod
-    def from_str(backend_str: str) -> 'Backend':
+    def from_str(backend_str: str) -> "Backend":
         """Creates a Backend from a string.
 
         Args:
@@ -86,18 +86,18 @@ class Backend(Enum):
             The created Backend.
         """
         match = {
-            'sqlite': Backend.SQLITE,
-            'json': Backend.JSON,
+            "sqlite": Backend.SQLITE,
+            "json": Backend.JSON,
         }
         try:
             return match[backend_str]
         except KeyError as exc:
-            raise ValueError(f'Invalid Backend string: {backend_str}') from exc
+            raise ValueError(f"Invalid Backend string: {backend_str}") from exc
 
     def __str__(self) -> str:
         return {
-            self.SQLITE: 'sqlite',
-            self.JSON: 'json',
+            self.SQLITE: "sqlite",
+            self.JSON: "json",
         }[self]
 
 
@@ -124,7 +124,7 @@ class Config:
         Returns:
             The path to the data file.
         """
-        return self.data_dir / 'db' / 'data.json'
+        return self.data_dir / "db" / "data.json"
 
 
 class ConfigBuilder:
@@ -189,19 +189,19 @@ class ConfigBuilder:
         config_parser = configparser.ConfigParser()
         config_parser.read_string(config)
 
-        data_dir = config_parser.get('data', 'dir', fallback=None)
+        data_dir = config_parser.get("data", "dir", fallback=None)
         if data_dir is not None:
             self._data_dir = Path(data_dir)
 
-        backend = config_parser.get('data', 'backend', fallback=None)
+        backend = config_parser.get("data", "backend", fallback=None)
         if backend is not None:
             self._backend = Backend.from_str(backend)
 
-        key_id = config_parser.get('gpg', 'key_id', fallback=None)
+        key_id = config_parser.get("gpg", "key_id", fallback=None)
         if key_id is not None:
             self._key_id = KeyId(key_id)
 
-        allow_multiple_keys = config_parser.getboolean('gpg', 'allow_multiple_keys', fallback=None)
+        allow_multiple_keys = config_parser.getboolean("gpg", "allow_multiple_keys", fallback=None)
         if allow_multiple_keys is not None:
             self._allow_multiple_keys = bool(allow_multiple_keys)
 
@@ -219,13 +219,13 @@ class ConfigBuilder:
         """
         if self._data_dir is None:
             if os_family is OsFamily.NT:
-                local_app_data = env.get('LOCALAPPDATA')
-                data_home = Path(local_app_data) if local_app_data else Path.home() / 'AppData' / 'Local'
+                local_app_data = env.get("LOCALAPPDATA")
+                data_home = Path(local_app_data) if local_app_data else Path.home() / "AppData" / "Local"
             else:
-                xdg_data_home = env.get('XDG_DATA_HOME')
-                data_home = Path(xdg_data_home) if xdg_data_home else Path.home() / '.local' / 'share'
+                xdg_data_home = env.get("XDG_DATA_HOME")
+                data_home = Path(xdg_data_home) if xdg_data_home else Path.home() / ".local" / "share"
 
-            self._data_dir = data_home / 'tartarus'
+            self._data_dir = data_home / "tartarus"
 
         if self._backend is None:
             self._backend = Backend.JSON
@@ -242,16 +242,16 @@ class ConfigBuilder:
             The configuration object.
         """
         if self._data_dir is None:
-            raise ValueError('data_dir is not set')
+            raise ValueError("data_dir is not set")
 
         if self._backend is None:
-            raise ValueError('backend is not set')
+            raise ValueError("backend is not set")
 
         if self._key_id is None:
-            raise ValueError('key_id is not set')
+            raise ValueError("key_id is not set")
 
         if self._allow_multiple_keys is None:
-            raise ValueError('allow_multiple_keys is not set')
+            raise ValueError("allow_multiple_keys is not set")
 
         # Create a configuration object
         config = Config(
@@ -276,11 +276,11 @@ def get_config_dir(os_family: OsFamily, env: Mapping[str, str]) -> Path:
         The path to the configuration directory.
     """
     if os_family is OsFamily.NT:
-        app_data = env.get('APPDATA')
-        config_home = Path(app_data) if app_data else Path.home() / 'AppData' / 'Roaming'
+        app_data = env.get("APPDATA")
+        config_home = Path(app_data) if app_data else Path.home() / "AppData" / "Roaming"
     else:
-        xdg_config_home = env.get('XDG_CONFIG_HOME')
-        config_home = Path(xdg_config_home) if xdg_config_home else Path.home() / '.config'
+        xdg_config_home = env.get("XDG_CONFIG_HOME")
+        config_home = Path(xdg_config_home) if xdg_config_home else Path.home() / ".config"
 
     return config_home
 
@@ -296,4 +296,4 @@ def get_config_file(os_family: OsFamily, env: Mapping[str, str]) -> Path:
         The path to the configuration file.
     """
     config_home = get_config_dir(os_family, env)
-    return config_home / 'tartarus' / 'tartarus.ini'
+    return config_home / "tartarus" / "tartarus.ini"

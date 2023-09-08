@@ -8,16 +8,16 @@ import string
 from datetime import datetime, timezone
 from typing import Any, Dict, NewType, Optional, Self
 
-KeyId = NewType('KeyId', str)
+KeyId = NewType("KeyId", str)
 """A Cryptographic Key Id."""
 
-Description = NewType('Description', str)
+Description = NewType("Description", str)
 """Describes an 'Entry'. Can be a URI or a descriptive name."""
 
-Identity = NewType('Identity', str)
+Identity = NewType("Identity", str)
 """An identifying value, such as the username in a username/password pair."""
 
-Metadata = NewType('Metadata', str)
+Metadata = NewType("Metadata", str)
 """Contains additional non-specific information for an 'Entry'."""
 
 
@@ -49,7 +49,7 @@ class Timestamp:
 
     def isoformat(self) -> str:
         """Returns the timestamp as an ISO 8601 string."""
-        return self.timestamp.isoformat().replace('+00:00', 'Z')
+        return self.timestamp.isoformat().replace("+00:00", "Z")
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, Timestamp):
@@ -92,7 +92,7 @@ class EntryId(str):
         Returns:
             The generated EntryId.
         """
-        input_str = f'{key_id}{timestamp.isoformat()}{description}'
+        input_str = f"{key_id}{timestamp.isoformat()}{description}"
         if maybe_identity:
             input_str += maybe_identity
         sha_signature = hashlib.sha1(input_str.encode()).hexdigest()
@@ -119,7 +119,7 @@ class Ciphertext(bytes):
             ValueError: If the value is not a valid base64 encoded string.
         """
         try:
-            return cls(base64.b64decode(value.encode('ascii')))
+            return cls(base64.b64decode(value.encode("ascii")))
         except binascii.Error as exc:
             raise ValueError("Invalid base64 string") from exc
 
@@ -129,7 +129,7 @@ class Ciphertext(bytes):
         Returns:
             The base64 encoded string.
         """
-        return base64.b64encode(self).decode('ascii')
+        return base64.b64encode(self).decode("ascii")
 
 
 class Plaintext(str):
@@ -166,7 +166,7 @@ class Plaintext(str):
         if use_punctuation:
             chars += string.punctuation
 
-        ret = cls(''.join(secrets.choice(chars) for _ in range(length)))
+        ret = cls("".join(secrets.choice(chars) for _ in range(length)))
 
         return cls(ret)
 
@@ -239,23 +239,23 @@ class Entry:
         """
         # Check required keys
         required_keys = {
-            'id': str,
-            'key_id': str,
-            'timestamp': str,
-            'description': str,
-            'ciphertext': str,
+            "id": str,
+            "key_id": str,
+            "timestamp": str,
+            "description": str,
+            "ciphertext": str,
         }
 
         for key, value_type in required_keys.items():
             if key not in data:
                 raise ValueError(f'Invalid entry format: missing required key "{key}"')
             if not isinstance(data[key], value_type):
-                raise ValueError(f'Invalid {key} format')
+                raise ValueError(f"Invalid {key} format")
 
         # Check optional keys
         optional_keys = {
-            'identity': str,
-            'meta': str,
+            "identity": str,
+            "meta": str,
         }
 
         for key, value_type in optional_keys.items():
@@ -263,30 +263,30 @@ class Entry:
             if maybe_value is None:
                 continue
             if not isinstance(maybe_value, value_type):
-                raise ValueError(f'Invalid {key} format')
+                raise ValueError(f"Invalid {key} format")
 
-        maybe_identity = data.get('identity')
-        maybe_meta = data.get('meta')
+        maybe_identity = data.get("identity")
+        maybe_meta = data.get("meta")
 
         # Validate timestamp
-        timestamp_str = data['timestamp']
+        timestamp_str = data["timestamp"]
         try:
             timestamp = Timestamp.fromisoformat(timestamp_str)
         except ValueError as err:
-            raise ValueError('Invalid timestamp format') from err
+            raise ValueError("Invalid timestamp format") from err
 
         # Validate ciphertext
-        ciphertext_str = data['ciphertext']
+        ciphertext_str = data["ciphertext"]
         try:
             ciphertext = Ciphertext.from_base64(ciphertext_str)
         except ValueError as err:
-            raise ValueError('Invalid ciphertext format') from err
+            raise ValueError("Invalid ciphertext format") from err
 
         return cls(
-            entry_id=EntryId(data['id']),
-            key_id=KeyId(data['key_id']),
+            entry_id=EntryId(data["id"]),
+            key_id=KeyId(data["key_id"]),
             timestamp=timestamp,
-            description=Description(data['description']),
+            description=Description(data["description"]),
             identity=Identity(maybe_identity) if maybe_identity else None,
             ciphertext=ciphertext,
             meta=Metadata(maybe_meta) if maybe_meta else None,
@@ -299,46 +299,46 @@ class Entry:
             The converted 'Entry'.
         """
         ret = {
-            'timestamp': self.timestamp.isoformat(),
-            'id': self.entry_id,
-            'key_id': self.key_id,
-            'description': self.description,
-            'ciphertext': self.ciphertext.to_base64(),
+            "timestamp": self.timestamp.isoformat(),
+            "id": self.entry_id,
+            "key_id": self.key_id,
+            "description": self.description,
+            "ciphertext": self.ciphertext.to_base64(),
         }
         if self.identity is not None:
-            ret['identity'] = self.identity
+            ret["identity"] = self.identity
         if self.meta is not None:
-            ret['meta'] = self.meta
+            ret["meta"] = self.meta
         return ret
 
 
 CAMEL_TO_SNAKE = {
     # camelCase
-    'timestamp': 'timestamp',
-    'id': 'id',
-    'keyId': 'key_id',
-    'description': 'description',
-    'identity': 'identity',
-    'ciphertext': 'ciphertext',
-    'meta': 'meta',
+    "timestamp": "timestamp",
+    "id": "id",
+    "keyId": "key_id",
+    "description": "description",
+    "identity": "identity",
+    "ciphertext": "ciphertext",
+    "meta": "meta",
     # PascalCase
-    'Timestamp': 'timestamp',
-    'Id': 'id',
-    'KeyId': 'key_id',
-    'Description': 'description',
-    'Identity': 'identity',
-    'Ciphertext': 'ciphertext',
-    'Meta': 'meta',
+    "Timestamp": "timestamp",
+    "Id": "id",
+    "KeyId": "key_id",
+    "Description": "description",
+    "Identity": "identity",
+    "Ciphertext": "ciphertext",
+    "Meta": "meta",
 }
 
 SNAKE_TO_CAMEL = {
-    'timestamp': 'timestamp',
-    'id': 'id',
-    'key_id': 'keyId',
-    'description': 'description',
-    'identity': 'identity',
-    'ciphertext': 'ciphertext',
-    'meta': 'meta',
+    "timestamp": "timestamp",
+    "id": "id",
+    "key_id": "keyId",
+    "description": "description",
+    "identity": "identity",
+    "ciphertext": "ciphertext",
+    "meta": "meta",
 }
 
 

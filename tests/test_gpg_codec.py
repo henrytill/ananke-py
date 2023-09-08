@@ -22,16 +22,16 @@ class TestGpgCodec(unittest.TestCase):
     """Test cases for the GpgCodec class."""
 
     def setUp(self) -> None:
-        self.key_id = KeyId('371C136C')
+        self.key_id = KeyId("371C136C")
         self.codec = GpgCodec(self.key_id)
-        os.environ['GNUPGHOME'] = str(Path.cwd() / 'example' / 'gnupg')
+        os.environ["GNUPGHOME"] = str(Path.cwd() / "example" / "gnupg")
 
     def test_encode_decode(self):
         """Tests the encode and decode methods."""
         test_cases = [
-            'ASecretPassword',
-            'AnotherSecretPassword',
-            'YetAnotherSecretPassword',
+            "ASecretPassword",
+            "AnotherSecretPassword",
+            "YetAnotherSecretPassword",
         ]
 
         for test_case in test_cases:
@@ -46,23 +46,23 @@ class TestGpgCodec(unittest.TestCase):
         """Tests the encode and decode methods with random data."""
         test_cases: list[RandomArgs] = [
             # length = 24
-            {'length': 24, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': True},
-            {'length': 24, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': False},
-            {'length': 24, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': True},
-            {'length': 24, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': False},
-            {'length': 24, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': True},
-            {'length': 24, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': False},
-            {'length': 24, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': True},
-            {'length': 24, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': False},
+            {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": True},
+            {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": False},
+            {"length": 24, "use_uppercase": True, "use_digits": False, "use_punctuation": True},
+            {"length": 24, "use_uppercase": True, "use_digits": False, "use_punctuation": False},
+            {"length": 24, "use_uppercase": False, "use_digits": True, "use_punctuation": True},
+            {"length": 24, "use_uppercase": False, "use_digits": True, "use_punctuation": False},
+            {"length": 24, "use_uppercase": False, "use_digits": False, "use_punctuation": True},
+            {"length": 24, "use_uppercase": False, "use_digits": False, "use_punctuation": False},
             # length = 48
-            {'length': 48, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': True},
-            {'length': 48, 'use_uppercase': True, 'use_digits': True, 'use_punctuation': False},
-            {'length': 48, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': True},
-            {'length': 48, 'use_uppercase': True, 'use_digits': False, 'use_punctuation': False},
-            {'length': 48, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': True},
-            {'length': 48, 'use_uppercase': False, 'use_digits': True, 'use_punctuation': False},
-            {'length': 48, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': True},
-            {'length': 48, 'use_uppercase': False, 'use_digits': False, 'use_punctuation': False},
+            {"length": 48, "use_uppercase": True, "use_digits": True, "use_punctuation": True},
+            {"length": 48, "use_uppercase": True, "use_digits": True, "use_punctuation": False},
+            {"length": 48, "use_uppercase": True, "use_digits": False, "use_punctuation": True},
+            {"length": 48, "use_uppercase": True, "use_digits": False, "use_punctuation": False},
+            {"length": 48, "use_uppercase": False, "use_digits": True, "use_punctuation": True},
+            {"length": 48, "use_uppercase": False, "use_digits": True, "use_punctuation": False},
+            {"length": 48, "use_uppercase": False, "use_digits": False, "use_punctuation": True},
+            {"length": 48, "use_uppercase": False, "use_digits": False, "use_punctuation": False},
         ]
 
         for test_case in test_cases:
@@ -75,15 +75,15 @@ class TestGpgCodec(unittest.TestCase):
 
     def test_encode_failure(self):
         """Tests the encode method with a bogus GNUPGHOME environment variable."""
-        os.environ['GNUPGHOME'] = tempfile.mkdtemp()
+        os.environ["GNUPGHOME"] = tempfile.mkdtemp()
         with self.assertRaises(ValueError):
-            self.codec.encode(Plaintext('test'))
+            self.codec.encode(Plaintext("test"))
 
     def test_decode_failure(self):
         """Tests the decode method with a bogus GNUPGHOME environment variable."""
-        os.environ['GNUPGHOME'] = tempfile.mkdtemp()
+        os.environ["GNUPGHOME"] = tempfile.mkdtemp()
         with self.assertRaises(ValueError):
-            self.codec.decode(Ciphertext(b'test'))
+            self.codec.decode(Ciphertext(b"test"))
 
     def test_key_id_getter(self) -> None:
         """Tests the key_id getter.
@@ -97,10 +97,10 @@ class TestGpgCodec(unittest.TestCase):
 
         This test checks that the setter of the key_id property updates the KeyId correctly.
         """
-        codec = GpgCodec(KeyId('original_key_id'))
-        codec.key_id = KeyId('new_key_id')
-        self.assertEqual(codec.key_id, KeyId('new_key_id'))
+        codec = GpgCodec(KeyId("original_key_id"))
+        codec.key_id = KeyId("new_key_id")
+        self.assertEqual(codec.key_id, KeyId("new_key_id"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -8,7 +8,7 @@ from .data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Ti
 from .store import AbstractReader, AbstractStore, AbstractWriter, Query
 
 
-class Application(AbstractContextManager['Application']):
+class Application(AbstractContextManager["Application"]):
     """The main application class."""
 
     def __init__(

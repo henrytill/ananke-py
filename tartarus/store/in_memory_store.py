@@ -121,16 +121,16 @@ class JsonFileReader(AbstractReader):
 
     def read(self) -> list[Entry]:
         """Reads entries from a JSON file"""
-        with open(self._file, 'r', encoding='utf-8') as file:
+        with open(self._file, "r", encoding="utf-8") as file:
             json_data = file.read()
 
         parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
         if not isinstance(parsed, list):
-            raise ValueError('Expected a list')
+            raise ValueError("Expected a list")
         ret: list[Entry] = []
         for item in parsed:  # type: ignore
             if not isinstance(item, dict):
-                raise ValueError('Expected a dictionary')
+                raise ValueError("Expected a dictionary")
             ret.append(Entry.from_dict(item))  # type: ignore
         return ret
 
@@ -146,6 +146,6 @@ class JsonFileWriter(AbstractWriter):
         """Writes entries to a JSON file"""
         writes.sort(key=lambda entry: entry.timestamp)
         dicts: list[dict[str, str]] = [data.remap_keys_snake_to_camel(entry.to_dict()) for entry in writes]
-        with open(self._file, 'w', encoding='utf-8') as file:
+        with open(self._file, "w", encoding="utf-8") as file:
             json_str = json.dumps(dicts, indent=4)
             file.write(json_str)

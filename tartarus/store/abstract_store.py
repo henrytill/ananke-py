@@ -111,7 +111,7 @@ class AbstractStore(ABC):
         """Synchronizes the store."""
 
 
-SchemaVersion = NewType('SchemaVersion', int)
+SchemaVersion = NewType("SchemaVersion", int)
 """Represents a schema version."""
 
 
