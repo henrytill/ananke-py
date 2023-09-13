@@ -54,12 +54,12 @@ class Timestamp:
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, Timestamp):
             return False
-        return self.timestamp == value.timestamp
+        return self.timestamp.__eq__(value.timestamp)
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, Timestamp):
             raise TypeError(f"'<' not supported between instances of 'Timestamp' and '{type(other).__name__}'")
-        return self.timestamp < other.timestamp
+        return self.timestamp.__lt__(other.timestamp)
 
     @property
     def value(self) -> datetime:
