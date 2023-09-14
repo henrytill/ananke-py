@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .. import data
 from ..data import Description, Entry, KeyId
-from .abstract_store import AbstractReader, AbstractStore, AbstractWriter, Query
+from .store import Query, Reader, Writer
 
 
 class EntryMap(defaultdict[Description, set[Entry]]):
@@ -61,7 +61,7 @@ class InMemoryQuery(Query):
         return self.meta.lower() in entry.meta.lower()
 
 
-class InMemoryStore(AbstractStore):
+class InMemoryStore:
     """An in-memory store.
 
     This class is used to store entries in memory.
@@ -74,19 +74,42 @@ class InMemoryStore(AbstractStore):
         self._storage = EntryMap()
         self._dirty = False
 
-    def init(self, reader: AbstractReader) -> None:
+    def init(self, reader: Reader) -> None:
+        """Initializes the store.
+
+        Args:
+            reader: The reader to use to initialize the store.
+        """
         for entry in reader.read():
             self._storage.add(entry)
 
     def put(self, entry: Entry) -> None:
+        """Puts an entry into the store.
+
+        Args:
+            entry: The entry to put into the store.
+        """
         self._storage.add(entry)
         self._dirty = True
 
     def remove(self, entry: Entry) -> None:
+        """Removes an entry from the store.
+
+        Args:
+            entry: The entry to remove from the store.
+        """
         self._storage.discard(entry)
         self._dirty = True
 
     def query(self, query: Query) -> list[Entry]:
+        """Queries the store.
+
+        Args:
+            query: The query to run.
+
+        Returns:
+            A list of entries that match the query.
+        """
         query = InMemoryQuery(query)
         return [
             entry
@@ -97,15 +120,38 @@ class InMemoryStore(AbstractStore):
         ]
 
     def select_all(self) -> list[Entry]:
+        """Returns all entries from the store.
+
+        Returns:
+            A list of entries.
+        """
         return [entry for entries in self._storage.values() for entry in entries]
 
     def get_count(self) -> int:
+        """Returns the count of all entries in the store.
+
+        Returns:
+            The count of all entries.
+        """
         return sum(len(entries) for entries in self._storage.values())
 
     def get_count_of_key_id(self, key_id: KeyId) -> int:
+        """Returns the count of entries for a specific key id.
+
+        Args:
+            key_id: The key id to count entries for.
+
+        Returns:
+            The count of entries for the key id.
+        """
         return sum(entry.key_id == key_id for entries in self._storage.values() for entry in entries)
 
-    def sync(self, writer: AbstractWriter) -> None:
+    def sync(self, writer: Writer) -> None:
+        """Synchronizes the store.
+
+        Args:
+            writer: The writer to use to synchronize the store.
+        """
         if self._dirty:
             entries = self.select_all()
             writer.write(entries)
@@ -113,7 +159,7 @@ class InMemoryStore(AbstractStore):
 
 
 # pylint: disable=too-few-public-methods
-class JsonFileReader(AbstractReader):
+class JsonFileReader:
     """A JSON file reader."""
 
     def __init__(self, file: Path) -> None:
@@ -136,7 +182,7 @@ class JsonFileReader(AbstractReader):
 
 
 # pylint: disable=too-few-public-methods
-class JsonFileWriter(AbstractWriter):
+class JsonFileWriter:
     """A JSON file writer."""
 
     def __init__(self, file: Path) -> None:

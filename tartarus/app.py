@@ -3,9 +3,9 @@ from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Optional, Self, Tuple, Type
 
-from .codec import AbstractCodec
+from .codec import Codec
 from .data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
-from .store import AbstractReader, AbstractStore, AbstractWriter, Query
+from .store import Query, Reader, Store, Writer
 
 
 class Application(AbstractContextManager["Application"]):
@@ -13,10 +13,10 @@ class Application(AbstractContextManager["Application"]):
 
     def __init__(
         self,
-        store: AbstractStore,
-        reader: AbstractReader,
-        writer: AbstractWriter,
-        codec: AbstractCodec,
+        store: Store,
+        reader: Reader,
+        writer: Writer,
+        codec: Codec,
     ) -> None:
         self._store = store
         self._reader = reader
