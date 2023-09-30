@@ -148,7 +148,7 @@ class ConfigBuilder:
         self._allow_multiple_keys = allow_multiple_keys
 
     def with_env(self, env: Mapping[str, str]) -> Self:
-        """Updates unset attributes from environment variables.
+        """Updates attributes from environment variables.
 
         Args:
             env: An environment. Typically, this is `os.environ`.
@@ -178,7 +178,7 @@ class ConfigBuilder:
         return self
 
     def with_config(self, config: str) -> Self:
-        """Updates unset attributes from the string representation of a configuration file.
+        """Updates attributes from the string representation of a configuration file.
 
         Args:
             config: The string representation of a configuration file.
