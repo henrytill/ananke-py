@@ -3,6 +3,7 @@ tartarus/version.py
 /*.egg-info/
 /build/
 /dist/
+/.pytest_cache/
 __pycache__/
 example/gnupg/random_seed
 example/gnupg/.gpg-v21-migrated
