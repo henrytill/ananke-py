@@ -353,6 +353,14 @@ def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
 
     Returns:
         A new dictionary where the keys have been replaced according to the mapping.
+
+    Examples:
+    >>> remap_keys({"a": "b"}, {"a": 1})
+    {'b': 1}
+    >>> remap_keys({"a": "b"}, {"a": 1, "c": 2})
+    {'b': 1, 'c': 2}
+    >>> remap_keys({"a": "b"}, {"c": 1})
+    {'c': 1}
     """
     return {mapping.get(key, key): value for key, value in data.items()}
 
