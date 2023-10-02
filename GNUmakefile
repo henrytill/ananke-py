@@ -62,6 +62,7 @@ generate: $(GENERATED)
 check: $(ENV_TARGET)
 	$(ACTIVATE)
 	$(PYTHON) -m unittest discover -v -s tests
+	$(PYTHON) -m doctest -v tartarus/data.py
 
 .PHONY: coverage
 coverage: $(ENV_TARGET)

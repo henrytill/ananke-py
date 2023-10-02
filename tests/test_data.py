@@ -1,10 +1,8 @@
 """Tests for the 'data' module."""
-import doctest
 import string
 import unittest
 from datetime import datetime, timezone
 from typing import List, LiteralString, TypedDict
-from unittest import TestLoader, TestSuite
 
 from tartarus import data
 from tartarus.data import (
@@ -345,12 +343,6 @@ class TestKeyConversion(unittest.TestCase):
                 input_dict = test_case["input_dict"]
                 expected_output = test_case["expected_output"]
                 self.assertEqual(expected_output, data.remap_keys(key_map, input_dict))
-
-
-# pylint: disable=unused-argument, missing-function-docstring
-def load_tests(loader: TestLoader, tests: TestSuite, ignore: object) -> TestSuite:
-    tests.addTests(doctest.DocTestSuite(data))
-    return tests
 
 
 if __name__ == "__main__":
