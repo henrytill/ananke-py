@@ -27,7 +27,8 @@ def strtobool(bool_str: str) -> bool:
     raise ValueError(f"Invalid boolean string: {bool_str}")
 
 
-# pylint: disable=too-few-public-methods
+# pylint: disable=invalid-name
+@dataclass(frozen=True)
 class Env:
     """Environment variables used for configuration."""
 
