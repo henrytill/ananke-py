@@ -5,13 +5,13 @@ from typing import Optional, TypedDict
 from unittest.mock import Mock
 
 from tartarus.app import Application
-from tartarus.codec import GpgCodec
 from tartarus.config import ConfigBuilder, OsFamily
 from tartarus.data import (
     Ciphertext,
     Description,
     Entry,
     EntryId,
+    GpgCodec,
     Identity,
     Metadata,
     Plaintext,

@@ -16,7 +16,7 @@ class Application(AbstractContextManager["Application"]):
         store: Store,
         reader: Reader,
         writer: Writer,
-        codec: Codec,
+        codec: Codec[Plaintext],
     ) -> None:
         self._store = store
         self._reader = reader

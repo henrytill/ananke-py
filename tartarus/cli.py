@@ -5,9 +5,8 @@ from typing import Mapping, Tuple
 
 from . import config, version
 from .app import Application
-from .codec import GpgCodec
 from .config import Backend, ConfigBuilder, OsFamily
-from .data import Description, Entry, EntryId, Identity, Plaintext
+from .data import Description, Entry, EntryId, GpgCodec, Identity, Plaintext
 from .store import InMemoryStore, JsonFileReader, JsonFileWriter
 
 
