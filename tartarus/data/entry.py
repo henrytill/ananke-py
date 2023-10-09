@@ -1,70 +1,11 @@
-"""Core data structures and related functions."""
+"""Module for the 'Entry' class and related types."""
 import base64
 import binascii
 import functools
 import hashlib
-import secrets
-import string
-from datetime import datetime, timezone
-from typing import Any, Dict, NewType, Optional, Self
+from typing import Any, Optional, Self
 
-KeyId = NewType("KeyId", str)
-"""A Cryptographic Key Id."""
-
-Description = NewType("Description", str)
-"""Describes an 'Entry'. Can be a URI or a descriptive name."""
-
-Identity = NewType("Identity", str)
-"""An identifying value, such as the username in a username/password pair."""
-
-Metadata = NewType("Metadata", str)
-"""Contains additional non-specific information for an 'Entry'."""
-
-
-class Timestamp:
-    """A UTC timestamp."""
-
-    def __init__(self, timestamp: datetime) -> None:
-        self.timestamp = timestamp
-
-    @classmethod
-    def now(cls) -> Self:
-        """Creates a Timestamp object with the current time."""
-        return cls(datetime.now(timezone.utc))
-
-    @classmethod
-    def fromisoformat(cls, timestamp: str) -> Self:
-        """Creates a Timestamp object from an ISO 8601 string.
-
-        Args:
-            timestamp: The ISO 8601 string.
-
-        Returns:
-            The Timestamp object.
-
-        Raises:
-            ValueError: If the timestamp is in an invalid format.
-        """
-        return cls(datetime.fromisoformat(timestamp))
-
-    def isoformat(self) -> str:
-        """Returns the timestamp as an ISO 8601 string."""
-        return self.timestamp.isoformat().replace("+00:00", "Z")
-
-    def __eq__(self, value: object) -> bool:
-        if not isinstance(value, Timestamp):
-            return False
-        return self.timestamp.__eq__(value.timestamp)
-
-    def __lt__(self, other: object) -> bool:
-        if not isinstance(other, Timestamp):
-            raise TypeError(f"'<' not supported between instances of 'Timestamp' and '{type(other).__name__}'")
-        return self.timestamp.__lt__(other.timestamp)
-
-    @property
-    def value(self) -> datetime:
-        """Returns the timestamp value."""
-        return self.timestamp
+from .core import Description, Identity, KeyId, Metadata, Timestamp, remap_keys
 
 
 class EntryId(str):
@@ -130,45 +71,6 @@ class Ciphertext(bytes):
             The base64 encoded string.
         """
         return base64.b64encode(self).decode("ascii")
-
-
-class Plaintext(str):
-    """A plaintext value."""
-
-    def __new__(cls, value: str) -> Self:
-        return super().__new__(cls, value)
-
-    @classmethod
-    def random(
-        cls,
-        length: int,
-        use_uppercase: bool = True,
-        use_digits: bool = True,
-        use_punctuation: bool = False,
-    ) -> Self:
-        """Generates a random Plaintext of a given length.
-
-        Args:
-            length: The length of the generated string.
-            use_lowercase: Whether to use lowercase letters.
-            use_uppercase: Whether to use uppercase letters.
-            use_digits: Whether to use digits.
-            use_punctuation: Whether to use punctuation.
-
-        Returns:
-            A random Plaintext of the specified length.
-        """
-        chars = string.ascii_lowercase
-        if use_uppercase:
-            chars += string.ascii_uppercase
-        if use_digits:
-            chars += string.digits
-        if use_punctuation:
-            chars += string.punctuation
-
-        ret = cls("".join(secrets.choice(chars) for _ in range(length)))
-
-        return cls(ret)
 
 
 class Entry:
@@ -340,29 +242,6 @@ SNAKE_TO_CAMEL = {
     "ciphertext": "ciphertext",
     "meta": "meta",
 }
-
-
-def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
-    """Maps the keys of a dictionary to a new set of keys.
-
-    If a key is not present in the mapping, it is left unchanged.
-
-    Args:
-        mapping: A dictionary that maps the old keys to the new keys.
-        data: The dictionary to transform.
-
-    Returns:
-        A new dictionary where the keys have been replaced according to the mapping.
-
-    Examples:
-    >>> remap_keys({"a": "b"}, {"a": 1})
-    {'b': 1}
-    >>> remap_keys({"a": "b"}, {"a": 1, "c": 2})
-    {'b': 1, 'c': 2}
-    >>> remap_keys({"a": "b"}, {"c": 1})
-    {'c': 1}
-    """
-    return {mapping.get(key, key): value for key, value in data.items()}
 
 
 remap_keys_camel_to_snake = functools.partial(remap_keys, CAMEL_TO_SNAKE)
