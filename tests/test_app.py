@@ -4,9 +4,9 @@ import unittest
 from typing import Optional, TypedDict
 from unittest.mock import Mock
 
-from tartarus.app import Application
-from tartarus.config import ConfigBuilder, OsFamily
-from tartarus.data import (
+from ananke.app import Application
+from ananke.config import ConfigBuilder, OsFamily
+from ananke.data import (
     Ciphertext,
     Description,
     Entry,
@@ -17,7 +17,7 @@ from tartarus.data import (
     Plaintext,
     Timestamp,
 )
-from tartarus.store import InMemoryStore, JsonFileReader
+from ananke.store import InMemoryStore, JsonFileReader
 
 
 class LookupArgs(TypedDict):
@@ -58,8 +58,8 @@ class TestApplication(unittest.TestCase):
 
     def setUp(self):
         env = {
-            "TARTARUS_DATA_DIR": "./example",
-            "TARTARUS_KEY_ID": "371C136C",
+            "ANANKE_DATA_DIR": "./example",
+            "ANANKE_KEY_ID": "371C136C",
         }
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
 

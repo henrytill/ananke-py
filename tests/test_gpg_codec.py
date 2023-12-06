@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from typing import TypedDict
 
-from tartarus.data import Ciphertext, GpgCodec, KeyId, Plaintext
+from ananke.data import Ciphertext, GpgCodec, KeyId, Plaintext
 
 
 class RandomArgs(TypedDict):

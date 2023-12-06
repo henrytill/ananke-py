@@ -3,7 +3,7 @@ requires = ["setuptools>=52.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tartarus"
+name = "ananke"
 dynamic = ["version"]
 description = ""
 authors = [{ name = "Henry Till", email = "henrytill@gmail.com" }]
@@ -15,17 +15,17 @@ dev = ["flake8>=5.0.4", "black>=23.1.0", "pylint>=2.16.2"]
 test = ["coverage>=6.5.0"]
 
 [project.scripts]
-tartarus = "tartarus.__main__:main"
+ananke-py = "ananke.__main__:main"
 
 [tool.setuptools.dynamic]
-version = { attr = "tartarus.version.__version__" }
+version = { attr = "ananke.version.__version__" }
 
 [tool.black]
 line-length = 120
 
 [tool.isort]
 profile = "black"
-known_first_party = ["tartarus"]
+known_first_party = ["ananke"]
 
 [tool.pylint]
 max-line-length = 120

@@ -4,8 +4,8 @@ import unittest
 from datetime import datetime, timezone
 from typing import List, LiteralString, TypedDict
 
-from tartarus import data
-from tartarus.data import (
+from ananke import data
+from ananke.data import (
     Ciphertext,
     Description,
     Entry,

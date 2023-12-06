@@ -1,5 +1,3 @@
-# tartarus
+# ananke-py
 
-![tartarus](docs/tartarus.jpg)
-
-[![Test](https://github.com/henrytill/tartarus/actions/workflows/main.yml/badge.svg)](https://github.com/henrytill/tartarus/actions/workflows/main.yml)
+[![Test](https://github.com/henrytill/ananke-py/actions/workflows/main.yml/badge.svg)](https://github.com/henrytill/ananke-py/actions/workflows/main.yml)

@@ -1,7 +1,7 @@
 """Tests for the 'in_memory_store' module."""
 import unittest
 
-from tartarus.data import (
+from ananke.data import (
     Ciphertext,
     Description,
     Entry,
@@ -11,7 +11,7 @@ from tartarus.data import (
     Metadata,
     Timestamp,
 )
-from tartarus.store import InMemoryStore, Query
+from ananke.store import InMemoryStore, Query
 
 
 class TestInMemoryStore(unittest.TestCase):

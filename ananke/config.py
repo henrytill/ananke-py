@@ -32,10 +32,10 @@ def strtobool(bool_str: str) -> bool:
 class Env:
     """Environment variables used for configuration."""
 
-    DATA_DIR: str = "TARTARUS_DATA_DIR"
-    BACKEND: str = "TARTARUS_BACKEND"
-    KEY_ID: str = "TARTARUS_KEY_ID"
-    ALLOW_MULTIPLE_KEYS: str = "TARTARUS_ALLOW_MULTIPLE_KEYS"
+    DATA_DIR: str = "ANANKE_DATA_DIR"
+    BACKEND: str = "ANANKE_BACKEND"
+    KEY_ID: str = "ANANKE_KEY_ID"
+    ALLOW_MULTIPLE_KEYS: str = "ANANKE_ALLOW_MULTIPLE_KEYS"
 
 
 class OsFamily(Enum):
@@ -226,7 +226,7 @@ class ConfigBuilder:
                 xdg_data_home = env.get("XDG_DATA_HOME")
                 data_home = Path(xdg_data_home) if xdg_data_home else Path.home() / ".local" / "share"
 
-            self._data_dir = data_home / "tartarus"
+            self._data_dir = data_home / "ananke"
 
         if self._backend is None:
             self._backend = Backend.JSON
@@ -297,4 +297,4 @@ def get_config_file(os_family: OsFamily, env: Mapping[str, str]) -> Path:
         The path to the configuration file.
     """
     config_home = get_config_dir(os_family, env)
-    return config_home / "tartarus" / "tartarus.ini"
+    return config_home / "ananke" / "ananke.ini"

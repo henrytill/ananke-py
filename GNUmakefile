@@ -23,7 +23,7 @@ endef
 define POST_COMMIT =
 #!/bin/sh
 echo "Generating version.py..."
-make tartarus/version.py >/dev/null
+make ananke/version.py >/dev/null
 endef
 
 ifeq ($(BUILD_ENV), venv)
@@ -36,7 +36,7 @@ BUILD_FLAGS = --no-isolation
 endif
 
 GENERATED = \
-	tartarus/version.py
+	ananke/version.py
 
 .PHONY: all
 all: generate
@@ -62,7 +62,7 @@ generate: $(GENERATED)
 check: $(ENV_TARGET)
 	$(ACTIVATE)
 	$(PYTHON) -m unittest discover -v -s tests
-	$(PYTHON) -m doctest -v tartarus/data.py
+	$(PYTHON) -m doctest -v ananke/data.py
 
 .PHONY: coverage
 coverage: $(ENV_TARGET)
@@ -74,9 +74,9 @@ coverage: $(ENV_TARGET)
 lint: $(ENV_TARGET)
 	$(ACTIVATE)
 	$(PYTHON) -m flake8 --config .flake8
-	$(PYTHON) -m pylint tartarus tests
+	$(PYTHON) -m pylint ananke tests
 
-tartarus/version.py: FORCE
+ananke/version.py: FORCE
 	@echo "$(VERSION_PY)" > $@
 
 .git/hooks/post-commit: FORCE

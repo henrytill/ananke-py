@@ -3,9 +3,9 @@ import textwrap
 import unittest
 from pathlib import Path
 
-from tartarus import config
-from tartarus.config import Backend, ConfigBuilder, Env, OsFamily
-from tartarus.data import KeyId
+from ananke import config
+from ananke.config import Backend, ConfigBuilder, Env, OsFamily
+from ananke.data import KeyId
 
 
 # pylint: disable=too-few-public-methods
@@ -131,7 +131,7 @@ class TestConfigBuilder(unittest.TestCase):
 
         test_config = ConfigBuilder(key_id=self.key_id).with_defaults(OsFamily.POSIX, env).build()
 
-        self.assertEqual(test_config.data_dir, self.data_dir / "tartarus")
+        self.assertEqual(test_config.data_dir, self.data_dir / "ananke")
         self.assertEqual(test_config.backend, Backend.JSON)
         self.assertEqual(test_config.key_id, self.key_id)
         self.assertEqual(test_config.allow_multiple_keys, False)
@@ -144,7 +144,7 @@ class TestConfigBuilder(unittest.TestCase):
 
         test_config = ConfigBuilder(key_id=self.key_id).with_defaults(OsFamily.NT, env).build()
 
-        self.assertEqual(test_config.data_dir, self.data_dir / "tartarus")
+        self.assertEqual(test_config.data_dir, self.data_dir / "ananke")
         self.assertEqual(test_config.backend, Backend.JSON)
         self.assertEqual(test_config.key_id, self.key_id)
         self.assertEqual(test_config.allow_multiple_keys, False)
@@ -241,12 +241,12 @@ class TestGetConfigFilePath(unittest.TestCase):
     def test_get_config_file_path_posix(self):
         """Tests the 'get_config_file' function with a POSIX environment."""
         path = config.get_config_file(OsFamily.POSIX, {})
-        self.assertEqual(path, Path.home() / ".config" / "tartarus" / "tartarus.ini")
+        self.assertEqual(path, Path.home() / ".config" / "ananke" / "ananke.ini")
 
     def test_get_config_file_path_nt(self):
         """Tests the 'get_config_file' function with a NT environment."""
         path = config.get_config_file(OsFamily.NT, {})
-        self.assertEqual(path, Path.home() / "AppData" / "Roaming" / "tartarus" / "tartarus.ini")
+        self.assertEqual(path, Path.home() / "AppData" / "Roaming" / "ananke" / "ananke.ini")
 
     def test_get_config_file_path_with_xdg_config_home(self):
         """Tests the 'get_config_file' function with a XDG_CONFIG_HOME environment variable."""
@@ -254,7 +254,7 @@ class TestGetConfigFilePath(unittest.TestCase):
             "XDG_CONFIG_HOME": str(self.config_home),
         }
         path = config.get_config_file(OsFamily.POSIX, env)
-        self.assertEqual(path, self.config_home / "tartarus" / "tartarus.ini")
+        self.assertEqual(path, self.config_home / "ananke" / "ananke.ini")
 
     def test_get_config_file_path_with_appdata(self):
         """Tests the 'get_config_file' function with a APPDATA environment variable."""
@@ -262,7 +262,7 @@ class TestGetConfigFilePath(unittest.TestCase):
             "APPDATA": str(self.config_home),
         }
         path = config.get_config_file(OsFamily.NT, env)
-        self.assertEqual(path, self.config_home / "tartarus" / "tartarus.ini")
+        self.assertEqual(path, self.config_home / "ananke" / "ananke.ini")
 
 
 if __name__ == "__main__":
