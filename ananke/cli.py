@@ -1,9 +1,10 @@
 """The command line interface."""
 import argparse
 import os
+from pathlib import Path
 from typing import Mapping, Tuple
 
-from . import config, version
+from . import version
 from .app import Application
 from .config import Backend, ConfigBuilder, OsFamily
 from .data import Description, Entry, EntryId, GpgCodec, Identity, Plaintext
@@ -13,6 +14,24 @@ from .store import InMemoryStore, JsonFileReader, JsonFileWriter
 def get_version() -> str:
     """Returns the version of the application."""
     return version.__version__
+
+
+def file_reader(maybe_path: Path | None) -> str | None:
+    """A file reader.
+
+    Args:
+        maybe_path: The path to the file to read.
+
+    Returns:
+        The contents of the file.
+    """
+    if maybe_path is None:
+        return None
+
+    with open(maybe_path, encoding="ascii") as file:
+        ret = file.read()
+
+    return ret
 
 
 def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
@@ -29,12 +48,7 @@ def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
     Returns:
         The configured Application instance ready for use.
     """
-    config_file = config.get_config_file(host_os, env)
-
-    with open(config_file, encoding="ascii") as file:
-        config_str = file.read()
-
-    cfg = ConfigBuilder().with_defaults(host_os, env).with_config(config_str).with_env(env).build()
+    cfg = ConfigBuilder().with_defaults(host_os, env).with_config(file_reader).with_env(env).build()
 
     if cfg.backend is Backend.JSON:
         store = InMemoryStore()

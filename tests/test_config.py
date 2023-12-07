@@ -3,7 +3,6 @@ import textwrap
 import unittest
 from pathlib import Path
 
-from ananke import config
 from ananke.config import Backend, ConfigBuilder, Env, OsFamily
 from ananke.data import KeyId
 
@@ -28,6 +27,11 @@ class ConfigFile:
             allow_multiple_keys={self.ALLOW_MULTIPLE_KEYS}
             """
         )
+
+
+def config_reader(_maybe_config_path: Path | None) -> str:
+    """A test configuration file reader."""
+    return str(ConfigFile())
 
 
 class TestOsFamily(unittest.TestCase):
@@ -158,7 +162,7 @@ class TestConfigBuilder(unittest.TestCase):
             Env.ALLOW_MULTIPLE_KEYS: "true",
         }
 
-        test_config = ConfigBuilder().with_env(env).build()
+        test_config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
 
         self.assertEqual(test_config.data_dir, self.data_dir)
         self.assertEqual(test_config.backend, Backend.SQLITE)
@@ -174,13 +178,13 @@ class TestConfigBuilder(unittest.TestCase):
             Env.ALLOW_MULTIPLE_KEYS: "invalid",
         }
 
-        test_config = ConfigBuilder().with_env(env).build()
+        test_config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
 
         self.assertEqual(test_config.allow_multiple_keys, False)
 
     def test_build_with_config_file(self):
         """Tests the 'build' method with a configuration file."""
-        test_config = ConfigBuilder().with_config(str(ConfigFile())).build()
+        test_config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_config(config_reader).build()
 
         self.assertEqual(test_config.data_dir, Path(ConfigFile.DATA_DIR))
         self.assertEqual(test_config.backend, Backend.SQLITE)
@@ -198,7 +202,7 @@ class TestConfigBuilder(unittest.TestCase):
             Env.ALLOW_MULTIPLE_KEYS: "false",
         }
 
-        test_config = ConfigBuilder().with_config(str(ConfigFile())).with_env(env).build()
+        test_config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_config(config_reader).with_env(env).build()
 
         self.assertEqual(test_config.data_dir, self.data_dir)
         self.assertEqual(test_config.backend, Backend.JSON)
@@ -222,7 +226,11 @@ class TestConfigBuilder(unittest.TestCase):
         }
 
         test_config = (
-            ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_config(partial_config_ini).with_env(env).build()
+            ConfigBuilder()
+            .with_defaults(OsFamily.POSIX, {})
+            .with_config(lambda _: partial_config_ini)
+            .with_env(env)
+            .build()
         )
 
         self.assertEqual(test_config.data_dir, self.data_dir)
@@ -232,37 +240,33 @@ class TestConfigBuilder(unittest.TestCase):
 
         self.assertEqual(test_config.data_file, self.data_dir / "db" / "data.json")
 
+    def test_config_dir_posix(self):
+        """Tests the 'config_dir' property with POSIX defaults."""
+        test_config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_config(config_reader).build()
+        self.assertEqual(test_config.config_dir, Path.home() / ".config" / "ananke")
 
-class TestGetConfigFilePath(unittest.TestCase):
-    """Tests the 'get_config_file' function."""
+    def test_config_dir_nt(self):
+        """Tests the 'config_dir' property with NT defaults."""
+        test_config = ConfigBuilder().with_defaults(OsFamily.NT, {}).with_config(config_reader).build()
+        self.assertEqual(test_config.config_dir, Path.home() / "AppData" / "Roaming" / "ananke")
 
-    config_home = Path("/foo/bar")
-
-    def test_get_config_file_path_posix(self):
-        """Tests the 'get_config_file' function with a POSIX environment."""
-        path = config.get_config_file(OsFamily.POSIX, {})
-        self.assertEqual(path, Path.home() / ".config" / "ananke" / "ananke.ini")
-
-    def test_get_config_file_path_nt(self):
-        """Tests the 'get_config_file' function with a NT environment."""
-        path = config.get_config_file(OsFamily.NT, {})
-        self.assertEqual(path, Path.home() / "AppData" / "Roaming" / "ananke" / "ananke.ini")
-
-    def test_get_config_file_path_with_xdg_config_home(self):
-        """Tests the 'get_config_file' function with a XDG_CONFIG_HOME environment variable."""
+    def test_config_dir_with_xdg_config_home(self):
+        """Tests the 'config_dir' property with an environment containing 'XDG_CONFIG_HOME'."""
+        config_home = Path("/foo/bar")
         env = {
-            "XDG_CONFIG_HOME": str(self.config_home),
+            "XDG_CONFIG_HOME": str(config_home),
         }
-        path = config.get_config_file(OsFamily.POSIX, env)
-        self.assertEqual(path, self.config_home / "ananke" / "ananke.ini")
+        test_config = ConfigBuilder().with_defaults(OsFamily.POSIX, env).with_config(config_reader).build()
+        self.assertEqual(test_config.config_dir, config_home / "ananke")
 
-    def test_get_config_file_path_with_appdata(self):
-        """Tests the 'get_config_file' function with a APPDATA environment variable."""
+    def test_config_dir_with_appdata(self):
+        """Tests the 'config_dir' property with an environment containing 'APPDATA'."""
+        config_home = Path("/foo/bar")
         env = {
-            "APPDATA": str(self.config_home),
+            "APPDATA": str(config_home),
         }
-        path = config.get_config_file(OsFamily.NT, env)
-        self.assertEqual(path, self.config_home / "ananke" / "ananke.ini")
+        test_config = ConfigBuilder().with_defaults(OsFamily.NT, env).with_config(config_reader).build()
+        self.assertEqual(test_config.config_dir, config_home / "ananke")
 
 
 if __name__ == "__main__":
