@@ -58,11 +58,11 @@ venv: $(ENV_TARGET)
 .PHONY: generate
 generate: $(GENERATED)
 
-.PHONY: check
-check: $(ENV_TARGET)
+.PHONY: check test
+check test: $(ENV_TARGET)
 	$(ACTIVATE)
 	$(PYTHON) -m unittest discover -v -s tests
-	$(PYTHON) -m doctest -v ananke/data.py
+	$(PYTHON) -m doctest -v ananke/data/core.py
 
 .PHONY: coverage
 coverage: $(ENV_TARGET)
