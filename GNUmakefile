@@ -22,7 +22,7 @@ endef
 
 define POST_COMMIT =
 #!/bin/sh
-echo "Generating version.py..."
+echo \"Generating version.py...\"
 make ananke/version.py >/dev/null
 endef
 
