@@ -18,10 +18,10 @@ class Query:
         meta: The metadata to filter by.
     """
 
-    __entry_id: Optional[EntryId]
-    __description: Optional[Description]
-    __identity: Optional[Identity]
-    __meta: Optional[Metadata]
+    _entry_id: Optional[EntryId]
+    _description: Optional[Description]
+    _identity: Optional[Identity]
+    _meta: Optional[Metadata]
 
     def __init__(
         self,
@@ -30,30 +30,30 @@ class Query:
         identity: Optional[Identity] = None,
         meta: Optional[Metadata] = None,
     ) -> None:
-        self.__entry_id = entry_id
-        self.__description = description
-        self.__identity = identity
-        self.__meta = meta
+        self._entry_id = entry_id
+        self._description = description
+        self._identity = identity
+        self._meta = meta
 
     @property
     def entry_id(self) -> Optional[EntryId]:
         """Returns the entry id."""
-        return self.__entry_id
+        return self._entry_id
 
     @property
     def description(self) -> Optional[Description]:
         """Returns the description."""
-        return self.__description
+        return self._description
 
     @property
     def identity(self) -> Optional[Identity]:
         """Returns the identity."""
-        return self.__identity
+        return self._identity
 
     @property
     def meta(self) -> Optional[Metadata]:
         """Returns the metadata."""
-        return self.__meta
+        return self._meta
 
 
 # pylint: disable=unnecessary-ellipsis, too-few-public-methods
