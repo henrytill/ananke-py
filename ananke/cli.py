@@ -50,13 +50,12 @@ def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
     """
     cfg = ConfigBuilder().with_defaults(host_os, env).with_config(file_reader).with_env(env).build()
 
-    if cfg.backend is Backend.JSON:
-        store = InMemoryStore()
-        reader = JsonFileReader(cfg.data_file)
-        writer = JsonFileWriter(cfg.data_file)
-    else:
+    if cfg.backend is not Backend.JSON:
         raise NotImplementedError(f"Backend {cfg.backend} is not supported")
 
+    store = InMemoryStore()
+    reader = JsonFileReader(cfg.data_file)
+    writer = JsonFileWriter(cfg.data_file)
     codec = GpgCodec(cfg.key_id)
     return Application(store, reader, writer, codec)
 
