@@ -16,19 +16,16 @@ def get_version() -> str:
     return version.__version__
 
 
-def file_reader(maybe_path: Path | None) -> str | None:
+def file_reader(path: Path) -> str:
     """A file reader.
 
     Args:
-        maybe_path: The path to the file to read.
+        path: The path to the file to read.
 
     Returns:
         The contents of the file.
     """
-    if maybe_path is None:
-        return None
-
-    with open(maybe_path, encoding="ascii") as file:
+    with open(path, encoding="ascii") as file:
         ret = file.read()
 
     return ret

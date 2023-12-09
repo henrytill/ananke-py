@@ -197,7 +197,7 @@ class ConfigBuilder:
 
         return self
 
-    def with_config(self, reader: Callable[[Path | None], str | None]) -> Self:
+    def with_config(self, reader: Callable[[Path], str]) -> Self:
         """Updates attributes from the string representation of a configuration file.
 
         Args:
@@ -206,13 +206,14 @@ class ConfigBuilder:
         Returns:
             The updated configuration.
         """
-        maybe_config_file = self._config_dir / "ananke.ini" if self._config_dir else None
-        maybe_config_str = reader(maybe_config_file)
-        if maybe_config_str is None:
-            return self
+        if self._config_dir is None:
+            raise ValueError("config_dir is not set")
+
+        config_file = self._config_dir / "ananke.ini"
+        config_str = reader(config_file)
 
         config_parser = configparser.ConfigParser()
-        config_parser.read_string(maybe_config_str)
+        config_parser.read_string(config_str)
 
         data_dir = config_parser.get("data", "dir", fallback=None)
         if data_dir is not None:
