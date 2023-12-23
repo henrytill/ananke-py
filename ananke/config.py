@@ -3,7 +3,7 @@ import configparser
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Callable, Mapping, Optional, Self, cast
+from typing import Callable, Mapping, Optional, Self
 
 from .data import KeyId
 
@@ -55,21 +55,20 @@ class OsFamily(Enum):
         Returns:
             The created OsFamily.
         """
-        match = {
-            "posix": OsFamily.POSIX,
-            "nt": OsFamily.NT,
-        }
-        try:
-            return match[os_family_str]
-        except KeyError as exc:
-            raise ValueError(f"Invalid OsFamily string: {os_family_str}") from exc
+        match os_family_str:
+            case "posix":
+                return OsFamily.POSIX
+            case "nt":
+                return OsFamily.NT
+            case _:
+                raise ValueError(f"Invalid OsFamily string: {os_family_str}")
 
     def __str__(self) -> str:
-        if self is cast(OsFamily, self.POSIX):
-            return "posix"
-        if self is cast(OsFamily, self.NT):
-            return "nt"
-        raise ValueError(f"Invalid OsFamily: {self}")
+        match self:
+            case OsFamily.POSIX:
+                return "posix"
+            case OsFamily.NT:
+                return "nt"
 
 
 class Backend(Enum):
@@ -88,21 +87,20 @@ class Backend(Enum):
         Returns:
             The created Backend.
         """
-        match = {
-            "sqlite": Backend.SQLITE,
-            "json": Backend.JSON,
-        }
-        try:
-            return match[backend_str]
-        except KeyError as exc:
-            raise ValueError(f"Invalid Backend string: {backend_str}") from exc
+        match backend_str:
+            case "sqlite":
+                return Backend.SQLITE
+            case "json":
+                return Backend.JSON
+            case _:
+                raise ValueError(f"Invalid Backend string: {backend_str}")
 
     def __str__(self) -> str:
-        if self is cast(Backend, self.SQLITE):
-            return "sqlite"
-        if self is cast(Backend, self.JSON):
-            return "json"
-        raise ValueError(f"Invalid Backend: {self}")
+        match self:
+            case Backend.SQLITE:
+                return "sqlite"
+            case Backend.JSON:
+                return "json"
 
 
 @dataclass(frozen=True)
