@@ -56,7 +56,7 @@ class ModifyArgs(TypedDict):
 class TestApplication(unittest.TestCase):
     """Test the Application class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         env = {
             "ANANKE_DATA_DIR": "./example",
             "ANANKE_KEY_ID": "371C136C",
@@ -72,7 +72,7 @@ class TestApplication(unittest.TestCase):
 
         os.environ["GNUPGHOME"] = "./example/gnupg"
 
-    def test_lookup(self):
+    def test_lookup(self) -> None:
         """Test the lookup method against the example data."""
 
         # see example/data.json for the test data
@@ -125,7 +125,7 @@ class TestApplication(unittest.TestCase):
                     plaintexts = [plaintext for _, plaintext in app.lookup(**test_case["args"])]
                     self.assertEqual(test_case["plaintexts"], plaintexts)
 
-    def test_add(self):
+    def test_add(self) -> None:
         """Test the add method against the example data."""
 
         test_cases: list[AddArgs] = [
@@ -168,7 +168,7 @@ class TestApplication(unittest.TestCase):
                     self.assertEqual(test_case["plaintext"], plaintext)
                     self.assertEqual(test_case["maybe_meta"], entry.meta)
 
-    def test_modify(self):
+    def test_modify(self) -> None:
         """Test the modify method against the example data."""
 
         test_cases: list[ModifyArgs] = [
@@ -280,7 +280,7 @@ class TestApplication(unittest.TestCase):
                         "meta should change if provided",
                     )
 
-    def test_modify_fails_if_no_entries_match(self):
+    def test_modify_fails_if_no_entries_match(self) -> None:
         """Test that modify fails if no entries match."""
 
         target = Description("zzz")
@@ -291,7 +291,7 @@ class TestApplication(unittest.TestCase):
 
         self.assertEqual(f"No entries match {target}", str(exc.exception))
 
-    def test_modify_fails_if_multiple_entries_match(self):
+    def test_modify_fails_if_multiple_entries_match(self) -> None:
         """Test that modify fails if multiple entries match."""
 
         target = Description("www")
@@ -302,7 +302,7 @@ class TestApplication(unittest.TestCase):
 
         self.assertEqual(f"Multiple entries match {target}", str(exc.exception))
 
-    def test_remove(self):
+    def test_remove(self) -> None:
         """Test the remove method against the example data."""
 
         test_cases: list[Description | EntryId] = [
@@ -325,7 +325,7 @@ class TestApplication(unittest.TestCase):
                     results = app.lookup(test_case)
                     self.assertEqual(0, len(results))
 
-    def test_remove_fails_if_no_entries_match(self):
+    def test_remove_fails_if_no_entries_match(self) -> None:
         """Test that remove fails if no entries match."""
 
         target = Description("zzz")
@@ -336,7 +336,7 @@ class TestApplication(unittest.TestCase):
 
         self.assertEqual(f"No entries match {target}", str(exc.exception))
 
-    def test_remove_fails_if_multiple_entries_match(self):
+    def test_remove_fails_if_multiple_entries_match(self) -> None:
         """Test that remove fails if multiple entries match."""
 
         target = Description("www")
@@ -347,7 +347,7 @@ class TestApplication(unittest.TestCase):
 
         self.assertEqual(f"Multiple entries match {target}", str(exc.exception))
 
-    def test_dump(self):
+    def test_dump(self) -> None:
         """Test the dump method against the example data."""
 
         expected_entries: list[Entry] = [

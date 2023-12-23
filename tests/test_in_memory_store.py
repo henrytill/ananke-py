@@ -17,10 +17,10 @@ from ananke.store import InMemoryStore, Query
 class TestInMemoryStore(unittest.TestCase):
     """Tests for the 'InMemoryStore' class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.store = InMemoryStore()
 
-    def test_put(self):
+    def test_put(self) -> None:
         """Tests the 'put' method."""
         entry = Entry(
             entry_id=EntryId("1"),

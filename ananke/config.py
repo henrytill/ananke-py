@@ -3,7 +3,7 @@ import configparser
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Callable, Mapping, Optional, Self
+from typing import Callable, Mapping, Optional, Self, cast
 
 from .data import KeyId
 
@@ -65,10 +65,11 @@ class OsFamily(Enum):
             raise ValueError(f"Invalid OsFamily string: {os_family_str}") from exc
 
     def __str__(self) -> str:
-        return {
-            self.POSIX: "posix",
-            self.NT: "nt",
-        }[self]
+        if self is cast(OsFamily, self.POSIX):
+            return "posix"
+        if self is cast(OsFamily, self.NT):
+            return "nt"
+        raise ValueError(f"Invalid OsFamily: {self}")
 
 
 class Backend(Enum):
@@ -97,10 +98,11 @@ class Backend(Enum):
             raise ValueError(f"Invalid Backend string: {backend_str}") from exc
 
     def __str__(self) -> str:
-        return {
-            self.SQLITE: "sqlite",
-            self.JSON: "json",
-        }[self]
+        if self is cast(Backend, self.SQLITE):
+            return "sqlite"
+        if self is cast(Backend, self.JSON):
+            return "json"
+        raise ValueError(f"Invalid Backend: {self}")
 
 
 @dataclass(frozen=True)

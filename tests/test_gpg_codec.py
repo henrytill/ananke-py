@@ -25,7 +25,7 @@ class TestGpgCodec(unittest.TestCase):
         self.codec = GpgCodec(self.key_id)
         os.environ["GNUPGHOME"] = str(Path.cwd() / "example" / "gnupg")
 
-    def test_encode_decode(self):
+    def test_encode_decode(self) -> None:
         """Tests the encode and decode methods."""
         test_cases = [
             "ASecretPassword",
@@ -41,7 +41,7 @@ class TestGpgCodec(unittest.TestCase):
                 decoded_plaintext = self.codec.decode(ciphertext)
                 self.assertEqual(decoded_plaintext, plaintext)
 
-    def test_encode_decode_random(self):
+    def test_encode_decode_random(self) -> None:
         """Tests the encode and decode methods with random data."""
         test_cases: list[RandomArgs] = [
             # length = 24
@@ -72,13 +72,13 @@ class TestGpgCodec(unittest.TestCase):
                 decoded_plaintext = self.codec.decode(ciphertext)
                 self.assertEqual(decoded_plaintext, plaintext)
 
-    def test_encode_failure(self):
+    def test_encode_failure(self) -> None:
         """Tests the encode method with a bogus GNUPGHOME environment variable."""
         os.environ["GNUPGHOME"] = tempfile.mkdtemp()
         with self.assertRaises(ValueError):
             self.codec.encode(Plaintext("test"))
 
-    def test_decode_failure(self):
+    def test_decode_failure(self) -> None:
         """Tests the decode method with a bogus GNUPGHOME environment variable."""
         os.environ["GNUPGHOME"] = tempfile.mkdtemp()
         with self.assertRaises(ValueError):

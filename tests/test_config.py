@@ -37,16 +37,16 @@ def config_reader(_maybe_config_path: Path | None) -> str:
 class TestOsFamily(unittest.TestCase):
     """Tests for the 'OsFamily' enum."""
 
-    def test_from_str(self):
+    def test_from_str(self) -> None:
         """Tests the 'from_str' method."""
         self.assertEqual(OsFamily.from_str("posix"), OsFamily.POSIX)
         self.assertEqual(OsFamily.from_str("nt"), OsFamily.NT)
 
-    def test_from_str_with_invalid_os(self):
+    def test_from_str_with_invalid_os(self) -> None:
         """Tests the 'from_str' method with an invalid OS."""
         self.assertRaises(ValueError, OsFamily.from_str, "invalid")
 
-    def test_str(self):
+    def test_str(self) -> None:
         """Tests the '__str__' method."""
         self.assertEqual(str(OsFamily.POSIX), "posix")
         self.assertEqual(str(OsFamily.NT), "nt")
@@ -55,12 +55,12 @@ class TestOsFamily(unittest.TestCase):
 class TestBackend(unittest.TestCase):
     """Tests for the 'Backend' enum."""
 
-    def test_from_str(self):
+    def test_from_str(self) -> None:
         """Tests the 'from_str' method."""
         self.assertEqual(Backend.from_str("json"), Backend.JSON)
         self.assertEqual(Backend.from_str("sqlite"), Backend.SQLITE)
 
-    def test_from_str_with_invalid_backend(self):
+    def test_from_str_with_invalid_backend(self) -> None:
         """Tests the 'from_str' method with an invalid backend."""
         self.assertRaises(ValueError, Backend.from_str, "invalid")
 
@@ -71,19 +71,19 @@ class TestConfigBuilder(unittest.TestCase):
     data_dir = Path("/foo/bar")
     key_id = KeyId("alice@example.com")
 
-    def test_build(self):
+    def test_build(self) -> None:
         """Tests the 'build' method."""
         self.assertRaises(ValueError, ConfigBuilder().build)
 
-    def test_build_with_defaults_posix(self):
+    def test_build_with_defaults_posix(self) -> None:
         """Tests the 'build' method with POSIX defaults."""
         self.assertRaises(ValueError, ConfigBuilder().with_defaults(OsFamily.POSIX, {}).build)
 
-    def test_build_with_defaults_nt(self):
+    def test_build_with_defaults_nt(self) -> None:
         """Tests the 'build' method with NT defaults."""
         self.assertRaises(ValueError, ConfigBuilder().with_defaults(OsFamily.NT, {}).build)
 
-    def test_build_without_data_dir(self):
+    def test_build_without_data_dir(self) -> None:
         """Tests the 'build' method without a data directory."""
         self.assertRaises(
             ValueError,
@@ -94,7 +94,7 @@ class TestConfigBuilder(unittest.TestCase):
             ).build,
         )
 
-    def test_build_without_key_id(self):
+    def test_build_without_key_id(self) -> None:
         """Tests the 'build' method without a key ID."""
         self.assertRaises(
             ValueError,
@@ -105,7 +105,7 @@ class TestConfigBuilder(unittest.TestCase):
             ).build,
         )
 
-    def test_build_without_backend(self):
+    def test_build_without_backend(self) -> None:
         """Tests the 'build' method without a backend."""
         self.assertRaises(
             ValueError,
@@ -116,7 +116,7 @@ class TestConfigBuilder(unittest.TestCase):
             ).build,
         )
 
-    def test_build_without_allow_multiple_keys(self):
+    def test_build_without_allow_multiple_keys(self) -> None:
         """Tests the 'build' method without allowing multiple keys."""
         self.assertRaises(
             ValueError,
@@ -127,7 +127,7 @@ class TestConfigBuilder(unittest.TestCase):
             ).build,
         )
 
-    def test_build_with_defaults_posix_env(self):
+    def test_build_with_defaults_posix_env(self) -> None:
         """Tests the 'build' method with POSIX defaults and an environment."""
         env = {
             "XDG_DATA_HOME": str(self.data_dir),
@@ -140,7 +140,7 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertEqual(test_config.key_id, self.key_id)
         self.assertEqual(test_config.allow_multiple_keys, False)
 
-    def test_build_with_defaults_nt_env(self):
+    def test_build_with_defaults_nt_env(self) -> None:
         """Tests the 'build' method with NT defaults and an environment."""
         env = {
             "LOCALAPPDATA": str(self.data_dir),
@@ -153,7 +153,7 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertEqual(test_config.key_id, self.key_id)
         self.assertEqual(test_config.allow_multiple_keys, False)
 
-    def test_build_with_env(self):
+    def test_build_with_env(self) -> None:
         """Tests the 'build' method with an environment."""
         env = {
             Env.DATA_DIR: str(self.data_dir),
@@ -169,7 +169,7 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertEqual(test_config.key_id, self.key_id)
         self.assertEqual(test_config.allow_multiple_keys, True)
 
-    def test_build_with_env_non_bool_allow_multiple_keys(self):
+    def test_build_with_env_non_bool_allow_multiple_keys(self) -> None:
         """Tests the 'build' method with an environment and a non-boolean value for 'allow_multiple_keys'."""
         env = {
             Env.DATA_DIR: str(self.data_dir),
@@ -182,7 +182,7 @@ class TestConfigBuilder(unittest.TestCase):
 
         self.assertEqual(test_config.allow_multiple_keys, False)
 
-    def test_build_with_config_file(self):
+    def test_build_with_config_file(self) -> None:
         """Tests the 'build' method with a configuration file."""
         test_config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_config(config_reader).build()
 
@@ -191,7 +191,7 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertEqual(test_config.key_id, ConfigFile.KEY_ID)
         self.assertEqual(test_config.allow_multiple_keys, True)
 
-    def test_build_with_config_file_with_env(self):
+    def test_build_with_config_file_with_env(self) -> None:
         """Tests the 'build' method with a configuration file and an environment."""
         key_id = KeyId("alice_env@example.com")
 
@@ -209,7 +209,7 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertEqual(test_config.key_id, key_id)
         self.assertEqual(test_config.allow_multiple_keys, False)
 
-    def test_build_with_defaults_with_config_file_with_env(self):
+    def test_build_with_defaults_with_config_file_with_env(self) -> None:
         """Tests the 'build' method with defaults, a configuration file, and an environment."""
         partial_config_ini = textwrap.dedent(
             """\
@@ -240,17 +240,17 @@ class TestConfigBuilder(unittest.TestCase):
 
         self.assertEqual(test_config.data_file, self.data_dir / "db" / "data.json")
 
-    def test_config_dir_posix(self):
+    def test_config_dir_posix(self) -> None:
         """Tests the 'config_dir' property with POSIX defaults."""
         test_config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_config(config_reader).build()
         self.assertEqual(test_config.config_dir, Path.home() / ".config" / "ananke")
 
-    def test_config_dir_nt(self):
+    def test_config_dir_nt(self) -> None:
         """Tests the 'config_dir' property with NT defaults."""
         test_config = ConfigBuilder().with_defaults(OsFamily.NT, {}).with_config(config_reader).build()
         self.assertEqual(test_config.config_dir, Path.home() / "AppData" / "Roaming" / "ananke")
 
-    def test_config_dir_with_xdg_config_home(self):
+    def test_config_dir_with_xdg_config_home(self) -> None:
         """Tests the 'config_dir' property with an environment containing 'XDG_CONFIG_HOME'."""
         config_home = Path("/foo/bar")
         env = {
@@ -259,7 +259,7 @@ class TestConfigBuilder(unittest.TestCase):
         test_config = ConfigBuilder().with_defaults(OsFamily.POSIX, env).with_config(config_reader).build()
         self.assertEqual(test_config.config_dir, config_home / "ananke")
 
-    def test_config_dir_with_appdata(self):
+    def test_config_dir_with_appdata(self) -> None:
         """Tests the 'config_dir' property with an environment containing 'APPDATA'."""
         config_home = Path("/foo/bar")
         env = {

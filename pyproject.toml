@@ -11,7 +11,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
-dev = ["flake8>=5.0.4", "black>=23.1.0", "pylint>=2.16.2"]
+dev = ["flake8>=5.0.4", "black>=23.1.0", "pylint>=2.16.2", "mypy>=1.8.0"]
 test = ["coverage>=6.5.0"]
 
 [project.scripts]
@@ -33,3 +33,12 @@ disable = [
     "C0301", # line-too-long, we use black for formatting
     "C0414", # useless-import-alias, we use aliases for type checking
 ]
+
+[tool.pyright]
+strict = true
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+
+[tool.mypy]
+strict = true
+check_untyped_defs = true

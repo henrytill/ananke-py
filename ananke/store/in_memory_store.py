@@ -174,10 +174,10 @@ class JsonFileReader:
         if not isinstance(parsed, list):
             raise ValueError("Expected a list")
         ret: list[Entry] = []
-        for item in parsed:  # type: ignore
+        for item in parsed:
             if not isinstance(item, dict):
                 raise ValueError("Expected a dictionary")
-            ret.append(Entry.from_dict(item))  # type: ignore
+            ret.append(Entry.from_dict(item))
         return ret
 
 

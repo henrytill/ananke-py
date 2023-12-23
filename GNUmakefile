@@ -5,6 +5,7 @@ SHELL = /bin/bash
 .SHELLFLAGS += -e
 
 PYTHON = python3
+MYPY = mypy
 
 BUILD_ENV = host
 
@@ -58,8 +59,14 @@ venv: $(ENV_TARGET)
 .PHONY: generate
 generate: $(GENERATED)
 
-.PHONY: check test
-check test: $(ENV_TARGET)
+.PHONY: check
+check: $(ENV_TARGET)
+	$(ACTIVATE)
+	$(MYPY) ananke
+	$(MYPY) tests
+
+.PHONY: test
+test: $(ENV_TARGET)
 	$(ACTIVATE)
 	$(PYTHON) -m unittest discover -v -s tests
 	$(PYTHON) -m doctest -v ananke/data/core.py
