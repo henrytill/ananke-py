@@ -36,9 +36,8 @@ disable = [
 
 [tool.pyright]
 strict = true
-reportUnknownVariableType = false
-reportUnknownArgumentType = false
 
 [tool.mypy]
 strict = true
 check_untyped_defs = true
+warn_redundant_casts = false

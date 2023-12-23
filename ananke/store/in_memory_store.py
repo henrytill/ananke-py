@@ -2,6 +2,7 @@
 import json
 from collections import defaultdict
 from pathlib import Path
+from typing import Any, cast
 
 from .. import data
 from ..data import Description, Entry, KeyId
@@ -174,10 +175,10 @@ class JsonFileReader:
         if not isinstance(parsed, list):
             raise ValueError("Expected a list")
         ret: list[Entry] = []
-        for item in parsed:
+        for item in cast(list[object], parsed):
             if not isinstance(item, dict):
                 raise ValueError("Expected a dictionary")
-            ret.append(Entry.from_dict(item))
+            ret.append(Entry.from_dict(cast(dict[Any, Any], item)))
         return ret
 
 
