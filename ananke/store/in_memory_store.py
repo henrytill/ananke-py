@@ -153,10 +153,11 @@ class InMemoryStore:
         Args:
             writer: The writer to use to synchronize the store.
         """
-        if self._dirty:
-            entries = self.select_all()
-            writer.write(entries)
-            self._dirty = False
+        if not self._dirty:
+            return
+        entries = self.select_all()
+        writer.write(entries)
+        self._dirty = False
 
 
 # pylint: disable=too-few-public-methods
