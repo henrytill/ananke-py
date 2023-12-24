@@ -2,12 +2,12 @@
 import argparse
 import os
 from pathlib import Path
-from typing import Mapping, Tuple
+from typing import Mapping, Optional, Tuple
 
-from . import version
+from . import data, version
 from .app import Application
-from .config import Backend, ConfigBuilder, OsFamily
-from .data import Description, Entry, EntryId, GpgCodec, Identity, Plaintext
+from .config import Backend, Config, ConfigBuilder, OsFamily
+from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, GpgCodec, Identity, Plaintext, SchemaVersion
 from .store import InMemoryStore, JsonFileReader, JsonFileWriter
 
 
@@ -16,19 +16,41 @@ def get_version() -> str:
     return version.__version__
 
 
-def file_reader(path: Path) -> str:
-    """A file reader.
+def file_reader(path: Path) -> Optional[str]:
+    """Reads a file into a string.
 
     Args:
         path: The path to the file to read.
 
     Returns:
-        The contents of the file.
+        The contents of the file or None if the file does not exist.
     """
+    if not path.exists():
+        return None
     with open(path, encoding="ascii") as file:
         ret = file.read()
-
     return ret
+
+
+def file_writer(path: Path, contents: str) -> None:
+    """Writes a string into a file.
+
+    Args:
+        path: The path to the file to write.
+        contents: The contents to write to the file.
+    """
+    with open(path, "w", encoding="ascii") as file:
+        file.write(contents)
+
+
+def migrate(cfg: Config, found: SchemaVersion) -> None:
+    """Migrates the data to the current schema version.
+
+    Args:
+        cfg: The configuration.
+        found: The schema version found in the schema file.
+    """
+    raise NotImplementedError()
 
 
 def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
@@ -49,6 +71,12 @@ def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
 
     if cfg.backend is not Backend.JSON:
         raise NotImplementedError(f"Backend {cfg.backend} is not supported")
+
+    schema_version = data.get_schema_version(cfg.schema_file, file_reader, file_writer)
+    if schema_version < CURRENT_SCHEMA_VERSION:
+        migrate(cfg, schema_version)
+    elif schema_version > CURRENT_SCHEMA_VERSION:
+        raise RuntimeError(f"Schema version {schema_version} is not supported")
 
     store = InMemoryStore()
     reader = JsonFileReader(cfg.data_file)

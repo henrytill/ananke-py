@@ -138,6 +138,15 @@ class Config:
         """
         return self.data_dir / "db" / "data.json"
 
+    @property
+    def schema_file(self) -> Path:
+        """Returns the path to the schema file.
+
+        Returns:
+            The path to the schema file.
+        """
+        return self.data_dir / "db" / "schema"
+
 
 class ConfigBuilder:
     """A configuration builder."""
@@ -197,7 +206,7 @@ class ConfigBuilder:
 
         return self
 
-    def with_config(self, reader: Callable[[Path], str]) -> Self:
+    def with_config(self, reader: Callable[[Path], Optional[str]]) -> Self:
         """Updates attributes from the string representation of a configuration file.
 
         Args:
@@ -210,10 +219,12 @@ class ConfigBuilder:
             raise ValueError("config_dir is not set")
 
         config_file = self._config_dir / "ananke.ini"
-        config_str = reader(config_file)
+        maybe_config_str = reader(config_file)
+        if maybe_config_str is None:
+            raise ValueError(f"Configuration file does not exist: {config_file}")
 
         config_parser = configparser.ConfigParser()
-        config_parser.read_string(config_str)
+        config_parser.read_string(maybe_config_str)
 
         data_dir = config_parser.get("data", "dir", fallback=None)
         if data_dir is not None:

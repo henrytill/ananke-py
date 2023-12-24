@@ -12,3 +12,6 @@ from .entry import EntryId as EntryId
 from .entry import GpgCodec as GpgCodec
 from .entry import remap_keys_camel_to_snake as remap_keys_camel_to_snake
 from .entry import remap_keys_snake_to_camel as remap_keys_snake_to_camel
+from .schema import CURRENT_SCHEMA_VERSION as CURRENT_SCHEMA_VERSION
+from .schema import SchemaVersion as SchemaVersion
+from .schema import get_schema_version as get_schema_version
