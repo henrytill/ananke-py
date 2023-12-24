@@ -2,7 +2,7 @@
 import secrets
 import string
 from datetime import datetime, timezone
-from typing import Any, Dict, NewType, Self
+from typing import Any, NewType, Self
 
 KeyId = NewType("KeyId", str)
 """A Cryptographic Key Id."""
@@ -102,7 +102,7 @@ class Plaintext(str):
         return cls(ret)
 
 
-def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
+def remap_keys(mapping: dict[str, str], data: dict[str, Any]) -> dict[str, Any]:
     """Maps the keys of a dictionary to a new set of keys.
 
     If a key is not present in the mapping, it is left unchanged.
