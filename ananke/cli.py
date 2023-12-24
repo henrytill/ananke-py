@@ -129,7 +129,9 @@ def handle_lookup(args: argparse.Namespace) -> int:
     os_family = OsFamily.from_str(os.name)
     with setup_application(os_family, os.environ) as app:
         results = app.lookup(args.description, args.identity)
-        print(format_results(results, args.verbose))
+    if not results:
+        return 1
+    print(format_results(results, args.verbose))
     return 0
 
 
