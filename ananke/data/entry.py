@@ -6,15 +6,7 @@ import hashlib
 import subprocess
 from typing import Any, Optional, Self
 
-from .core import (
-    Description,
-    Identity,
-    KeyId,
-    Metadata,
-    Plaintext,
-    Timestamp,
-    remap_keys,
-)
+from .core import Description, Identity, KeyId, Metadata, Plaintext, Timestamp, remap_keys
 
 
 class EntryId(str):

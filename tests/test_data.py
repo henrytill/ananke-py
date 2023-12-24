@@ -5,16 +5,7 @@ from datetime import datetime, timezone
 from typing import List, LiteralString, TypedDict
 
 from ananke import data
-from ananke.data import (
-    Ciphertext,
-    Description,
-    Entry,
-    EntryId,
-    Identity,
-    KeyId,
-    Plaintext,
-    Timestamp,
-)
+from ananke.data import Ciphertext, Description, Entry, EntryId, Identity, KeyId, Plaintext, Timestamp
 
 
 class RandomArgs(TypedDict):
