@@ -193,8 +193,37 @@ class TestEntry(unittest.TestCase):
 
     def test_from_dict_with_invalid_dict(self) -> None:
         """An Entry cannot be created from an invalid dict."""
-        with self.assertRaises(ValueError, msg="Invalid dict"):
+        with self.assertRaises(ValueError):
             Entry.from_dict({})
+
+    def test_from_dict_with_illtyped_dict_required_key(self) -> None:
+        """An Entry cannot be created from an ill-typed dict."""
+        entry_dict = {
+            "timestamp": 0,
+            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "key_id": "371C136C",
+            "description": "https://www.foomail.com",
+            "identity": "quux",
+            "ciphertext": "hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=",
+        }
+
+        with self.assertRaises(TypeError):
+            Entry.from_dict(entry_dict)
+
+    def test_from_dict_with_illtyped_dict_optional_key(self) -> None:
+        """An Entry cannot be created from an ill-typed dict."""
+        entry_dict = {
+            "timestamp": "2023-06-12T08:12:08.528402975Z",
+            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "key_id": "371C136C",
+            "description": "https://www.foomail.com",
+            "identity": "quux",
+            "ciphertext": "hQEMAzc/TVLd4/C8AQf5AWOscf34zklI490vQKnp5tI0xA0ntYuqiof7EEolHGC9V0jOjft1eBs38SMvI4MEskjKuZR+JE/m40g9xl3oSeXYbPLDAdgP0k4P7sBznbzYotRoFxKEi1mnYi/MxBtNrjG+nttxeTWXx3EseKDQfu3lz749XScwyY5aEzO+LbjQHGzqUMcntHRmareC63Do6S3pgMio1bKTuhGl87Ijf4bfw6NARg8GlF8UDUZDLnDpaaJjxJyW17owiV0SS7IC81ETydKM9wz60xUo23ow3fpEmcUhFHUspbXfSNzh2cABIfgRDhLMlZrMyuGQr9UBjw6cxMbwuNWJ5ECCGm3n3tJKAdzBFRyudhcHPwI7fm2nrthdqTJ2l+89EuP09aJsCvo4BpmAJcwSPxkrsCqirAsgctveeu+9F1LOymY9J8JGvnUu/81kYP9HYfA=",
+            "meta": 0,
+        }
+
+        with self.assertRaises(TypeError):
+            Entry.from_dict(entry_dict)
 
     def test_from_dict_with_invalid_timestamp(self) -> None:
         """An Entry cannot be created from a dict with an invalid timestamp."""

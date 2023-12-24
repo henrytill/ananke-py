@@ -148,56 +148,34 @@ class Entry:
         Returns:
             The created 'Entry'.
         """
-        # Check required keys
-        required_keys = {
-            "id": str,
-            "key_id": str,
-            "timestamp": str,
-            "description": str,
-            "ciphertext": str,
-        }
+        # Get required keys
+        id_str: str = _get_required(data, "id", str)
+        key_id_str: str = _get_required(data, "key_id", str)
+        timestamp_str: str = _get_required(data, "timestamp", str)
+        description_str: str = _get_required(data, "description", str)
+        ciphertext_str: str = _get_required(data, "ciphertext", str)
 
-        for key, value_type in required_keys.items():
-            if key not in data:
-                raise ValueError(f'Invalid entry format: missing required key "{key}"')
-            if not isinstance(data[key], value_type):
-                raise ValueError(f"Invalid {key} format")
-
-        # Check optional keys
-        optional_keys = {
-            "identity": str,
-            "meta": str,
-        }
-
-        for key, value_type in optional_keys.items():
-            maybe_value = data.get(key)
-            if maybe_value is None:
-                continue
-            if not isinstance(maybe_value, value_type):
-                raise ValueError(f"Invalid {key} format")
-
-        maybe_identity = data.get("identity")
-        maybe_meta = data.get("meta")
+        # Get optional keys
+        maybe_identity: Optional[str] = _get_optional(data, "identity", str)
+        maybe_meta: Optional[str] = _get_optional(data, "meta", str)
 
         # Validate timestamp
-        timestamp_str = data["timestamp"]
         try:
             timestamp = Timestamp.fromisoformat(timestamp_str)
         except ValueError as err:
             raise ValueError("Invalid timestamp format") from err
 
         # Validate ciphertext
-        ciphertext_str = data["ciphertext"]
         try:
             ciphertext = Ciphertext.from_base64(ciphertext_str)
         except ValueError as err:
             raise ValueError("Invalid ciphertext format") from err
 
         return cls(
-            entry_id=EntryId(data["id"]),
-            key_id=KeyId(data["key_id"]),
+            entry_id=EntryId(id_str),
+            key_id=KeyId(key_id_str),
             timestamp=timestamp,
-            description=Description(data["description"]),
+            description=Description(description_str),
             identity=Identity(maybe_identity) if maybe_identity else None,
             ciphertext=ciphertext,
             meta=Metadata(maybe_meta) if maybe_meta else None,
@@ -221,6 +199,24 @@ class Entry:
         if self.meta is not None:
             ret["meta"] = self.meta
         return ret
+
+
+def _get_required(d: dict[Any, Any], key: Any, value_type: type) -> Any:
+    value = d.get(key)
+    if value is None:
+        raise ValueError(f'Invalid entry format: missing required key "{key}"')
+    if not isinstance(value, value_type):
+        raise TypeError(f"Invalid {key}: expected a value of type {value_type}")
+    return value
+
+
+def _get_optional(d: dict[Any, Any], key: Any, value_type: type) -> Optional[Any]:
+    value = d.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, value_type):
+        raise TypeError(f"Invalid {key}: expected a value of type {value_type}")
+    return value
 
 
 CAMEL_TO_SNAKE = {
