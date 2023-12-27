@@ -197,13 +197,10 @@ def handle_remove(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
-    """The main entry point of the application.
-
-    This function parses the command line arguments and calls the appropriate
-    function.
+    """The main entry point for the command-line interface.
 
     Returns:
-        The exit code of the application.
+        An exit code.
     """
     parser = argparse.ArgumentParser(description="A minimal password manager.")
     parser.add_argument("--version", action="version", version=f"%(prog)s {get_version()}")
