@@ -82,7 +82,7 @@ class Backend(Enum):
         """Creates a Backend from a string.
 
         Args:
-            s: The string to create the Backend from.
+            backend_str: The string to create the Backend from.
 
         Returns:
             The created Backend.
