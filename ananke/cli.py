@@ -222,9 +222,9 @@ def main() -> int:
     parser_modify_group = parser_modify.add_mutually_exclusive_group(required=True)
     parser_modify_group.add_argument("-d", "--description", type=Description, help="URL or description")
     parser_modify_group.add_argument("-e", "--entry-id", type=EntryId, help="entry ID")
+    parser_modify.add_argument("-p", "--plaintext", action="store_true", help="modify plaintext")
     parser_modify.add_argument("-i", "--identity", type=Identity, help="username or email address")
     parser_modify.add_argument("-m", "--meta", type=str, help="additional metadata")
-    parser_modify.add_argument("-p", "--plaintext", action="store_true", help="modify plaintext")
     parser_modify.set_defaults(func=handle_modify)
 
     parser_remove = subparsers.add_parser("remove", help="remove an entry")
