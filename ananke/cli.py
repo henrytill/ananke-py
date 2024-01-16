@@ -29,7 +29,7 @@ def file_reader(path: Path) -> Optional[str]:
         return None
     with open(path, encoding="ascii") as file:
         ret = file.read()
-    return ret
+        return ret
 
 
 def file_writer(path: Path, contents: str) -> None:
@@ -155,6 +155,7 @@ def handle_lookup(args: argparse.Namespace) -> int:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
+    results = []
     with setup_application(os_family, os.environ) as app:
         results = app.lookup(args.description, args.identity)
     if not results:
