@@ -5,6 +5,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Callable, Mapping, Optional, Self
 
+from . import io
 from .data import KeyId
 
 
@@ -206,7 +207,7 @@ class ConfigBuilder:
 
         return self
 
-    def with_config(self, reader: Callable[[Path], Optional[str]]) -> Self:
+    def with_config(self, reader: Callable[[Path], Optional[str]] = io.file_reader) -> Self:
         """Updates attributes from the string representation of a configuration file.
 
         Args:

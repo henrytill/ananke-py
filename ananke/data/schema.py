@@ -3,6 +3,8 @@
 from pathlib import Path
 from typing import Callable, Optional, Self
 
+from .. import io
+
 
 class SchemaVersion:
     """Schema version."""
@@ -48,7 +50,9 @@ CURRENT_SCHEMA_VERSION = SchemaVersion(3)
 
 
 def get_schema_version(
-    schema_file: Path, read: Callable[[Path], Optional[str]], write: Callable[[Path, str], None]
+    schema_file: Path,
+    reader: Callable[[Path], Optional[str]] = io.file_reader,
+    writer: Callable[[Path, str], None] = io.file_writer,
 ) -> SchemaVersion:
     """Read the schema version from a file.
 
@@ -56,14 +60,14 @@ def get_schema_version(
 
     Args:
         schema_file: The file to read from and write to.
-        read: The file reader.
-        write: The file writer.
+        reader: The file reader.
+        writer: The file writer.
 
     Returns:
         The schema version.
     """
-    maybe_schema_version_str = read(schema_file)
+    maybe_schema_version_str = reader(schema_file)
     if maybe_schema_version_str is None:
-        write(schema_file, str(CURRENT_SCHEMA_VERSION))
+        writer(schema_file, str(CURRENT_SCHEMA_VERSION))
         return CURRENT_SCHEMA_VERSION
     return SchemaVersion.from_str(maybe_schema_version_str)

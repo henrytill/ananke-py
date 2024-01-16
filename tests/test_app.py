@@ -1,7 +1,6 @@
 """Test the 'app' module."""
 import os
 import unittest
-from pathlib import Path
 from typing import Optional, TypedDict
 from unittest.mock import Mock
 
@@ -56,19 +55,6 @@ class ModifyArgs(TypedDict):
     maybe_meta: Optional[Metadata]
 
 
-def _reader(path: Path) -> Optional[str]:
-    if not path.exists():
-        return None
-    with open(path, encoding="ascii") as file:
-        ret = file.read()
-    return ret
-
-
-def _writer(path: Path, contents: str) -> None:
-    with open(path, "w", encoding="ascii") as file:
-        file.write(contents)
-
-
 class TestApplication(unittest.TestCase):
     """Test the Application class."""
 
@@ -79,7 +65,7 @@ class TestApplication(unittest.TestCase):
         }
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
 
-        schema_version = data.get_schema_version(self.config.schema_file, _reader, _writer)
+        schema_version = data.get_schema_version(self.config.schema_file)
         if schema_version != CURRENT_SCHEMA_VERSION:
             raise RuntimeError(f"Schema version {schema_version} is not supported")
 

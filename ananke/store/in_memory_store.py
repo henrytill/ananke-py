@@ -2,9 +2,9 @@
 import json
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Callable, Optional, cast
 
-from .. import data
+from .. import data, io
 from ..data import Description, Entry, KeyId
 from .store import Query, Reader, Writer
 
@@ -164,13 +164,15 @@ class InMemoryStore:
 class JsonFileReader:
     """A JSON file reader."""
 
-    def __init__(self, file: Path) -> None:
+    def __init__(self, file: Path, reader: Callable[[Path], Optional[str]] = io.file_reader) -> None:
         self._file = file
+        self._reader = reader
 
     def read(self) -> list[Entry]:
         """Reads entries from a JSON file"""
-        with open(self._file, "r", encoding="utf-8") as file:
-            json_data = file.read()
+        json_data = self._reader(self._file)
+        if json_data is None:
+            raise FileExistsError(f"File '{self._file}' does not exist")
 
         parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
         if not isinstance(parsed, list):
@@ -187,13 +189,13 @@ class JsonFileReader:
 class JsonFileWriter:
     """A JSON file writer."""
 
-    def __init__(self, file: Path) -> None:
+    def __init__(self, file: Path, writer: Callable[[Path, str], None] = io.file_writer) -> None:
         self._file = file
+        self._writer = writer
 
     def write(self, writes: list[Entry]) -> None:
         """Writes entries to a JSON file"""
         writes.sort(key=lambda entry: entry.timestamp)
         dicts: list[dict[str, str]] = [data.remap_keys_snake_to_camel(entry.to_dict()) for entry in writes]
-        with open(self._file, "w", encoding="utf-8") as file:
-            json_str = json.dumps(dicts, indent=4)
-            file.write(json_str)
+        json_str = json.dumps(dicts, indent=4)
+        self._writer(self._file, json_str)
