@@ -212,6 +212,7 @@ class ConfigBuilder:
 
         Args:
             config: The string representation of a configuration file.
+            reader: A function that reads a file and returns its string representation.
 
         Returns:
             The updated configuration.

@@ -60,8 +60,8 @@ def get_schema_version(
 
     Args:
         schema_file: The file to read from and write to.
-        reader: The file reader.
-        writer: The file writer.
+        reader: A function that reads a file and returns its string representation.
+        writer: A function that writes a string to a file.
 
     Returns:
         The schema version.
