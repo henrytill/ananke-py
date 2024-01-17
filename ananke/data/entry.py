@@ -7,7 +7,7 @@ import subprocess
 from typing import Any, Optional, Self
 
 from . import core
-from .core import Description, Identity, KeyId, Metadata, Plaintext, Timestamp, remap_keys
+from .core import Description, Identity, KeyId, Metadata, Plaintext, Timestamp
 
 
 class EntryId(str):
@@ -224,8 +224,8 @@ SNAKE_TO_CAMEL = {
 }
 
 
-remap_keys_camel_to_snake = functools.partial(remap_keys, CAMEL_TO_SNAKE)
-remap_keys_snake_to_camel = functools.partial(remap_keys, SNAKE_TO_CAMEL)
+remap_keys_camel_to_snake = functools.partial(core.remap_keys, CAMEL_TO_SNAKE)
+remap_keys_snake_to_camel = functools.partial(core.remap_keys, SNAKE_TO_CAMEL)
 
 
 class GpgCodec:
