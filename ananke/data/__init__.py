@@ -5,6 +5,8 @@ from .core import KeyId as KeyId
 from .core import Metadata as Metadata
 from .core import Plaintext as Plaintext
 from .core import Timestamp as Timestamp
+from .core import get_optional as get_optional
+from .core import get_required as get_required
 from .core import remap_keys as remap_keys
 from .entry import Ciphertext as Ciphertext
 from .entry import Entry as Entry

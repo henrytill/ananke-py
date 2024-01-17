@@ -2,7 +2,7 @@
 import secrets
 import string
 from datetime import datetime, timezone
-from typing import Any, NewType, Self
+from typing import Any, NewType, Optional, Self
 
 KeyId = NewType("KeyId", str)
 """A Cryptographic Key Id."""
@@ -123,3 +123,41 @@ def remap_keys(mapping: dict[str, str], data: dict[str, Any]) -> dict[str, Any]:
     {'c': 1}
     """
     return {mapping.get(key, key): value for key, value in data.items()}
+
+
+def get_required(d: dict[Any, Any], key: Any, value_type: type) -> Any:
+    """Gets a required value from a dictionary.
+
+    Args:
+        d: The dictionary to get the value from.
+        key: The key to get the value for.
+        value_type: The type of the value.
+
+    Returns:
+        The value.
+    """
+    value = d.get(key)
+    if value is None:
+        raise ValueError(f'Invalid entry format: missing required key "{key}"')
+    if not isinstance(value, value_type):
+        raise TypeError(f"Invalid {key}: expected a value of type {value_type}")
+    return value
+
+
+def get_optional(d: dict[Any, Any], key: Any, value_type: type) -> Optional[Any]:
+    """Gets an optional value from a dictionary.
+
+    Args:
+        d: The dictionary to get the value from.
+        key: The key to get the value for.
+        value_type: The type of the value.
+
+    Returns:
+        The value, or None if the key is not present.
+    """
+    value = d.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, value_type):
+        raise TypeError(f"Invalid {key}: expected a value of type {value_type}")
+    return value
