@@ -1,5 +1,4 @@
 """Schema management."""
-
 from pathlib import Path
 from typing import Callable, Optional, Self
 
