@@ -24,42 +24,44 @@ class EntryMap(defaultdict[Description, set[Entry]]):
         self[entry.description].discard(entry)
 
 
-class InMemoryQuery(Query):
-    """An in-memory query.
+class QueryMatcher:
+    """A query matcher.
 
-    This class is used to filter entries in an in-memory store.
+    This class is used to filter entries.
     """
 
+    _query: Query
+
     def __init__(self, query: Query) -> None:
-        super().__init__(query.entry_id, query.description, query.identity, query.meta)
+        self._query = query
 
     def match_id(self, entry: Entry) -> bool:
         """Returns True if the entry matches the query"""
-        if self.entry_id is None:
+        if self._query.entry_id is None:
             return True
-        return self.entry_id == entry.entry_id
+        return self._query.entry_id == entry.entry_id
 
     def match_description(self, description: Description) -> bool:
         """Returns True if the description matches the query."""
-        if self.description is None:
+        if self._query.description is None:
             return True
-        return self.description.lower() in description.lower()
+        return self._query.description.lower() in description.lower()
 
     def match_identity(self, entry: Entry) -> bool:
         """Returns True if the identity matches the query."""
-        if self.identity is None:
+        if self._query.identity is None:
             return True
         if entry.identity is None:
             return False
-        return self.identity.lower() in entry.identity.lower()
+        return self._query.identity.lower() in entry.identity.lower()
 
     def match_meta(self, entry: Entry) -> bool:
         """Returns True if the meta matches the query."""
-        if self.meta is None:
+        if self._query.meta is None:
             return True
         if entry.meta is None:
             return False
-        return self.meta.lower() in entry.meta.lower()
+        return self._query.meta.lower() in entry.meta.lower()
 
 
 class InMemoryStore:
@@ -111,13 +113,13 @@ class InMemoryStore:
         Returns:
             A list of entries that match the query.
         """
-        query = InMemoryQuery(query)
+        matcher = QueryMatcher(query)
         return [
             entry
             for description, entries in self._storage.items()
-            if query.match_description(description)
+            if matcher.match_description(description)
             for entry in entries
-            if query.match_id(entry) and query.match_identity(entry) and query.match_meta(entry)
+            if matcher.match_id(entry) and matcher.match_identity(entry) and matcher.match_meta(entry)
         ]
 
     def select_all(self) -> list[Entry]:

@@ -1,9 +1,11 @@
 """The store protocol."""
+from dataclasses import dataclass
 from typing import Any, Optional, Protocol
 
 from ..data import Description, Entry, EntryId, Identity, KeyId, Metadata
 
 
+@dataclass(frozen=True)
 class Query:
     """A query for filtering entries.
 
@@ -18,42 +20,10 @@ class Query:
         meta: The metadata to filter by.
     """
 
-    _entry_id: Optional[EntryId]
-    _description: Optional[Description]
-    _identity: Optional[Identity]
-    _meta: Optional[Metadata]
-
-    def __init__(
-        self,
-        entry_id: Optional[EntryId] = None,
-        description: Optional[Description] = None,
-        identity: Optional[Identity] = None,
-        meta: Optional[Metadata] = None,
-    ) -> None:
-        self._entry_id = entry_id
-        self._description = description
-        self._identity = identity
-        self._meta = meta
-
-    @property
-    def entry_id(self) -> Optional[EntryId]:
-        """Returns the entry id."""
-        return self._entry_id
-
-    @property
-    def description(self) -> Optional[Description]:
-        """Returns the description."""
-        return self._description
-
-    @property
-    def identity(self) -> Optional[Identity]:
-        """Returns the identity."""
-        return self._identity
-
-    @property
-    def meta(self) -> Optional[Metadata]:
-        """Returns the metadata."""
-        return self._meta
+    entry_id: Optional[EntryId] = None
+    description: Optional[Description] = None
+    identity: Optional[Identity] = None
+    meta: Optional[Metadata] = None
 
 
 # pylint: disable=unnecessary-ellipsis, too-few-public-methods
