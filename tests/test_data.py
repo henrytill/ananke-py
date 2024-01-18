@@ -134,7 +134,7 @@ class TestPlaintext(unittest.TestCase):
         for case in test_cases:
             with self.subTest(case=case):
                 actual_plaintext = Plaintext.random(**case["args"])
-                for char in actual_plaintext:
+                for char in str(actual_plaintext):
                     self.assertIn(char, case["char_set"])
 
     def test_random_length(self) -> None:

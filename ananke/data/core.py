@@ -1,6 +1,7 @@
 """Core datatypes and related functions."""
 import secrets
 import string
+from collections import UserString
 from datetime import datetime, timezone
 from typing import Any, NewType, Optional, Self
 
@@ -63,11 +64,8 @@ class Timestamp:
         return self.timestamp
 
 
-class Plaintext(str):
+class Plaintext(UserString):
     """A plaintext value."""
-
-    def __new__(cls, value: str) -> Self:
-        return super().__new__(cls, value)
 
     @classmethod
     def random(

@@ -4,17 +4,15 @@ import binascii
 import functools
 import hashlib
 import subprocess
+from collections import UserString
 from typing import Any, Optional, Self
 
 from . import core
 from .core import Description, Identity, KeyId, Metadata, Plaintext, Timestamp
 
 
-class EntryId(str):
+class EntryId(UserString):
     """Uniquely identifies an 'Entry'."""
-
-    def __new__(cls, value: str) -> Self:
-        return super().__new__(cls, value)
 
     @classmethod
     def generate(
@@ -182,7 +180,7 @@ class Entry:
         """
         ret = {
             "timestamp": self.timestamp.isoformat(),
-            "id": self.entry_id,
+            "id": str(self.entry_id),
             "key_id": self.key_id,
             "description": self.description,
             "ciphertext": self.ciphertext.to_base64(),

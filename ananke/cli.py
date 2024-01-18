@@ -83,12 +83,12 @@ def format_verbose(entry: Entry, plaintext: Plaintext) -> str:
     Returns:
         The formatted entry.
     """
-    elements = [entry.timestamp.isoformat(), entry.entry_id, entry.key_id, entry.description]
+    elements = [entry.timestamp.isoformat(), str(entry.entry_id), entry.key_id, entry.description]
 
     if entry.identity is not None:
         elements.append(entry.identity)
 
-    elements.append(plaintext)
+    elements.append(str(plaintext))
 
     if entry.meta is not None:
         elements.append(f'"{entry.meta}"')
@@ -108,7 +108,7 @@ def format_results(results: list[Tuple[Entry, Plaintext]], verbose: bool) -> str
     """
     if len(results) == 1:
         entry, plaintext = results[0]
-        return format_verbose(entry, plaintext) if verbose else plaintext
+        return format_verbose(entry, plaintext) if verbose else str(plaintext)
 
     formatted_results: list[str] = []
     for entry, plaintext in results:
