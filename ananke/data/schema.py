@@ -9,23 +9,25 @@ from .. import io
 class SchemaVersion:
     """Schema version."""
 
+    _value: int
+
     def __init__(self, version: int) -> None:
-        self.version = version
+        self._value = version
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, SchemaVersion):
             return False
-        return self.version.__eq__(value.version)
+        return self._value.__eq__(value._value)
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, SchemaVersion):
             raise TypeError(f"'<' not supported between instances of 'SchemaVersion' and '{type(other).__name__}'")
-        return self.version.__lt__(other.version)
+        return self._value.__lt__(other._value)
 
     @property
     def value(self) -> int:
         """Returns the schema version value."""
-        return self.version
+        return self._value
 
     @classmethod
     def from_str(cls, version: str) -> Self:
@@ -43,7 +45,7 @@ class SchemaVersion:
         return cls(int(version))
 
     def __str__(self) -> str:
-        return str(self.version)
+        return str(self._value)
 
 
 CURRENT_SCHEMA_VERSION = SchemaVersion(3)

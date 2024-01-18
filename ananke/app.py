@@ -11,6 +11,11 @@ from .store import Query, Reader, Store, Writer
 class Application(AbstractContextManager["Application"]):
     """The main application class."""
 
+    _store: Store
+    _reader: Reader
+    _writer: Writer
+    _codec: Codec[Plaintext]
+
     def __init__(
         self,
         store: Store,

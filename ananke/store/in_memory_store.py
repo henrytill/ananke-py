@@ -164,6 +164,9 @@ class InMemoryStore:
 class JsonFileReader:
     """A JSON file reader."""
 
+    _file: Path
+    _reader: Callable[[Path], Optional[str]]
+
     def __init__(self, file: Path, reader: Callable[[Path], Optional[str]] = io.file_reader) -> None:
         self._file = file
         self._reader = reader
@@ -188,6 +191,9 @@ class JsonFileReader:
 # pylint: disable=too-few-public-methods
 class JsonFileWriter:
     """A JSON file writer."""
+
+    _file: Path
+    _writer: Callable[[Path, str], None]
 
     def __init__(self, file: Path, writer: Callable[[Path, str], None] = io.file_writer) -> None:
         self._file = file

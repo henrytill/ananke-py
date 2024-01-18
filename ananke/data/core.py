@@ -21,8 +21,10 @@ Metadata = NewType("Metadata", str)
 class Timestamp:
     """A UTC timestamp."""
 
+    _value: datetime
+
     def __init__(self, timestamp: datetime) -> None:
-        self.timestamp = timestamp
+        self._value = timestamp
 
     @classmethod
     def now(cls) -> Self:
@@ -46,22 +48,22 @@ class Timestamp:
 
     def isoformat(self) -> str:
         """Returns the timestamp as an ISO 8601 string."""
-        return self.timestamp.isoformat().replace("+00:00", "Z")
+        return self._value.isoformat().replace("+00:00", "Z")
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, Timestamp):
             return False
-        return self.timestamp.__eq__(value.timestamp)
+        return self._value.__eq__(value._value)
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, Timestamp):
             raise TypeError(f"'<' not supported between instances of 'Timestamp' and '{type(other).__name__}'")
-        return self.timestamp.__lt__(other.timestamp)
+        return self._value.__lt__(other._value)
 
     @property
     def value(self) -> datetime:
         """Returns the timestamp value."""
-        return self.timestamp
+        return self._value
 
 
 class Plaintext(UserString):
