@@ -3,18 +3,9 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
-from typing import TypedDict
 
 from ananke.data import Ciphertext, GpgCodec, KeyId, Plaintext
-
-
-class RandomArgs(TypedDict):
-    """Type hint class for the 'test_random' method."""
-
-    length: int
-    use_uppercase: bool
-    use_digits: bool
-    use_punctuation: bool
+from tests import RandomArgs
 
 
 class TestGpgCodec(unittest.TestCase):

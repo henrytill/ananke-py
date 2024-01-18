@@ -6,15 +6,7 @@ from typing import List, LiteralString, TypedDict
 
 from ananke import data
 from ananke.data import Ciphertext, Description, Entry, EntryId, Identity, KeyId, Plaintext, Timestamp
-
-
-class RandomArgs(TypedDict):
-    """Type hint class for the 'test_random' method."""
-
-    length: int
-    use_uppercase: bool
-    use_digits: bool
-    use_punctuation: bool
+from tests import RandomArgs
 
 
 class RandomTestCase(TypedDict):
