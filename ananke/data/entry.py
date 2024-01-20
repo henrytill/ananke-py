@@ -2,42 +2,11 @@
 import base64
 import binascii
 import functools
-import hashlib
 import subprocess
-from collections import UserString
 from typing import Any, Optional, Self
 
 from . import core
-from .core import Description, Identity, KeyId, Metadata, Plaintext, Timestamp
-
-
-class EntryId(UserString):
-    """Uniquely identifies an 'Entry'."""
-
-    @classmethod
-    def generate(
-        cls,
-        key_id: KeyId,
-        timestamp: Timestamp,
-        description: Description,
-        maybe_identity: Optional[Identity] = None,
-    ) -> Self:
-        """Generates an EntryId from the given values.
-
-        Args:
-            key_id: The GPG Key Id used for encryption.
-            timestamp: The time the entry was created or updated.
-            description: Description of the entry. Can be a URI or a descriptive name.
-            maybe_identity: Optional identifying value, such as a username.
-
-        Returns:
-            The generated EntryId.
-        """
-        input_str = f"{key_id}{timestamp.isoformat()}{description}"
-        if maybe_identity:
-            input_str += maybe_identity
-        sha_signature = hashlib.sha1(input_str.encode()).hexdigest()
-        return cls(sha_signature)
+from .core import Description, EntryId, Identity, KeyId, Metadata, Plaintext, Timestamp
 
 
 class Ciphertext(bytes):

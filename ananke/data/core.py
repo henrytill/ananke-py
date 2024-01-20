@@ -1,4 +1,5 @@
 """Core datatypes and related functions."""
+import hashlib
 import secrets
 import string
 from collections import UserString
@@ -100,6 +101,35 @@ class Plaintext(UserString):
         ret = cls("".join(secrets.choice(chars) for _ in range(length)))
 
         return cls(ret)
+
+
+class EntryId(UserString):
+    """Uniquely identifies an 'Entry'."""
+
+    @classmethod
+    def generate(
+        cls,
+        key_id: KeyId,
+        timestamp: Timestamp,
+        description: Description,
+        maybe_identity: Optional[Identity] = None,
+    ) -> Self:
+        """Generates an EntryId from the given values.
+
+        Args:
+            key_id: The GPG Key Id used for encryption.
+            timestamp: The time the entry was created or updated.
+            description: Description of the entry. Can be a URI or a descriptive name.
+            maybe_identity: Optional identifying value, such as a username.
+
+        Returns:
+            The generated EntryId.
+        """
+        input_str = f"{key_id}{timestamp.isoformat()}{description}"
+        if maybe_identity:
+            input_str += maybe_identity
+        sha_signature = hashlib.sha1(input_str.encode()).hexdigest()
+        return cls(sha_signature)
 
 
 def remap_keys(mapping: dict[str, str], data: dict[str, Any]) -> dict[str, Any]:
