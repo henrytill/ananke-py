@@ -11,10 +11,10 @@ from .store import Query, Reader, Store, Writer
 class Application(AbstractContextManager["Application"]):
     """The main application class."""
 
-    _store: Store
-    _reader: Reader
-    _writer: Writer
-    _codec: Codec[Plaintext]
+    store: Store
+    reader: Reader
+    writer: Writer
+    codec: Codec[Plaintext]
 
     def __init__(
         self,
@@ -23,10 +23,10 @@ class Application(AbstractContextManager["Application"]):
         writer: Writer,
         codec: Codec[Plaintext],
     ) -> None:
-        self._store = store
-        self._reader = reader
-        self._writer = writer
-        self._codec = codec
+        self.store = store
+        self.reader = reader
+        self.writer = writer
+        self.codec = codec
 
     def __enter__(self) -> Self:
         self.init()
@@ -42,11 +42,11 @@ class Application(AbstractContextManager["Application"]):
 
     def init(self) -> None:
         """Initialize the store."""
-        self._store.init(self._reader)
+        self.store.init(self.reader)
 
     def sync(self) -> None:
         """Synchronize the store."""
-        self._store.sync(self._writer)
+        self.store.sync(self.writer)
 
     def add(
         self,
@@ -64,18 +64,18 @@ class Application(AbstractContextManager["Application"]):
             maybe_meta: The metadata of the entry.
         """
         timestamp = Timestamp.now()
-        entry_id = EntryId.generate(self._codec.key_id, timestamp, description, maybe_identity)
-        ciphertext = self._codec.encode(plaintext)
+        entry_id = EntryId.generate(self.codec.key_id, timestamp, description, maybe_identity)
+        ciphertext = self.codec.encode(plaintext)
         entry = Entry(
             entry_id=entry_id,
-            key_id=self._codec.key_id,
+            key_id=self.codec.key_id,
             timestamp=timestamp,
             description=description,
             identity=maybe_identity,
             ciphertext=ciphertext,
             meta=maybe_meta,
         )
-        self._store.put(entry)
+        self.store.put(entry)
 
     def lookup(
         self,
@@ -95,7 +95,7 @@ class Application(AbstractContextManager["Application"]):
             A list of the matching entries and their corresponding plaintexts.
         """
         query = Query(description=description, identity=maybe_identity)
-        return [(result, self._codec.decode(result.ciphertext)) for result in self._store.query(query)]
+        return [(result, self.codec.decode(result.ciphertext)) for result in self.store.query(query)]
 
     # pylint: disable=too-many-arguments,too-many-locals
     def modify(
@@ -117,7 +117,7 @@ class Application(AbstractContextManager["Application"]):
         """
         query = Query(entry_id=target) if isinstance(target, EntryId) else Query(description=target)
 
-        query_results = self._store.query(query)
+        query_results = self.store.query(query)
         query_results_len = len(query_results)
 
         if query_results_len == 0:
@@ -129,15 +129,15 @@ class Application(AbstractContextManager["Application"]):
         entry = query_results[0]
         description = maybe_description if maybe_description is not None else entry.description
         identity = maybe_identity if maybe_identity is not None else entry.identity
-        ciphertext = self._codec.encode(maybe_plaintext) if maybe_plaintext is not None else entry.ciphertext
+        ciphertext = self.codec.encode(maybe_plaintext) if maybe_plaintext is not None else entry.ciphertext
         meta = maybe_meta if maybe_meta is not None else entry.meta
 
         timestamp = Timestamp.now()
-        entry_id = EntryId.generate(self._codec.key_id, timestamp, description, identity)
+        entry_id = EntryId.generate(self.codec.key_id, timestamp, description, identity)
 
         new_entry = Entry(
             entry_id=entry_id,
-            key_id=self._codec.key_id,
+            key_id=self.codec.key_id,
             timestamp=timestamp,
             description=description,
             identity=identity,
@@ -145,8 +145,8 @@ class Application(AbstractContextManager["Application"]):
             meta=meta,
         )
 
-        self._store.put(new_entry)
-        self._store.remove(entry)
+        self.store.put(new_entry)
+        self.store.remove(entry)
 
     def remove(self, target: EntryId | Description) -> None:
         """Remove an existing entry.
@@ -156,7 +156,7 @@ class Application(AbstractContextManager["Application"]):
         """
         query = Query(entry_id=target) if isinstance(target, EntryId) else Query(description=target)
 
-        query_results = self._store.query(query)
+        query_results = self.store.query(query)
         query_results_len = len(query_results)
 
         if query_results_len == 0:
@@ -166,7 +166,7 @@ class Application(AbstractContextManager["Application"]):
             raise ValueError(f"Multiple entries match {target}")
 
         entry = query_results[0]
-        self._store.remove(entry)
+        self.store.remove(entry)
 
     def dump(self) -> list[Entry]:
         """Dump all entries.
@@ -174,4 +174,4 @@ class Application(AbstractContextManager["Application"]):
         Returns:
             A list of all entries in the store.
         """
-        return self._store.select_all()
+        return self.store.select_all()

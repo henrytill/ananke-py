@@ -30,38 +30,38 @@ class QueryMatcher:
     This class is used to filter entries.
     """
 
-    _query: Query
+    query: Query
 
     def __init__(self, query: Query) -> None:
-        self._query = query
+        self.query = query
 
     def match_id(self, entry: Entry) -> bool:
         """Returns True if the entry matches the query"""
-        if self._query.entry_id is None:
+        if self.query.entry_id is None:
             return True
-        return self._query.entry_id == entry.entry_id
+        return self.query.entry_id == entry.entry_id
 
     def match_description(self, description: Description) -> bool:
         """Returns True if the description matches the query."""
-        if self._query.description is None:
+        if self.query.description is None:
             return True
-        return self._query.description.lower() in description.lower()
+        return self.query.description.lower() in description.lower()
 
     def match_identity(self, entry: Entry) -> bool:
         """Returns True if the identity matches the query."""
-        if self._query.identity is None:
+        if self.query.identity is None:
             return True
         if entry.identity is None:
             return False
-        return self._query.identity.lower() in entry.identity.lower()
+        return self.query.identity.lower() in entry.identity.lower()
 
     def match_meta(self, entry: Entry) -> bool:
         """Returns True if the meta matches the query."""
-        if self._query.meta is None:
+        if self.query.meta is None:
             return True
         if entry.meta is None:
             return False
-        return self._query.meta.lower() in entry.meta.lower()
+        return self.query.meta.lower() in entry.meta.lower()
 
 
 class InMemoryStore:
@@ -70,12 +70,12 @@ class InMemoryStore:
     This class is used to store entries in memory.
     """
 
-    _storage: EntryMap
-    _dirty: bool
+    storage: EntryMap
+    dirty: bool
 
     def __init__(self) -> None:
-        self._storage = EntryMap()
-        self._dirty = False
+        self.storage = EntryMap()
+        self.dirty = False
 
     def init(self, reader: Reader) -> None:
         """Initializes the store.
@@ -84,7 +84,7 @@ class InMemoryStore:
             reader: The reader to use to initialize the store.
         """
         for entry in reader.read():
-            self._storage.add(entry)
+            self.storage.add(entry)
 
     def put(self, entry: Entry) -> None:
         """Puts an entry into the store.
@@ -92,8 +92,8 @@ class InMemoryStore:
         Args:
             entry: The entry to put into the store.
         """
-        self._storage.add(entry)
-        self._dirty = True
+        self.storage.add(entry)
+        self.dirty = True
 
     def remove(self, entry: Entry) -> None:
         """Removes an entry from the store.
@@ -101,8 +101,8 @@ class InMemoryStore:
         Args:
             entry: The entry to remove from the store.
         """
-        self._storage.discard(entry)
-        self._dirty = True
+        self.storage.discard(entry)
+        self.dirty = True
 
     def query(self, query: Query) -> list[Entry]:
         """Queries the store.
@@ -116,7 +116,7 @@ class InMemoryStore:
         matcher = QueryMatcher(query)
         return [
             entry
-            for description, entries in self._storage.items()
+            for description, entries in self.storage.items()
             if matcher.match_description(description)
             for entry in entries
             if matcher.match_id(entry) and matcher.match_identity(entry) and matcher.match_meta(entry)
@@ -128,7 +128,7 @@ class InMemoryStore:
         Returns:
             A list of entries.
         """
-        return [entry for entries in self._storage.values() for entry in entries]
+        return [entry for entries in self.storage.values() for entry in entries]
 
     def get_count(self) -> int:
         """Returns the count of all entries in the store.
@@ -136,7 +136,7 @@ class InMemoryStore:
         Returns:
             The count of all entries.
         """
-        return sum(len(entries) for entries in self._storage.values())
+        return sum(len(entries) for entries in self.storage.values())
 
     def get_count_of_key_id(self, key_id: KeyId) -> int:
         """Returns the count of entries for a specific key id.
@@ -147,7 +147,7 @@ class InMemoryStore:
         Returns:
             The count of entries for the key id.
         """
-        return sum(entry.key_id == key_id for entries in self._storage.values() for entry in entries)
+        return sum(entry.key_id == key_id for entries in self.storage.values() for entry in entries)
 
     def sync(self, writer: Writer) -> None:
         """Synchronizes the store.
@@ -155,29 +155,29 @@ class InMemoryStore:
         Args:
             writer: The writer to use to synchronize the store.
         """
-        if not self._dirty:
+        if not self.dirty:
             return
         entries = self.select_all()
         writer.write(entries)
-        self._dirty = False
+        self.dirty = False
 
 
 # pylint: disable=too-few-public-methods
 class JsonFileReader:
     """A JSON file reader."""
 
-    _file: Path
-    _reader: Callable[[Path], Optional[str]]
+    file: Path
+    reader: Callable[[Path], Optional[str]]
 
     def __init__(self, file: Path, reader: Callable[[Path], Optional[str]] = io.file_reader) -> None:
-        self._file = file
-        self._reader = reader
+        self.file = file
+        self.reader = reader
 
     def read(self) -> list[Entry]:
         """Reads entries from a JSON file"""
-        json_data = self._reader(self._file)
+        json_data = self.reader(self.file)
         if json_data is None:
-            raise FileExistsError(f"File '{self._file}' does not exist")
+            raise FileExistsError(f"File '{self.file}' does not exist")
 
         parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
         if not isinstance(parsed, list):
@@ -194,16 +194,16 @@ class JsonFileReader:
 class JsonFileWriter:
     """A JSON file writer."""
 
-    _file: Path
-    _writer: Callable[[Path, str], None]
+    file: Path
+    writer: Callable[[Path, str], None]
 
     def __init__(self, file: Path, writer: Callable[[Path, str], None] = io.file_writer) -> None:
-        self._file = file
-        self._writer = writer
+        self.file = file
+        self.writer = writer
 
     def write(self, writes: list[Entry]) -> None:
         """Writes entries to a JSON file"""
         writes.sort(key=lambda entry: entry.timestamp)
         dicts: list[dict[str, str]] = [data.remap_keys_snake_to_camel(entry.to_dict()) for entry in writes]
         json_str = json.dumps(dicts, indent=4)
-        self._writer(self._file, json_str)
+        self.writer(self.file, json_str)

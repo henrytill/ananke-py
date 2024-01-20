@@ -201,7 +201,7 @@ class GpgCodec:
     This class is used to encode Plaintexts and decode Ciphertexts using GPG.
     """
 
-    _key_id: KeyId
+    key_id: KeyId
 
     def __init__(self, key_id: KeyId) -> None:
         """Creates a new GpgCodec with the given KeyId.
@@ -209,16 +209,7 @@ class GpgCodec:
         Args:
             key_id: The KeyId to use for encryption and decryption.
         """
-        self._key_id = key_id
-
-    @property
-    def key_id(self) -> KeyId:
-        """Returns the KeyId of this GpgCodec."""
-        return self._key_id
-
-    @key_id.setter
-    def key_id(self, key_id: KeyId) -> None:
-        self._key_id = key_id
+        self.key_id = key_id
 
     def encode(self, obj: Plaintext) -> Ciphertext:
         """Encodes a Plaintext into a Ciphertext.

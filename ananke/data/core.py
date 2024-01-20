@@ -21,10 +21,20 @@ Metadata = NewType("Metadata", str)
 class Timestamp:
     """A UTC timestamp."""
 
-    _value: datetime
+    value: datetime
 
     def __init__(self, timestamp: datetime) -> None:
-        self._value = timestamp
+        self.value = timestamp
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Timestamp):
+            return False
+        return self.value.__eq__(value.value)
+
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, Timestamp):
+            raise TypeError(f"'<' not supported between instances of 'Timestamp' and '{type(other).__name__}'")
+        return self.value.__lt__(other.value)
 
     @classmethod
     def now(cls) -> Self:
@@ -48,45 +58,30 @@ class Timestamp:
 
     def isoformat(self) -> str:
         """Returns the timestamp as an ISO 8601 string."""
-        return self._value.isoformat().replace("+00:00", "Z")
-
-    def __eq__(self, value: object) -> bool:
-        if not isinstance(value, Timestamp):
-            return False
-        return self._value.__eq__(value._value)
-
-    def __lt__(self, other: object) -> bool:
-        if not isinstance(other, Timestamp):
-            raise TypeError(f"'<' not supported between instances of 'Timestamp' and '{type(other).__name__}'")
-        return self._value.__lt__(other._value)
-
-    @property
-    def value(self) -> datetime:
-        """Returns the timestamp value."""
-        return self._value
+        return self.value.isoformat().replace("+00:00", "Z")
 
 
 class Plaintext:
     """A plaintext value."""
 
-    _value: str
+    value: str
 
     def __init__(self, value: str) -> None:
-        self._value = value
+        self.value = value
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, Plaintext):
             return False
-        return self._value.__eq__(value._value)
+        return self.value.__eq__(value.value)
 
     def __str__(self) -> str:
-        return self._value
+        return self.value
 
     def __repr__(self) -> str:
-        return f"Plaintext({self._value!r})"
+        return f"Plaintext({self.value!r})"
 
     def __len__(self) -> int:
-        return self._value.__len__()
+        return self.value.__len__()
 
     def encode(self, encoding: str = "utf-8", errors: str = "strict") -> bytes:
         """Encodes the plaintext value using the specified encoding.
@@ -98,7 +93,7 @@ class Plaintext:
         Returns:
             The encoded value.
         """
-        return self._value.encode(encoding, errors)
+        return self.value.encode(encoding, errors)
 
     @classmethod
     def random(
@@ -136,27 +131,27 @@ class Plaintext:
 class EntryId:
     """Uniquely identifies an 'Entry'."""
 
-    _value: str
+    value: str
 
     def __init__(self, value: str) -> None:
-        self._value = value
+        self.value = value
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, EntryId):
             return False
-        return self._value.__eq__(value._value)
+        return self.value.__eq__(value.value)
 
     def __str__(self) -> str:
-        return self._value
+        return self.value
 
     def __repr__(self) -> str:
-        return f"EntryId({self._value!r})"
+        return f"EntryId({self.value!r})"
 
     def __len__(self) -> int:
-        return self._value.__len__()
+        return self.value.__len__()
 
     def __hash__(self) -> int:
-        return self._value.__hash__()
+        return self.value.__hash__()
 
     @classmethod
     def generate(

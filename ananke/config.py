@@ -152,11 +152,11 @@ class Config:
 class ConfigBuilder:
     """A configuration builder."""
 
-    _config_dir: Optional[Path]
-    _data_dir: Optional[Path]
-    _backend: Optional[Backend]
-    _key_id: Optional[KeyId]
-    _allow_multiple_keys: Optional[bool]
+    config_dir: Optional[Path]
+    data_dir: Optional[Path]
+    backend: Optional[Backend]
+    key_id: Optional[KeyId]
+    allow_multiple_keys: Optional[bool]
 
     # pylint: disable=too-many-arguments
     def __init__(
@@ -167,11 +167,11 @@ class ConfigBuilder:
         key_id: Optional[KeyId] = None,
         allow_multiple_keys: Optional[bool] = None,
     ) -> None:
-        self._config_dir = config_dir
-        self._data_dir = data_dir
-        self._backend = backend
-        self._key_id = key_id
-        self._allow_multiple_keys = allow_multiple_keys
+        self.config_dir = config_dir
+        self.data_dir = data_dir
+        self.backend = backend
+        self.key_id = key_id
+        self.allow_multiple_keys = allow_multiple_keys
 
     def with_env(self, env: Mapping[str, str]) -> Self:
         """Updates attributes from environment variables.
@@ -184,26 +184,26 @@ class ConfigBuilder:
         """
         config_dir = env.get(Env.CONFIG_DIR)
         if config_dir is not None:
-            self._config_dir = Path(config_dir)
+            self.config_dir = Path(config_dir)
 
         data_dir = env.get(Env.DATA_DIR)
         if data_dir is not None:
-            self._data_dir = Path(data_dir)
+            self.data_dir = Path(data_dir)
 
         backend = env.get(Env.BACKEND)
         if backend is not None:
-            self._backend = Backend.from_str(backend)
+            self.backend = Backend.from_str(backend)
 
         key_id = env.get(Env.KEY_ID)
         if key_id is not None:
-            self._key_id = KeyId(key_id)
+            self.key_id = KeyId(key_id)
 
         allow_multiple_keys = env.get(Env.ALLOW_MULTIPLE_KEYS)
         if allow_multiple_keys is not None:
             try:
-                self._allow_multiple_keys = bool(strtobool(allow_multiple_keys))
+                self.allow_multiple_keys = bool(strtobool(allow_multiple_keys))
             except ValueError:
-                self._allow_multiple_keys = False
+                self.allow_multiple_keys = False
 
         return self
 
@@ -217,10 +217,10 @@ class ConfigBuilder:
         Returns:
             The updated configuration.
         """
-        if self._config_dir is None:
+        if self.config_dir is None:
             raise ValueError("config_dir is not set")
 
-        config_file = self._config_dir / "ananke.ini"
+        config_file = self.config_dir / "ananke.ini"
         maybe_config_str = reader(config_file)
         if maybe_config_str is None:
             raise ValueError(f"Configuration file does not exist: {config_file}")
@@ -230,19 +230,19 @@ class ConfigBuilder:
 
         data_dir = config_parser.get("data", "dir", fallback=None)
         if data_dir is not None:
-            self._data_dir = Path(data_dir)
+            self.data_dir = Path(data_dir)
 
         backend = config_parser.get("data", "backend", fallback=None)
         if backend is not None:
-            self._backend = Backend.from_str(backend)
+            self.backend = Backend.from_str(backend)
 
         key_id = config_parser.get("gpg", "key_id", fallback=None)
         if key_id is not None:
-            self._key_id = KeyId(key_id)
+            self.key_id = KeyId(key_id)
 
         allow_multiple_keys = config_parser.getboolean("gpg", "allow_multiple_keys", fallback=None)
         if allow_multiple_keys is not None:
-            self._allow_multiple_keys = bool(allow_multiple_keys)
+            self.allow_multiple_keys = bool(allow_multiple_keys)
 
         return self
 
@@ -256,17 +256,17 @@ class ConfigBuilder:
         Returns:
             The updated configuration.
         """
-        if self._config_dir is None:
-            self._config_dir = _get_config_dir(os_family, env)
+        if self.config_dir is None:
+            self.config_dir = _get_config_dir(os_family, env)
 
-        if self._data_dir is None:
-            self._data_dir = _get_data_dir(os_family, env)
+        if self.data_dir is None:
+            self.data_dir = _get_data_dir(os_family, env)
 
-        if self._backend is None:
-            self._backend = Backend.JSON
+        if self.backend is None:
+            self.backend = Backend.JSON
 
-        if self._allow_multiple_keys is None:
-            self._allow_multiple_keys = False
+        if self.allow_multiple_keys is None:
+            self.allow_multiple_keys = False
 
         return self
 
@@ -276,28 +276,28 @@ class ConfigBuilder:
         Returns:
             The configuration object.
         """
-        if self._config_dir is None:
+        if self.config_dir is None:
             raise ValueError("config_dir is not set")
 
-        if self._data_dir is None:
+        if self.data_dir is None:
             raise ValueError("data_dir is not set")
 
-        if self._backend is None:
+        if self.backend is None:
             raise ValueError("backend is not set")
 
-        if self._key_id is None:
+        if self.key_id is None:
             raise ValueError("key_id is not set")
 
-        if self._allow_multiple_keys is None:
+        if self.allow_multiple_keys is None:
             raise ValueError("allow_multiple_keys is not set")
 
         # Create a configuration object
         config = Config(
-            config_dir=self._config_dir,
-            data_dir=self._data_dir,
-            backend=self._backend,
-            key_id=self._key_id,
-            allow_multiple_keys=self._allow_multiple_keys,
+            config_dir=self.config_dir,
+            data_dir=self.data_dir,
+            backend=self.backend,
+            key_id=self.key_id,
+            allow_multiple_keys=self.allow_multiple_keys,
         )
 
         # Return the configuration
