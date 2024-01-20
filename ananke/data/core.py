@@ -2,7 +2,6 @@
 import hashlib
 import secrets
 import string
-from collections import UserString
 from datetime import datetime, timezone
 from typing import Any, NewType, Optional, Self
 
@@ -67,8 +66,39 @@ class Timestamp:
         return self._value
 
 
-class Plaintext(UserString):
+class Plaintext:
     """A plaintext value."""
+
+    _value: str
+
+    def __init__(self, value: str) -> None:
+        self._value = value
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Plaintext):
+            return False
+        return self._value.__eq__(value._value)
+
+    def __str__(self) -> str:
+        return self._value
+
+    def __repr__(self) -> str:
+        return f"Plaintext({self._value!r})"
+
+    def __len__(self) -> int:
+        return self._value.__len__()
+
+    def encode(self, encoding: str = "utf-8", errors: str = "strict") -> bytes:
+        """Encodes the plaintext value using the specified encoding.
+
+        Args:
+            encoding: The encoding to use.
+            errors: The error handling scheme to use for encoding errors.
+
+        Returns:
+            The encoded value.
+        """
+        return self._value.encode(encoding, errors)
 
     @classmethod
     def random(
@@ -98,13 +128,35 @@ class Plaintext(UserString):
         if use_punctuation:
             chars += string.punctuation
 
-        ret = cls("".join(secrets.choice(chars) for _ in range(length)))
+        ret = "".join(secrets.choice(chars) for _ in range(length))
 
         return cls(ret)
 
 
-class EntryId(UserString):
+class EntryId:
     """Uniquely identifies an 'Entry'."""
+
+    _value: str
+
+    def __init__(self, value: str) -> None:
+        self._value = value
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, EntryId):
+            return False
+        return self._value.__eq__(value._value)
+
+    def __str__(self) -> str:
+        return self._value
+
+    def __repr__(self) -> str:
+        return f"EntryId({self._value!r})"
+
+    def __len__(self) -> int:
+        return self._value.__len__()
+
+    def __hash__(self) -> int:
+        return self._value.__hash__()
 
     @classmethod
     def generate(
