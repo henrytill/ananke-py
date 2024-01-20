@@ -188,11 +188,11 @@ class JsonFileReader:
 
         parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
         if not isinstance(parsed, list):
-            raise ValueError("Expected a list")
+            raise TypeError("Expected a list")
         ret: list[Entry] = []
         for item in cast(list[object], parsed):
             if not isinstance(item, dict):
-                raise ValueError("Expected a dictionary")
+                raise TypeError("Expected a dictionary")
             ret.append(Entry.from_dict(cast(dict[Any, Any], item)))
         return ret
 
