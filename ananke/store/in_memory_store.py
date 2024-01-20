@@ -184,7 +184,7 @@ class JsonFileReader:
         """Reads entries from a JSON file"""
         json_data = self.reader(self.file)
         if json_data is None:
-            raise FileExistsError(f"File '{self.file}' does not exist")
+            raise FileNotFoundError(f"File '{self.file}' does not exist")
 
         parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
         if not isinstance(parsed, list):
