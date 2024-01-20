@@ -23,11 +23,6 @@ class SchemaVersion:
             raise TypeError(f"'<' not supported between instances of 'SchemaVersion' and '{type(other).__name__}'")
         return self._value.__lt__(other._value)
 
-    @property
-    def value(self) -> int:
-        """Returns the schema version value."""
-        return self._value
-
     @classmethod
     def from_str(cls, version: str) -> Self:
         """Creates a SchemaVersion object from a string.
