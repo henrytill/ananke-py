@@ -39,7 +39,7 @@ class SchemaVersion:
         return cls(int(version))
 
     def __str__(self) -> str:
-        return str(self._value)
+        return self._value.__str__()
 
 
 CURRENT_SCHEMA_VERSION = SchemaVersion(3)
