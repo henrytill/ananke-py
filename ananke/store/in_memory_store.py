@@ -28,6 +28,9 @@ class QueryMatcher:
     """A query matcher.
 
     This class is used to filter entries.
+
+    Attributes:
+        query: The query to match.
     """
 
     query: Query
@@ -68,6 +71,10 @@ class InMemoryStore:
     """An in-memory store.
 
     This class is used to store entries in memory.
+
+    Attributes:
+        storage: A map of Description to a set of Entry.
+        dirty: True if the store has been modified since the last sync.
     """
 
     storage: EntryMap

@@ -19,7 +19,11 @@ Metadata = NewType("Metadata", str)
 
 
 class Timestamp:
-    """A UTC timestamp."""
+    """A UTC timestamp.
+
+    Attributes:
+        value: The datetime object.
+    """
 
     value: datetime
 
@@ -62,7 +66,11 @@ class Timestamp:
 
 
 class Plaintext:
-    """A plaintext value."""
+    """A plaintext value.
+
+    Attributes:
+        value: The plaintext value.
+    """
 
     value: str
 
@@ -129,7 +137,11 @@ class Plaintext:
 
 
 class EntryId:
-    """Uniquely identifies an 'Entry'."""
+    """Uniquely identifies an 'Entry'.
+
+    Attributes:
+        value: The entry id.
+    """
 
     value: str
 

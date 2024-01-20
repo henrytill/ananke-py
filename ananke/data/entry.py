@@ -199,6 +199,9 @@ class GpgCodec:
     """A GPG codec.
 
     This class is used to encode Plaintexts and decode Ciphertexts using GPG.
+
+    Attributes:
+        key_id: The KeyId to use for encryption and decryption.
     """
 
     key_id: KeyId

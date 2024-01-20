@@ -6,7 +6,11 @@ from .. import io
 
 
 class SchemaVersion:
-    """Schema version."""
+    """Schema version.
+
+    Attributes:
+        value: The version number.
+    """
 
     value: int
 
