@@ -176,7 +176,7 @@ class EntryId:
         """Generates an EntryId from the given values.
 
         Args:
-            key_id: The GPG Key Id used for encryption.
+            key_id: The cryptographic key id used to encrypt the entry.
             timestamp: The time the entry was created or updated.
             description: Description of the entry. Can be a URI or a descriptive name.
             maybe_identity: Optional identifying value, such as a username.
