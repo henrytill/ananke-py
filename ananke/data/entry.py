@@ -87,7 +87,7 @@ class Entry:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Entry):
-            return NotImplemented
+            return False
         return (
             self.timestamp == other.timestamp
             and self.entry_id == other.entry_id

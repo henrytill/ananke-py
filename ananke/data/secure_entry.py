@@ -46,7 +46,7 @@ class SecureEntry:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SecureEntry):
-            return NotImplemented
+            return False
         return (
             self.timestamp == other.timestamp
             and self.description == other.description
