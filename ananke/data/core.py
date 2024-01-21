@@ -224,6 +224,18 @@ def get_required(d: dict[Any, Any], key: Any, value_type: type) -> Any:
 
     Returns:
         The value.
+
+    Examples:
+    >>> get_required({"a": 1}, "a", int)
+    1
+    >>> get_required({"a": 1}, "a", str)
+    Traceback (most recent call last):
+    ...
+    TypeError: Invalid a: expected a value of type <class 'str'>
+    >>> get_required({"a": 1}, "b", int)
+    Traceback (most recent call last):
+    ...
+    KeyError: 'Invalid entry: missing required key: b'
     """
     value = d.get(key)
     if value is None:
@@ -243,6 +255,16 @@ def get_optional(d: dict[Any, Any], key: Any, value_type: type) -> Optional[Any]
 
     Returns:
         The value, or None if the key is not present.
+
+    Examples:
+    >>> get_optional({"a": 1}, "a", int)
+    1
+    >>> get_optional({"a": 1}, "a", str)
+    Traceback (most recent call last):
+    ...
+    TypeError: Invalid a: expected a value of type <class 'str'>
+    >>> get_optional({"a": 1}, "b", int) is None
+    True
     """
     value = d.get(key)
     if value is None:
