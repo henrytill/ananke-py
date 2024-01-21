@@ -27,6 +27,12 @@ class SchemaVersion:
             raise TypeError(f"'<' not supported between instances of 'SchemaVersion' and '{type(other).__name__}'")
         return self.value.__lt__(other.value)
 
+    def __str__(self) -> str:
+        return self.value.__str__()
+
+    def __repr__(self) -> str:
+        return f"SchemaVersion({self.value!r})"
+
     @classmethod
     def from_str(cls, version: str) -> Self:
         """Creates a SchemaVersion object from a string.
@@ -41,9 +47,6 @@ class SchemaVersion:
             ValueError: If the version is in an invalid format.
         """
         return cls(int(version))
-
-    def __str__(self) -> str:
-        return self.value.__str__()
 
 
 CURRENT_SCHEMA_VERSION = SchemaVersion(3)
