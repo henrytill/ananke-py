@@ -1,4 +1,5 @@
 """Module for the 'SecureEntry' class and related types."""
+# pylint: disable=duplicate-code
 import functools
 from typing import Any, NewType, Optional, Self
 
@@ -88,7 +89,6 @@ class SecureEntry:
             meta=Metadata(maybe_meta) if maybe_meta else None,
         )
 
-    # pylint: disable=duplicate-code
     def to_dict(self) -> dict[str, str]:
         """Converts the 'SecretEntry' to a dictionary.
 
@@ -107,7 +107,6 @@ class SecureEntry:
         return ret
 
 
-# pylint: disable=duplicate-code
 CAMEL_TO_SNAKE = {
     # camelCase
     "timestamp": "timestamp",
