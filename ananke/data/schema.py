@@ -14,13 +14,13 @@ class SchemaVersion:
 
     value: int
 
-    def __init__(self, version: int) -> None:
-        self.value = version
+    def __init__(self, value: int) -> None:
+        self.value = value
 
-    def __eq__(self, value: object) -> bool:
-        if not isinstance(value, SchemaVersion):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SchemaVersion):
             return False
-        return self.value.__eq__(value.value)
+        return self.value.__eq__(other.value)
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, SchemaVersion):

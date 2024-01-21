@@ -27,13 +27,13 @@ class Timestamp:
 
     value: datetime
 
-    def __init__(self, timestamp: datetime) -> None:
-        self.value = timestamp
+    def __init__(self, value: datetime) -> None:
+        self.value = value
 
-    def __eq__(self, value: object) -> bool:
-        if not isinstance(value, Timestamp):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Timestamp):
             return False
-        return self.value.__eq__(value.value)
+        return self.value.__eq__(other.value)
 
     def __lt__(self, other: object) -> bool:
         if not isinstance(other, Timestamp):
@@ -77,10 +77,10 @@ class Plaintext:
     def __init__(self, value: str) -> None:
         self.value = value
 
-    def __eq__(self, value: object) -> bool:
-        if not isinstance(value, Plaintext):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Plaintext):
             return False
-        return self.value.__eq__(value.value)
+        return self.value.__eq__(other.value)
 
     def __str__(self) -> str:
         return self.value
@@ -148,10 +148,10 @@ class EntryId:
     def __init__(self, value: str) -> None:
         self.value = value
 
-    def __eq__(self, value: object) -> bool:
-        if not isinstance(value, EntryId):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, EntryId):
             return False
-        return self.value.__eq__(value.value)
+        return self.value.__eq__(other.value)
 
     def __str__(self) -> str:
         return self.value
