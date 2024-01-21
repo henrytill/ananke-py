@@ -83,7 +83,7 @@ class Plaintext:
         return self.value.__eq__(other.value)
 
     def __str__(self) -> str:
-        return self.value
+        return self.value.__str__()
 
     def __repr__(self) -> str:
         return f"Plaintext({self.value!r})"
@@ -154,7 +154,7 @@ class EntryId:
         return self.value.__eq__(other.value)
 
     def __str__(self) -> str:
-        return self.value
+        return self.value.__str__()
 
     def __repr__(self) -> str:
         return f"EntryId({self.value!r})"
