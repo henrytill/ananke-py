@@ -227,7 +227,7 @@ def get_required(d: dict[Any, Any], key: Any, value_type: type) -> Any:
     """
     value = d.get(key)
     if value is None:
-        raise ValueError(f'Invalid entry format: missing required key "{key}"')
+        raise KeyError(f"Invalid entry: missing required key: {key}")
     if not isinstance(value, value_type):
         raise TypeError(f"Invalid {key}: expected a value of type {value_type}")
     return value

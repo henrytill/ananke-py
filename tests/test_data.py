@@ -176,7 +176,7 @@ class TestEntry(unittest.TestCase):
 
     def test_from_dict_with_invalid_dict(self) -> None:
         """An Entry cannot be created from an invalid dict."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             Entry.from_dict({})
 
     def test_from_dict_with_illtyped_dict_required_key(self) -> None:
@@ -259,10 +259,8 @@ class TestEntry(unittest.TestCase):
                 entry_dict = base_dict.copy()
                 del entry_dict[key]
 
-                with self.assertRaises(ValueError) as context:
+                with self.assertRaises(KeyError):
                     Entry.from_dict(entry_dict)
-
-                self.assertEqual(f'Invalid entry format: missing required key "{key}"', str(context.exception))
 
     def test_round_trip_through_dict(self) -> None:
         """An Entry can be created from a dict and converted back to a dict."""
