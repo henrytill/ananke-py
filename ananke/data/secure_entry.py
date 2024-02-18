@@ -3,8 +3,8 @@
 import functools
 from typing import Any, NewType, Optional, Self
 
-from . import core
-from .core import Description, Identity, Metadata, Plaintext, Timestamp
+from . import common
+from .common import Description, Identity, Metadata, Plaintext, Timestamp
 
 ArmoredCiphertext = NewType("ArmoredCiphertext", str)
 """An armored ciphertext value of an 'SecureEntry'."""
@@ -67,13 +67,13 @@ class SecureEntry:
             The created 'SecretEntry'.
         """
         # Get required keys
-        timestamp_str = core.get_required(data, "timestamp", str)
-        description_str = core.get_required(data, "description", str)
-        plaintext_str = core.get_required(data, "plaintext", str)
+        timestamp_str = common.get_required(data, "timestamp", str)
+        description_str = common.get_required(data, "description", str)
+        plaintext_str = common.get_required(data, "plaintext", str)
 
         # Get optional keys
-        maybe_identity = core.get_optional(data, "identity", str)
-        maybe_meta = core.get_optional(data, "meta", str)
+        maybe_identity = common.get_optional(data, "identity", str)
+        maybe_meta = common.get_optional(data, "meta", str)
 
         # Validate timestamp
         try:
@@ -131,5 +131,5 @@ SNAKE_TO_CAMEL = {
 }
 
 
-remap_keys_camel_to_snake = functools.partial(core.remap_keys, CAMEL_TO_SNAKE)
-remap_keys_snake_to_camel = functools.partial(core.remap_keys, SNAKE_TO_CAMEL)
+remap_keys_camel_to_snake = functools.partial(common.remap_keys, CAMEL_TO_SNAKE)
+remap_keys_snake_to_camel = functools.partial(common.remap_keys, SNAKE_TO_CAMEL)

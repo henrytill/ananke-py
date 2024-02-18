@@ -1,4 +1,4 @@
-"""Core datatypes and related functions."""
+"""Common datatypes and related functions."""
 import hashlib
 import secrets
 import string

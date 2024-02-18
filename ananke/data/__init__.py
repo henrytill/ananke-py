@@ -1,14 +1,14 @@
 """The data package."""
-from .core import Description as Description
-from .core import EntryId as EntryId
-from .core import Identity as Identity
-from .core import KeyId as KeyId
-from .core import Metadata as Metadata
-from .core import Plaintext as Plaintext
-from .core import Timestamp as Timestamp
-from .core import get_optional as get_optional
-from .core import get_required as get_required
-from .core import remap_keys as remap_keys
+from .common import Description as Description
+from .common import EntryId as EntryId
+from .common import Identity as Identity
+from .common import KeyId as KeyId
+from .common import Metadata as Metadata
+from .common import Plaintext as Plaintext
+from .common import Timestamp as Timestamp
+from .common import get_optional as get_optional
+from .common import get_required as get_required
+from .common import remap_keys as remap_keys
 from .entry import Ciphertext as Ciphertext
 from .entry import Entry as Entry
 from .entry import GpgCodec as GpgCodec

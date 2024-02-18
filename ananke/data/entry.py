@@ -5,8 +5,8 @@ import functools
 import subprocess
 from typing import Any, Optional, Self
 
-from . import core
-from .core import Description, EntryId, Identity, KeyId, Metadata, Plaintext, Timestamp
+from . import common
+from .common import Description, EntryId, Identity, KeyId, Metadata, Plaintext, Timestamp
 
 
 class Ciphertext(bytes):
@@ -109,15 +109,15 @@ class Entry:
             The created 'Entry'.
         """
         # Get required keys
-        id_str: str = core.get_required(data, "id", str)
-        key_id_str: str = core.get_required(data, "key_id", str)
-        timestamp_str: str = core.get_required(data, "timestamp", str)
-        description_str: str = core.get_required(data, "description", str)
-        ciphertext_str: str = core.get_required(data, "ciphertext", str)
+        id_str: str = common.get_required(data, "id", str)
+        key_id_str: str = common.get_required(data, "key_id", str)
+        timestamp_str: str = common.get_required(data, "timestamp", str)
+        description_str: str = common.get_required(data, "description", str)
+        ciphertext_str: str = common.get_required(data, "ciphertext", str)
 
         # Get optional keys
-        maybe_identity: Optional[str] = core.get_optional(data, "identity", str)
-        maybe_meta: Optional[str] = core.get_optional(data, "meta", str)
+        maybe_identity: Optional[str] = common.get_optional(data, "identity", str)
+        maybe_meta: Optional[str] = common.get_optional(data, "meta", str)
 
         # Validate timestamp
         try:
@@ -191,8 +191,8 @@ SNAKE_TO_CAMEL = {
 }
 
 
-remap_keys_camel_to_snake = functools.partial(core.remap_keys, CAMEL_TO_SNAKE)
-remap_keys_snake_to_camel = functools.partial(core.remap_keys, SNAKE_TO_CAMEL)
+remap_keys_camel_to_snake = functools.partial(common.remap_keys, CAMEL_TO_SNAKE)
+remap_keys_snake_to_camel = functools.partial(common.remap_keys, SNAKE_TO_CAMEL)
 
 
 class GpgCodec:
