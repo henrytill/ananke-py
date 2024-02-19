@@ -47,4 +47,4 @@ disable = [
 ]
 
 [tool.pyright]
-strict = true
+strict = ["ananke", "tests"]
