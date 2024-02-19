@@ -1,4 +1,5 @@
 """Common code for tests."""
+
 from typing import TypedDict
 
 

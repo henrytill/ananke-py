@@ -1,4 +1,5 @@
 """The store package."""
+
 from .in_memory_store import InMemoryStore as InMemoryStore
 from .in_memory_store import JsonFileReader as JsonFileReader
 from .in_memory_store import JsonFileWriter as JsonFileWriter

@@ -1,4 +1,5 @@
 """Tests for the 'config' module."""
+
 import textwrap
 import unittest
 from pathlib import Path

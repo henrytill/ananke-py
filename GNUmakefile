@@ -17,6 +17,7 @@ VERSION = "0.1.0+$(shell git rev-parse --short HEAD)"
 
 define VERSION_PY =
 \"\"\"This module contains version information.\"\"\"
+
 # This file is auto-generated, do not edit by hand
 __version__ = \"$(VERSION)\"
 endef

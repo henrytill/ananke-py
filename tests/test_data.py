@@ -1,4 +1,5 @@
 """Tests for the 'data' module."""
+
 import string
 import unittest
 from datetime import datetime, timezone

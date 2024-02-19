@@ -1,4 +1,5 @@
 """Tests for the GpgCodec class."""
+
 import os
 import tempfile
 import unittest

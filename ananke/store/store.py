@@ -1,4 +1,5 @@
 """The store protocol."""
+
 from dataclasses import dataclass
 from typing import Any, Optional, Protocol
 

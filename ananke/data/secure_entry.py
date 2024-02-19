@@ -1,4 +1,5 @@
 """Module for the 'SecureEntry' class and related types."""
+
 # pylint: disable=duplicate-code
 import functools
 from typing import Any, NewType, Optional, Self

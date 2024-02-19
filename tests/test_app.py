@@ -1,4 +1,5 @@
 """Test the 'app' module."""
+
 import os
 import unittest
 from typing import Optional, TypedDict

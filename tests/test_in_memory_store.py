@@ -1,4 +1,5 @@
 """Tests for the 'in_memory_store' module."""
+
 import unittest
 
 from ananke.data import Ciphertext, Description, Entry, EntryId, Identity, KeyId, Metadata, Timestamp

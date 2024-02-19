@@ -1,4 +1,5 @@
 """Codec protocol."""
+
 from typing import Generic, Protocol, TypeVar
 
 from .data import Ciphertext, KeyId

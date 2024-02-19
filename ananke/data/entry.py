@@ -1,4 +1,5 @@
 """Module for the 'Entry' class and related types."""
+
 import base64
 import binascii
 import functools

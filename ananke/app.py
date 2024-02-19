@@ -1,4 +1,5 @@
 """The main application module."""
+
 from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Optional, Self, Tuple, Type

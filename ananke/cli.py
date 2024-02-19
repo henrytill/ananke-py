@@ -1,4 +1,5 @@
 """The command line interface."""
+
 import argparse
 import os
 from typing import Mapping, Tuple
