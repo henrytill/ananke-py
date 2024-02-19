@@ -1,9 +1,9 @@
 """The store protocol."""
 
 from dataclasses import dataclass
-from typing import Any, Optional, Protocol
+from typing import Any, Generic, Optional, Protocol, TypeVar
 
-from ..data import Description, Entry, EntryId, Identity, KeyId, Metadata
+from ..data import Description, EntryId, Identity, KeyId, Metadata
 
 
 @dataclass(frozen=True)
@@ -45,8 +45,11 @@ class Writer(Protocol):
         ...
 
 
+A = TypeVar("A")
+
+
 # pylint: disable=unnecessary-ellipsis
-class Store(Protocol):
+class Store(Protocol, Generic[A]):
     "The store protocol."
 
     def init(self, reader: Reader) -> None:
@@ -57,7 +60,7 @@ class Store(Protocol):
         """
         ...
 
-    def put(self, entry: Entry) -> None:
+    def put(self, entry: A) -> None:
         """Puts an entry into the store.
 
         Args:
@@ -65,7 +68,7 @@ class Store(Protocol):
         """
         ...
 
-    def remove(self, entry: Entry) -> None:
+    def remove(self, entry: A) -> None:
         """Removes an entry from the store.
 
         Args:
@@ -73,7 +76,7 @@ class Store(Protocol):
         """
         ...
 
-    def query(self, query: Query) -> list[Entry]:
+    def query(self, query: Query) -> list[A]:
         """Queries the store.
 
         Args:
@@ -84,7 +87,7 @@ class Store(Protocol):
         """
         ...
 
-    def select_all(self) -> list[Entry]:
+    def select_all(self) -> list[A]:
         """Returns all entries from the store.
 
         Returns:

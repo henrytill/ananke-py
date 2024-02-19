@@ -12,14 +12,14 @@ from .store import Query, Reader, Store, Writer
 class Application(AbstractContextManager["Application"]):
     """The main application class."""
 
-    store: Store
+    store: Store[Entry]
     reader: Reader
     writer: Writer
     codec: Codec[Plaintext]
 
     def __init__(
         self,
-        store: Store,
+        store: Store[Entry],
         reader: Reader,
         writer: Writer,
         codec: Codec[Plaintext],
