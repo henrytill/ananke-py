@@ -18,7 +18,7 @@ class SecureEntry:
         timestamp: The time the entry was created.
         description: Description of the entry. Can be a URI or a descriptive name.
         identity: Optional identifying value, such as a username.
-        plaintext: Holds the plaintext value of the entry.
+        plaintext: The plaintext value.
         meta: Optional field for additional non-specific information.
     """
 

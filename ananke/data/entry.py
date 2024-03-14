@@ -48,11 +48,11 @@ class Entry:
 
     Attributes:
         entry_id: Uniquely identifies the entry.
-        key_id: Represents the GPG Key Id used for encryption.
+        key_id: The GPG Key Id used for encryption.
         timestamp: The time the entry was created.
         description: Description of the entry. Can be a URI or a descriptive name.
         identity: Optional identifying value, such as a username.
-        ciphertext: Holds the encrypted value of the entry.
+        ciphertext: The encrypted value.
         meta: Optional field for additional non-specific information.
     """
 
