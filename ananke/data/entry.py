@@ -83,6 +83,9 @@ class Entry:
         self.ciphertext = ciphertext
         self.meta = meta
 
+    def __repr__(self) -> str:
+        return f"Entry({self.entry_id})"
+
     def __hash__(self) -> int:
         return hash(self.entry_id)
 
@@ -98,6 +101,20 @@ class Entry:
             and self.ciphertext == other.ciphertext
             and self.meta == other.meta
         )
+
+    def normalize(self) -> Self:
+        """Regenerates the 'entry_id' attribute.
+
+        Returns:
+            The 'Entry'
+        """
+        self.entry_id = EntryId.generate(
+            key_id=self.key_id,
+            timestamp=self.timestamp,
+            description=self.description,
+            maybe_identity=self.identity,
+        )
+        return self
 
     @classmethod
     def from_dict(cls, data: dict[Any, Any]) -> Self:
@@ -141,6 +158,29 @@ class Entry:
             ciphertext=ciphertext,
             meta=Metadata(maybe_meta) if maybe_meta else None,
         )
+
+    @classmethod
+    def from_tuple(cls, row: tuple[Any, Any, Any, Any, Any, Any, Any]) -> Self:
+        """Creates an 'Entry' from a tuple.
+
+        Args:
+            data: The tuple to create the 'Entry' from.
+
+        Returns:
+            The created 'Entry'.
+        """
+        entry_dict = {
+            "id": row[0],
+            "key_id": row[1],
+            "timestamp": row[2],
+            "description": row[3],
+            "ciphertext": row[5],
+        }
+        if row[4]:
+            entry_dict["identity"] = row[4]
+        if row[6]:
+            entry_dict["meta"] = row[6]
+        return cls.from_dict(entry_dict)
 
     def to_dict(self) -> dict[str, str]:
         """Converts the 'Entry' to a dictionary.

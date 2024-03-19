@@ -26,6 +26,10 @@ class Query:
     identity: Optional[Identity] = None
     meta: Optional[Metadata] = None
 
+    def is_empty(self) -> bool:
+        """Returns 'true' if all fields are 'None'."""
+        return self.entry_id is None and self.description is None and self.identity is None and self.meta is None
+
 
 # pylint: disable=unnecessary-ellipsis, too-few-public-methods
 class Reader(Protocol):
