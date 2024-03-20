@@ -2,6 +2,7 @@
 
 import argparse
 import os
+from pathlib import Path
 from typing import Mapping, Tuple
 
 from . import data, version
@@ -177,6 +178,47 @@ def handle_remove(args: argparse.Namespace) -> int:
     return 0
 
 
+def handle_import(args: argparse.Namespace) -> int:
+    """Handles the 'import' command.
+
+    Args:
+        args: The command line arguments.
+
+    Returns:
+        The exit code of the application.
+    """
+    file_path = args.file
+    if not isinstance(file_path, Path):
+        raise TypeError("Expected Path")
+    reader = JsonFileReader(file_path)
+    entries: list[Entry] = reader.read()
+    os_family = OsFamily.from_str(os.name)
+    with setup_application(os_family, os.environ) as app:
+        for entry in entries:
+            app.store.put(entry)
+    return 0
+
+
+def handle_export(args: argparse.Namespace) -> int:
+    """Handles the 'export' command.
+
+    Args:
+        args: The command line arguments.
+
+    Returns:
+        The exit code of the application.
+    """
+    file_path = args.file
+    if not isinstance(file_path, Path):
+        raise TypeError("Expected Path")
+    os_family = OsFamily.from_str(os.name)
+    with setup_application(os_family, os.environ) as app:
+        entries = app.dump()
+    writer = JsonFileWriter(file_path)
+    writer.write(entries)
+    return 0
+
+
 def main() -> int:
     """The main entry point for the command-line interface.
 
@@ -214,12 +256,22 @@ def main() -> int:
     parser_remove_group.add_argument("-e", "--entry-id", type=EntryId, help="entry ID")
     parser_remove.set_defaults(func=handle_remove)
 
+    parser_import = subparsers.add_parser("import", help="import entries from JSON file")
+    parser_import.add_argument("file", type=Path, help="file to import from")
+    parser_import.set_defaults(func=handle_import)
+
+    parser_export = subparsers.add_parser("export", help="export entries to JSON file")
+    parser_export.add_argument("file", type=Path, help="file to export to")
+    parser_export.set_defaults(func=handle_export)
+
     args = parser.parse_args()
 
     if not hasattr(args, "func"):
         parser.print_help()
         return 2
 
-    ret: int = args.func(args)
+    ret = args.func(args)
+    if not isinstance(ret, int):
+        raise TypeError("Expected int")
 
     return ret
