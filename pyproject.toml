@@ -44,6 +44,7 @@ max-line-length = 120
 disable = [
     "C0301", # line-too-long, we use black for formatting
     "C0414", # useless-import-alias, we use aliases for type checking
+    "R0801", # duplicate-code, no thanks
 ]
 
 [tool.pyright]
