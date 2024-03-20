@@ -6,6 +6,7 @@ ananke/version.py
 /.pytest_cache/
 /.hypothesis/
 __pycache__/
+example/db/db.sqlite
 example/gnupg/random_seed
 example/gnupg/.gpg-v21-migrated
 example/gnupg/private-keys-v1.d

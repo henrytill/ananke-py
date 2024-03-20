@@ -1,9 +1,10 @@
 """Test the 'app' module."""
 
 import os
+import sqlite3
 import unittest
+from contextlib import closing
 from typing import Optional, TypedDict
-from unittest.mock import Mock
 
 from ananke import data
 from ananke.app import Application
@@ -20,7 +21,7 @@ from ananke.data import (
     Plaintext,
     Timestamp,
 )
-from ananke.store import InMemoryStore, JsonFileReader
+from ananke.store import NoOpWriter, SqliteConnectionReader, SqliteStore
 
 
 class LookupArgs(TypedDict):
@@ -63,6 +64,7 @@ class TestApplication(unittest.TestCase):
         env = {
             "ANANKE_DATA_DIR": "./example",
             "ANANKE_KEY_ID": "371C136C",
+            "ANANKE_BACKEND": "sqlite",
         }
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
 
@@ -70,14 +72,23 @@ class TestApplication(unittest.TestCase):
         if schema_version != CURRENT_SCHEMA_VERSION:
             raise RuntimeError(f"Schema version {schema_version} is not supported")
 
-        store = InMemoryStore()
-        reader = JsonFileReader(self.config.data_file)
-        writer = Mock()
+        store = SqliteStore()
+        reader = SqliteConnectionReader(self.config.data_file)
+        writer = NoOpWriter()
         self.codec = GpgCodec(self.config.key_id)
 
         self.application = Application(store, reader, writer, self.codec)
 
         os.environ["GNUPGHOME"] = "./example/gnupg"
+
+        with open(self.config.data_dir / "db" / "data.sql", encoding="utf-8") as file:
+            sql = file.read()
+
+        with closing(sqlite3.connect(self.config.data_file)) as cursor:
+            cursor.executescript(sql)
+
+    def tearDown(self) -> None:
+        self.config.data_file.unlink()
 
     def test_lookup(self) -> None:
         """Test the lookup method against the example data."""

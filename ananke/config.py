@@ -138,7 +138,11 @@ class Config:
         Returns:
             The path to the data file.
         """
-        return self.data_dir / "db" / "data.json"
+        match self.backend:
+            case Backend.JSON:
+                return self.data_dir / "db" / "data.json"
+            case Backend.SQLITE:
+                return self.data_dir / "db" / "db.sqlite"
 
     @property
     def schema_file(self) -> Path:

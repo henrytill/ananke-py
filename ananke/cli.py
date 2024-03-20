@@ -8,7 +8,7 @@ from . import data, version
 from .app import Application
 from .config import Backend, Config, ConfigBuilder, OsFamily
 from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, GpgCodec, Identity, Plaintext, SchemaVersion
-from .store import InMemoryStore, JsonFileReader, JsonFileWriter
+from .store import InMemoryStore, JsonFileReader, JsonFileWriter, NoOpWriter, SqliteConnectionReader, SqliteStore
 
 
 def get_version() -> str:
@@ -42,20 +42,27 @@ def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
     """
     cfg = ConfigBuilder().with_defaults(host_os, env).with_config().with_env(env).build()
 
-    if cfg.backend is not Backend.JSON:
-        raise NotImplementedError(f"Backend {cfg.backend} is not supported")
-
     schema_version = data.get_schema_version(cfg.schema_file)
     if schema_version < CURRENT_SCHEMA_VERSION:
         migrate(cfg, schema_version)
     elif schema_version > CURRENT_SCHEMA_VERSION:
         raise RuntimeError(f"Schema version {schema_version} is not supported")
 
-    store = InMemoryStore()
-    reader = JsonFileReader(cfg.data_file)
-    writer = JsonFileWriter(cfg.data_file)
-    codec = GpgCodec(cfg.key_id)
-    return Application(store, reader, writer, codec)
+    match cfg.backend:
+        case Backend.JSON:
+            return Application(
+                store=InMemoryStore(),
+                reader=JsonFileReader(cfg.data_file),
+                writer=JsonFileWriter(cfg.data_file),
+                codec=GpgCodec(cfg.key_id),
+            )
+        case Backend.SQLITE:
+            return Application(
+                store=SqliteStore(),
+                reader=SqliteConnectionReader(cfg.data_file),
+                writer=NoOpWriter(),
+                codec=GpgCodec(cfg.key_id),
+            )
 
 
 def handle_add(args: argparse.Namespace) -> int:

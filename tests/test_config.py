@@ -239,7 +239,7 @@ class TestConfigBuilder(unittest.TestCase):
         self.assertEqual(test_config.key_id, key_id)
         self.assertEqual(test_config.allow_multiple_keys, False)
 
-        self.assertEqual(test_config.data_file, self.data_dir / "db" / "data.json")
+        self.assertEqual(test_config.data_file, self.data_dir / "db" / "db.sqlite")
 
     def test_config_dir_posix(self) -> None:
         """Tests the 'config_dir' property with POSIX defaults."""
