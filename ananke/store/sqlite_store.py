@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS entries (
 """
 
 
-    """Creates an SQLite Query."""
 def _create_query(query: Query) -> Tuple[str, dict[str, str]]:
     sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries WHERE "
     where: list[str] = []
@@ -95,8 +94,8 @@ class SqliteStore:
         self.maybe_conn = reader.read()
         if not isinstance(self.maybe_conn, Connection):
             raise TypeError("Expected a Connection")
-        cursor = self.maybe_conn.cursor()
-        cursor.execute(CREATE_TABLE)
+        with closing(self.maybe_conn.cursor()) as cursor:
+            cursor.execute(CREATE_TABLE)
 
     @property
     def conn(self) -> Connection:
