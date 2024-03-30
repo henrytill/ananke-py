@@ -81,10 +81,10 @@ class SqliteStore:
         conn: An SQLite Connection.
     """
 
-    conn: Optional[Connection]
+    maybe_conn: Optional[Connection]
 
     def __init__(self) -> None:
-        self.conn = None
+        self.maybe_conn = None
 
     def init(self, reader: Reader) -> None:
         """Initializes the store.
@@ -92,11 +92,22 @@ class SqliteStore:
         Args:
             reader: The reader to use to initialize the store.
         """
-        self.conn = reader.read()
-        if not isinstance(self.conn, Connection):
+        self.maybe_conn = reader.read()
+        if not isinstance(self.maybe_conn, Connection):
             raise TypeError("Expected a Connection")
-        cursor = self.conn.cursor()
+        cursor = self.maybe_conn.cursor()
         cursor.execute(CREATE_TABLE)
+
+    @property
+    def conn(self) -> Connection:
+        """Returns this instance's Connection.
+
+        Raises:
+            RuntimeError: If this instance has not been initialized.
+        """
+        if not self.maybe_conn:
+            raise RuntimeError("No connection")
+        return self.maybe_conn
 
     def put(self, entry: Entry) -> None:
         """Puts an entry into the store.
@@ -104,8 +115,6 @@ class SqliteStore:
         Args:
             entry: The entry to put into the store.
         """
-        if not self.conn:
-            raise RuntimeError("No connection")
         sql = """\
         INSERT OR REPLACE INTO
         entries(id, keyid, timestamp, description, identity, ciphertext, meta)
@@ -129,8 +138,6 @@ class SqliteStore:
         Args:
             entry: The entry to remove from the store.
         """
-        if not self.conn:
-            raise RuntimeError("No connection")
         sql = "DELETE FROM entries WHERE id = :id"
         parameters = {"id": str(entry.entry_id)}
         with closing(self.conn.cursor()) as cursor:
@@ -145,8 +152,6 @@ class SqliteStore:
         Returns:
             A list of entries that match the query.
         """
-        if not self.conn:
-            raise RuntimeError("No connection")
         if query.is_empty():
             return []
         sql, parameters = _create_query(query)
@@ -162,8 +167,6 @@ class SqliteStore:
         Returns:
             A list of all entries in the store.
         """
-        if not self.conn:
-            raise RuntimeError("No connection")
         sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries"
         ret: list[Entry] = []
         with closing(self.conn.cursor()) as cursor:
@@ -177,8 +180,6 @@ class SqliteStore:
         Returns:
             The count of all entries.
         """
-        if not self.conn:
-            raise RuntimeError("No connection")
         sql = "SELECT count(*) FROM entries"
         ret: int = 0
         with closing(self.conn.cursor()) as cursor:
@@ -196,8 +197,6 @@ class SqliteStore:
         Returns:
             The count of entries for the key id.
         """
-        if not self.conn:
-            raise RuntimeError("No connection")
         sql = "SELECT count(*) FROM entries WHERE keyid = :keyid"
         parameters = {"keyid": key_id}
         ret: int = 0
@@ -213,7 +212,5 @@ class SqliteStore:
         Args:
             writer: The writer to use to synchronize the store.
         """
-        if not self.conn:
-            raise RuntimeError("No connection")
         writer.write(None)
         self.conn.close()

@@ -56,10 +56,7 @@ class TestSqliteStore(unittest.TestCase):
 
     def test_table_exists(self) -> None:
         """Tests that the 'entries' table exits on a fresh store."""
-        conn = self.store.conn
-        if not conn:
-            self.fail("No connection")
-        cursor = conn.cursor()
+        cursor = self.store.conn.cursor()
         result_cursor = cursor.execute(TABLE_EXISTS)
         (table_exists,) = result_cursor.fetchone()
         if not isinstance(table_exists, int):
@@ -146,7 +143,7 @@ class TestSqliteStore(unittest.TestCase):
     @given(st.lists(st_entry))
     def test_roundtrip(self, entries: list[Entry]) -> None:
         """Tests the 'put' and 'query' methods."""
-        clear(self.store.conn)
+        clear(self.store.maybe_conn)
 
         for entry in entries:
             self.store.put(entry)
