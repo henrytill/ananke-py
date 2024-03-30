@@ -4,7 +4,7 @@ import os
 import sqlite3
 import unittest
 from contextlib import closing
-from typing import Optional, TypedDict
+from typing import Optional, Tuple, TypedDict
 
 from ananke import data
 from ananke.app import Application
@@ -252,20 +252,23 @@ class TestApplication(unittest.TestCase):
 
         for test_case in test_cases:
             with self.subTest(test_case=test_case):
+                target = test_case["target"]
+                if isinstance(target, EntryId):
+                    raise NotImplementedError
+
+                maybe_description = test_case["maybe_description"]
+                maybe_identity = test_case["maybe_identity"]
+                maybe_plaintext = test_case["maybe_plaintext"]
+                maybe_meta = test_case["maybe_meta"]
+
+                results: list[Tuple[Entry, Plaintext]] = []
+                entry: Entry
+                plaintext: Plaintext
+
                 with self.application as app:
-                    target = test_case["target"]
-                    maybe_description = test_case["maybe_description"]
-                    maybe_identity = test_case["maybe_identity"]
-                    maybe_plaintext = test_case["maybe_plaintext"]
-                    maybe_meta = test_case["maybe_meta"]
-
-                    if isinstance(target, EntryId):
-                        raise NotImplementedError
-
-                    results = app.lookup(target)
+                    results += app.lookup(target)
                     self.assertEqual(1, len(results))
                     entry, plaintext = results[0]
-
                     app.modify(**test_case)
 
                 with self.application as app:
@@ -275,10 +278,8 @@ class TestApplication(unittest.TestCase):
                     )
                     self.assertEqual(1, len(updated_results))
                     updated_entry, updated_plaintext = updated_results[0]
-
                     self.assertNotEqual(entry.entry_id, updated_entry.entry_id, "entry_id should change")
                     self.assertNotEqual(entry.timestamp, updated_entry.timestamp, "timestamp should change")
-
                     self.assertEqual(self.config.key_id, updated_entry.key_id, "key_id should not change")
                     self.assertEqual(
                         maybe_description if maybe_description is not None else entry.description,
@@ -334,13 +335,15 @@ class TestApplication(unittest.TestCase):
 
         for test_case in test_cases:
             with self.subTest(test_case=test_case):
+                if isinstance(test_case, EntryId):
+                    raise NotImplementedError
+
                 with self.application as app:
-                    if isinstance(test_case, EntryId):
-                        raise NotImplementedError
                     results = app.lookup(test_case)
                     self.assertEqual(1, len(results))
                     entry, _ = results[0]
                     app.remove(entry.entry_id)
+
                 with self.application as app:
                     results = app.lookup(test_case)
                     self.assertEqual(0, len(results))
