@@ -131,7 +131,6 @@ class SqliteStore:
         }
         with closing(self.conn.cursor()) as cursor:
             cursor.execute(sql, parameters)
-        self.conn.commit()
 
     def remove(self, entry: Entry) -> None:
         """Removes an entry from the store.
@@ -143,7 +142,6 @@ class SqliteStore:
         parameters = {"id": str(entry.entry_id)}
         with closing(self.conn.cursor()) as cursor:
             cursor.execute(sql, parameters)
-        self.conn.commit()
 
     def query(self, query: Query) -> list[Entry]:
         """Queries the store.
@@ -215,4 +213,5 @@ class SqliteStore:
             writer: The writer to use to synchronize the store.
         """
         writer.write(None)
+        self.conn.commit()
         self.conn.close()
