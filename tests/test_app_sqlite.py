@@ -173,10 +173,12 @@ class TestApplication(unittest.TestCase):
             },
         ]
 
-        with self.application as app:
-            for test_case in test_cases:
-                with self.subTest(test_case=test_case):
+        for test_case in test_cases:
+            with self.subTest(test_case=test_case):
+                with self.application as app:
                     app.add(**test_case)
+
+                with self.application as app:
                     results = app.lookup(test_case["description"], test_case["maybe_identity"])
                     self.assertEqual(1, len(results))
                     entry, plaintext = results[0]
@@ -248,9 +250,9 @@ class TestApplication(unittest.TestCase):
             },
         ]
 
-        with self.application as app:
-            for test_case in test_cases:
-                with self.subTest(test_case=test_case):
+        for test_case in test_cases:
+            with self.subTest(test_case=test_case):
+                with self.application as app:
                     target = test_case["target"]
                     maybe_description = test_case["maybe_description"]
                     maybe_identity = test_case["maybe_identity"]
@@ -266,6 +268,7 @@ class TestApplication(unittest.TestCase):
 
                     app.modify(**test_case)
 
+                with self.application as app:
                     updated_results = app.lookup(
                         maybe_description if maybe_description is not None else target,
                         maybe_identity,
@@ -329,17 +332,16 @@ class TestApplication(unittest.TestCase):
             Description("https://www.barphone.com"),
         ]
 
-        with self.application as app:
-            for test_case in test_cases:
-                with self.subTest(test_case=test_case):
+        for test_case in test_cases:
+            with self.subTest(test_case=test_case):
+                with self.application as app:
                     if isinstance(test_case, EntryId):
                         raise NotImplementedError
-
                     results = app.lookup(test_case)
                     self.assertEqual(1, len(results))
                     entry, _ = results[0]
-
                     app.remove(entry.entry_id)
+                with self.application as app:
                     results = app.lookup(test_case)
                     self.assertEqual(0, len(results))
 
