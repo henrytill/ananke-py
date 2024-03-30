@@ -4,7 +4,7 @@ import sqlite3
 from contextlib import closing
 from pathlib import Path
 from sqlite3 import Connection
-from typing import Any, Optional, cast
+from typing import Any, Optional, Tuple, cast
 
 from ..data import Entry, KeyId
 from .store import Query, Reader, Writer
@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS entries (
 """
 
 
-def _create_query(query: Query) -> tuple[str, dict[str, str]]:
     """Creates an SQLite Query."""
+def _create_query(query: Query) -> Tuple[str, dict[str, str]]:
     sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries WHERE "
     where: list[str] = []
     parameters: dict[str, str] = {}

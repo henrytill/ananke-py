@@ -4,7 +4,7 @@ import base64
 import binascii
 import functools
 import subprocess
-from typing import Any, Optional, Self
+from typing import Any, Optional, Self, Tuple
 
 from . import common
 from .common import Description, EntryId, Identity, KeyId, Metadata, Plaintext, Timestamp
@@ -160,7 +160,7 @@ class Entry:
         )
 
     @classmethod
-    def from_tuple(cls, row: tuple[Any, Any, Any, Any, Any, Any, Any]) -> Self:
+    def from_tuple(cls, row: Tuple[Any, Any, Any, Any, Any, Any, Any]) -> Self:
         """Creates an 'Entry' from a tuple.
 
         Args:
