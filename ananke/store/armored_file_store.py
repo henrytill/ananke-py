@@ -14,7 +14,6 @@ class ArmoredFileStore:
 
     def __init__(self, path: Path) -> None:
         self.path = path
-        self.path.mkdir(parents=True, exist_ok=True)
         self.writes = []
 
     def init(self, reader: Reader) -> None:

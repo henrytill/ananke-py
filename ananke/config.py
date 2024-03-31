@@ -132,6 +132,15 @@ class Config:
         return self.config_dir / "ananke.ini"
 
     @property
+    def db_dir(self) -> Path:
+        """Returns the path to db directory.
+
+        Returns:
+            The path to the db directory.
+        """
+        return self.data_dir / "db"
+
+    @property
     def data_file(self) -> Path:
         """Returns the path to the data file.
 
@@ -140,9 +149,9 @@ class Config:
         """
         match self.backend:
             case Backend.JSON:
-                return self.data_dir / "db" / "data.json"
+                return self.db_dir / "data.json"
             case Backend.SQLITE:
-                return self.data_dir / "db" / "db.sqlite"
+                return self.db_dir / "db.sqlite"
 
     @property
     def schema_file(self) -> Path:
