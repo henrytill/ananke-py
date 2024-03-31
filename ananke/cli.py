@@ -12,11 +12,6 @@ from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, GpgCodec,
 from .store import InMemoryStore, JsonFileReader, JsonFileWriter, NoOpWriter, SqliteConnectionReader, SqliteStore
 
 
-def get_version() -> str:
-    """Returns the version of the application."""
-    return version.__version__
-
-
 def migrate(cfg: Config, found: SchemaVersion) -> None:
     """Migrates the data to the current schema version.
 
@@ -234,7 +229,7 @@ def main() -> int:
         An exit code.
     """
     parser = argparse.ArgumentParser(description="A minimal password manager.")
-    parser.add_argument("--version", action="version", version=f"%(prog)s {get_version()}")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {version.__version__}")
     subparsers = parser.add_subparsers(help="Commands")
 
     parser_add = subparsers.add_parser("add", help="add an entry")
