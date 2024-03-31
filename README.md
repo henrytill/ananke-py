@@ -1,6 +1,6 @@
 <div align="center">
   <h1>ananke-py</h1>
-  <p><strong>A minimal password manager</strong></p>
+  <p><strong>A password manager</strong></p>
   <p>
     <a href="https://github.com/henrytill/ananke-py/actions/workflows/main.yml"><img src="https://github.com/henrytill/ananke-py/actions/workflows/main.yml/badge.svg" alt="CI" /></a>
   </p>
@@ -8,7 +8,7 @@
 
 ## About
 
-`ananke-py` is a port of [`ananke`](https://github.com/henrytill/ananke) from Haskell to Python.
+`ananke-py` is a Python port of [`ananke`](https://github.com/henrytill/ananke).
 
 ## Status
 
