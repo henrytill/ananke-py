@@ -1,7 +1,7 @@
 .SUFFIXES:
 .ONESHELL:
 
-SHELL = /bin/bash
+SHELL = bash
 .SHELLFLAGS += -e
 
 PYTHON = python3
@@ -11,7 +11,9 @@ BUILD_ENV = host
 
 VENV = env
 
-VERSION = "0.1.0+$(shell git rev-parse --short HEAD)"
+GIT_REF = $(shell git rev-parse --short HEAD)
+
+VERSION = $(if $(GIT_REF),"0.1.0+$(GIT_REF)","0.1.0")
 
 -include config.mk
 
