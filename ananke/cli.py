@@ -74,7 +74,7 @@ def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
             )
 
 
-def handle_add(args: argparse.Namespace) -> int:
+def cmd_add(args: argparse.Namespace) -> int:
     """Handles the 'add' command.
 
     Args:
@@ -134,7 +134,7 @@ def format_results(results: list[Tuple[Entry, Plaintext]], verbose: bool) -> str
     return "\n".join(formatted_results)
 
 
-def handle_lookup(args: argparse.Namespace) -> int:
+def cmd_lookup(args: argparse.Namespace) -> int:
     """Handles the 'lookup' command.
 
     Args:
@@ -153,7 +153,7 @@ def handle_lookup(args: argparse.Namespace) -> int:
     return 0
 
 
-def handle_modify(args: argparse.Namespace) -> int:
+def cmd_modify(args: argparse.Namespace) -> int:
     """Handles the 'modify' command.
 
     Args:
@@ -170,7 +170,7 @@ def handle_modify(args: argparse.Namespace) -> int:
     return 0
 
 
-def handle_remove(args: argparse.Namespace) -> int:
+def cmd_remove(args: argparse.Namespace) -> int:
     """Handles the 'remove' command.
 
     Args:
@@ -186,7 +186,7 @@ def handle_remove(args: argparse.Namespace) -> int:
     return 0
 
 
-def handle_import(args: argparse.Namespace) -> int:
+def cmd_import(args: argparse.Namespace) -> int:
     """Handles the 'import' command.
 
     Args:
@@ -207,7 +207,7 @@ def handle_import(args: argparse.Namespace) -> int:
     return 0
 
 
-def handle_export(args: argparse.Namespace) -> int:
+def cmd_export(args: argparse.Namespace) -> int:
     """Handles the 'export' command.
 
     Args:
@@ -241,13 +241,13 @@ def main() -> int:
     parser_add.add_argument("description", type=Description, help="URL or description")
     parser_add.add_argument("-i", "--identity", type=Identity, help="username or email address")
     parser_add.add_argument("-m", "--meta", type=str, help="additional metadata")
-    parser_add.set_defaults(func=handle_add)
+    parser_add.set_defaults(func=cmd_add)
 
     parser_lookup = subparsers.add_parser("lookup", help="lookup an entry")
     parser_lookup.add_argument("description", type=Description, help="URL or description")
     parser_lookup.add_argument("-i", "--identity", type=Identity, help="username or email address")
     parser_lookup.add_argument("-v", "--verbose", action="store_true", help="enable verbose output")
-    parser_lookup.set_defaults(func=handle_lookup)
+    parser_lookup.set_defaults(func=cmd_lookup)
 
     parser_modify = subparsers.add_parser("modify", help="modify an entry")
     parser_modify_group = parser_modify.add_mutually_exclusive_group(required=True)
@@ -256,21 +256,21 @@ def main() -> int:
     parser_modify.add_argument("-p", "--plaintext", action="store_true", help="modify plaintext")
     parser_modify.add_argument("-i", "--identity", type=Identity, help="username or email address")
     parser_modify.add_argument("-m", "--meta", type=str, help="additional metadata")
-    parser_modify.set_defaults(func=handle_modify)
+    parser_modify.set_defaults(func=cmd_modify)
 
     parser_remove = subparsers.add_parser("remove", help="remove an entry")
     parser_remove_group = parser_remove.add_mutually_exclusive_group(required=True)
     parser_remove_group.add_argument("-d", "--description", type=Description, help="URL or description")
     parser_remove_group.add_argument("-e", "--entry-id", type=EntryId, help="entry ID")
-    parser_remove.set_defaults(func=handle_remove)
+    parser_remove.set_defaults(func=cmd_remove)
 
     parser_import = subparsers.add_parser("import", help="import entries from JSON file")
     parser_import.add_argument("file", type=Path, help="file to import from")
-    parser_import.set_defaults(func=handle_import)
+    parser_import.set_defaults(func=cmd_import)
 
     parser_export = subparsers.add_parser("export", help="export entries to JSON file")
     parser_export.add_argument("file", type=Path, help="file to export to")
-    parser_export.set_defaults(func=handle_export)
+    parser_export.set_defaults(func=cmd_export)
 
     args = parser.parse_args()
 
