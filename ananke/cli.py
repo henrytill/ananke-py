@@ -27,7 +27,7 @@ def migrate(cfg: Config, found: SchemaVersion) -> None:
     raise NotImplementedError()
 
 
-def setup_application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
+def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
     """Sets up the application with necessary dependencies.
 
     This includes setting up an in-memory store, creating a configuration object
@@ -84,7 +84,7 @@ def handle_add(args: argparse.Namespace) -> int:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
-    with setup_application(os_family, os.environ) as app:
+    with application(os_family, os.environ) as app:
         user_plaintext = Plaintext(input("Enter plaintext: "))
         app.add(args.description, user_plaintext, args.identity, args.meta)
     return 0
@@ -145,7 +145,7 @@ def handle_lookup(args: argparse.Namespace) -> int:
     """
     os_family = OsFamily.from_str(os.name)
     results = []
-    with setup_application(os_family, os.environ) as app:
+    with application(os_family, os.environ) as app:
         results = app.lookup(args.description, args.identity)
     if not results:
         return 1
@@ -163,7 +163,7 @@ def handle_modify(args: argparse.Namespace) -> int:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
-    with setup_application(os_family, os.environ) as app:
+    with application(os_family, os.environ) as app:
         target = args.description if args.description is not None else args.entry_id
         maybe_plaintext = Plaintext(input("Enter plaintext: ")) if args.plaintext else None
         app.modify(target, None, args.identity, maybe_plaintext, args.meta)
@@ -180,7 +180,7 @@ def handle_remove(args: argparse.Namespace) -> int:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
-    with setup_application(os_family, os.environ) as app:
+    with application(os_family, os.environ) as app:
         target = args.description if args.description is not None else args.entry_id
         app.remove(target)
     return 0
@@ -201,7 +201,7 @@ def handle_import(args: argparse.Namespace) -> int:
     reader = JsonFileReader(file_path)
     entries: list[Entry] = reader.read()
     os_family = OsFamily.from_str(os.name)
-    with setup_application(os_family, os.environ) as app:
+    with application(os_family, os.environ) as app:
         for entry in entries:
             app.store.put(entry)
     return 0
@@ -220,7 +220,7 @@ def handle_export(args: argparse.Namespace) -> int:
     if not isinstance(file_path, Path):
         raise TypeError("Expected Path")
     os_family = OsFamily.from_str(os.name)
-    with setup_application(os_family, os.environ) as app:
+    with application(os_family, os.environ) as app:
         entries = app.dump()
     writer = JsonFileWriter(file_path)
     writer.write(entries)
