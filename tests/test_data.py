@@ -3,10 +3,12 @@
 import string
 import unittest
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import List, LiteralString, TypedDict
 
 from ananke import data
 from ananke.data import Ciphertext, Description, Entry, EntryId, Identity, KeyId, Plaintext, Timestamp
+from ananke.store.in_memory_store import JsonFileReader
 from tests import RandomArgs
 
 
@@ -354,6 +356,21 @@ class TestKeyConversion(unittest.TestCase):
                 input_dict = test_case["input_dict"]
                 expected_output = test_case["expected_output"]
                 self.assertEqual(expected_output, data.remap_keys(key_map, input_dict))
+
+
+class EntryIdGeneration(unittest.TestCase):
+    """Unit tests for EntryId#generate()"""
+
+    @unittest.skip("We've got id consistency problems across implementations")
+    def test_example_entry_ids(self) -> None:
+        """Checks the entry ids in example data"""
+        file: Path = Path("example") / "db" / "data.json"
+        reader = JsonFileReader(file)
+        entries: list[Entry] = reader.read()
+        for i, entry in enumerate(entries):
+            with self.subTest(i=i):
+                fresh_id = entry.fresh_id()
+                self.assertEqual(entry.entry_id, fresh_id)
 
 
 if __name__ == "__main__":

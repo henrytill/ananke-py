@@ -108,13 +108,21 @@ class Entry:
         Returns:
             The 'Entry'
         """
-        self.entry_id = EntryId.generate(
+        self.entry_id = self.fresh_id()
+        return self
+
+    def fresh_id(self) -> EntryId:
+        """Generates a fresh 'EntryId'.
+
+        Returns:
+            The fresh 'EntryId'
+        """
+        return EntryId.generate(
             key_id=self.key_id,
             timestamp=self.timestamp,
             description=self.description,
             maybe_identity=self.identity,
         )
-        return self
 
     @classmethod
     def from_dict(cls, data: dict[Any, Any]) -> Self:
