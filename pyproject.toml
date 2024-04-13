@@ -45,6 +45,8 @@ warn_redundant_casts = false
 [tool.pylint]
 max-line-length = 120
 disable = [
+    "C0114", # missing-module-docstring
+    "C0115", # missing-class-docstring
     "C0301", # line-too-long, we use black for formatting
     "C0414", # useless-import-alias, we use aliases for type checking
     "R0801", # duplicate-code, no thanks
