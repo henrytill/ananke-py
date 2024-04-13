@@ -3,6 +3,7 @@
 import textwrap
 import unittest
 from pathlib import Path
+from typing import Optional
 
 from ananke.config import Backend, ConfigBuilder, Env, OsFamily
 from ananke.data import KeyId
@@ -30,7 +31,7 @@ class ConfigFile:
         )
 
 
-def config_reader(_maybe_config_path: Path | None) -> str:
+def config_reader(_maybe_config_path: Optional[Path]) -> str:
     """A test configuration file reader."""
     return str(ConfigFile())
 
