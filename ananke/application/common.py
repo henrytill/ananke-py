@@ -1,5 +1,6 @@
 import json
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Optional, Tuple, TypeAlias, cast
 
@@ -7,6 +8,14 @@ from .. import data, io
 from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext
 
 Target: TypeAlias = EntryId | Description
+
+
+class NoEntries(Exception):
+    """Signals that no entries match a given query"""
+
+
+class MultipleEntries(Exception):
+    """Signals that multiple entries match a given query"""
 
 
 # pylint: disable=unnecessary-pass
@@ -98,6 +107,38 @@ class Application(ABC):
             path: The path to the JSON file.
         """
         pass
+
+
+@dataclass(frozen=True)
+class Query:
+    """A query for filtering entries.
+
+    This class is used to filter entries in a store.
+
+    It may be subclassed to add additional filtering capabilities.
+
+    Attributes:
+        entry_id: The entry id to filter by.
+        description: The description to filter by.
+        identity: The identity to filter by.
+        meta: The metadata to filter by.
+    """
+
+    entry_id: Optional[EntryId] = None
+    description: Optional[Description] = None
+    identity: Optional[Identity] = None
+    meta: Optional[Metadata] = None
+
+    def is_empty(self) -> bool:
+        """Returns 'true' if all fields are 'None'."""
+        return self.entry_id is None and self.description is None and self.identity is None and self.meta is None
+
+
+def target_matches(target: Target, entry: Entry) -> bool:
+    if isinstance(target, EntryId):
+        return target == entry.entry_id
+    else:
+        return target == entry.description
 
 
 def read(path: Path, reader: Callable[[Path], Optional[str]] = io.file_reader) -> list[Entry]:
