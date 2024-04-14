@@ -190,10 +190,7 @@ def _create_query(query: Query) -> Tuple[str, dict[str, str]]:
     return (sql, parameters)
 
 
-def _create_update(
-    target: Target,
-    entry: Entry,
-) -> Tuple[str, dict[str, str]]:
+def _create_update(target: Target, entry: Entry) -> Tuple[str, dict[str, str]]:
     parameters: dict[str, str] = {}
 
     wheres: list[str] = []
