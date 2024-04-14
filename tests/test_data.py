@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import List, LiteralString, TypedDict
 
 from ananke import data
+from ananke.application import common
 from ananke.data import Ciphertext, Description, Entry, EntryId, Identity, KeyId, Plaintext, Timestamp
-from ananke.store.in_memory_store import JsonFileReader
 from tests import RandomArgs
 
 
@@ -365,8 +365,7 @@ class EntryIdGeneration(unittest.TestCase):
     def test_example_entry_ids(self) -> None:
         """Checks the entry ids in example data"""
         file: Path = Path("example") / "db" / "data.json"
-        reader = JsonFileReader(file)
-        entries: list[Entry] = reader.read()
+        entries: list[Entry] = common.read(file)
         for i, entry in enumerate(entries):
             with self.subTest(i=i):
                 fresh_id = entry.fresh_id()

@@ -9,7 +9,7 @@ from ananke.application import Application, JsonApplication, SqliteApplication, 
 from ananke.config import Config, ConfigBuilder, OsFamily
 from ananke.data import Description, EntryId, Identity, Metadata, Plaintext
 
-example_data: Path = Path("example") / "db" / "data.json"
+EXAMPLE_DATA: Path = Path("example") / "db" / "data.json"
 
 
 class LookupArgs(TypedDict):
@@ -310,7 +310,6 @@ class TestApplication:
                     self.assertEqual(0, len(results))
 
 
-# pylint: disable=abstract-method
 class TestJsonApplication(TestApplication.Inner):
     def setUp(self) -> None:
         super().setUp()
@@ -322,11 +321,10 @@ class TestJsonApplication(TestApplication.Inner):
         }
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
         self.application = JsonApplication(self.config)
-        self.application.import_entries(example_data)
+        self.application.import_entries(EXAMPLE_DATA)
         os.environ["GNUPGHOME"] = "./example/gnupg"
 
 
-# pylint: disable=abstract-method
 class TestSqliteApplication(TestApplication.Inner):
     def setUp(self) -> None:
         super().setUp()
@@ -338,7 +336,7 @@ class TestSqliteApplication(TestApplication.Inner):
         }
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
         self.application = SqliteApplication(self.config)
-        self.application.import_entries(example_data)
+        self.application.import_entries(EXAMPLE_DATA)
         os.environ["GNUPGHOME"] = "./example/gnupg"
 
     def tearDown(self) -> None:

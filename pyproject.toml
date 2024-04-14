@@ -18,13 +18,13 @@ dev = [
     "mypy>=1.8.0",
     "pylint>=2.16.2",
 ]
-test = ["coverage>=6.5.0", "hypothesis>=6.98.4"]
+test = ["coverage>=6.5.0"]
 
 [project.scripts]
 ananke-py = "ananke.__main__:main"
 
 [tool.setuptools]
-packages = ["ananke", "ananke.data", "ananke.store"]
+packages = ["ananke", "ananke.application", "ananke.data"]
 
 [tool.setuptools.dynamic]
 version = { attr = "ananke.version.__version__" }

@@ -6,10 +6,9 @@ from pathlib import Path
 from typing import Mapping, Tuple
 
 from . import data, version
-from .app import Application
+from .application import Application, JsonApplication, SqliteApplication
 from .config import Backend, Config, ConfigBuilder, OsFamily
-from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, GpgCodec, Identity, Plaintext, SchemaVersion
-from .store import InMemoryStore, JsonFileReader, JsonFileWriter, NoOpWriter, SqliteConnectionReader, SqliteStore
+from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, Identity, Plaintext, SchemaVersion
 
 
 def migrate(cfg: Config, found: SchemaVersion) -> None:
@@ -54,19 +53,9 @@ def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
 
     match cfg.backend:
         case Backend.JSON:
-            return Application(
-                store=InMemoryStore(),
-                reader=JsonFileReader(cfg.data_file),
-                writer=JsonFileWriter(cfg.data_file),
-                codec=GpgCodec(cfg.key_id),
-            )
+            return JsonApplication(cfg)
         case Backend.SQLITE:
-            return Application(
-                store=SqliteStore(),
-                reader=SqliteConnectionReader(cfg.data_file),
-                writer=NoOpWriter(),
-                codec=GpgCodec(cfg.key_id),
-            )
+            return SqliteApplication(cfg)
 
 
 def cmd_add(args: argparse.Namespace) -> int:
@@ -79,9 +68,9 @@ def cmd_add(args: argparse.Namespace) -> int:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
-    with application(os_family, os.environ) as app:
-        user_plaintext = Plaintext(input("Enter plaintext: "))
-        app.add(args.description, user_plaintext, args.identity, args.meta)
+    app = application(os_family, os.environ)
+    user_plaintext = Plaintext(input("Enter plaintext: "))
+    app.add(args.description, user_plaintext, args.identity, args.meta)
     return 0
 
 
@@ -140,8 +129,8 @@ def cmd_lookup(args: argparse.Namespace) -> int:
     """
     os_family = OsFamily.from_str(os.name)
     results = []
-    with application(os_family, os.environ) as app:
-        results = app.lookup(args.description, args.identity)
+    app = application(os_family, os.environ)
+    results = app.lookup(args.description, args.identity)
     if not results:
         return 1
     print(format_results(results, args.verbose))
@@ -158,10 +147,10 @@ def cmd_modify(args: argparse.Namespace) -> int:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
-    with application(os_family, os.environ) as app:
-        target = args.description if args.description is not None else args.entry_id
-        maybe_plaintext = Plaintext(input("Enter plaintext: ")) if args.plaintext else None
-        app.modify(target, None, args.identity, maybe_plaintext, args.meta)
+    app = application(os_family, os.environ)
+    target = args.description if args.description is not None else args.entry_id
+    maybe_plaintext = Plaintext(input("Enter plaintext: ")) if args.plaintext else None
+    app.modify(target, None, args.identity, maybe_plaintext, args.meta)
     return 0
 
 
@@ -175,9 +164,9 @@ def cmd_remove(args: argparse.Namespace) -> int:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
-    with application(os_family, os.environ) as app:
-        target = args.description if args.description is not None else args.entry_id
-        app.remove(target)
+    app = application(os_family, os.environ)
+    target = args.description if args.description is not None else args.entry_id
+    app.remove(target)
     return 0
 
 
@@ -193,12 +182,9 @@ def cmd_import(args: argparse.Namespace) -> int:
     file_path = args.file
     if not isinstance(file_path, Path):
         raise TypeError("Expected Path")
-    reader = JsonFileReader(file_path)
-    entries: list[Entry] = reader.read()
     os_family = OsFamily.from_str(os.name)
-    with application(os_family, os.environ) as app:
-        for entry in entries:
-            app.store.put(entry)
+    app = application(os_family, os.environ)
+    app.import_entries(file_path)
     return 0
 
 
@@ -215,10 +201,8 @@ def cmd_export(args: argparse.Namespace) -> int:
     if not isinstance(file_path, Path):
         raise TypeError("Expected Path")
     os_family = OsFamily.from_str(os.name)
-    with application(os_family, os.environ) as app:
-        entries = app.dump()
-    writer = JsonFileWriter(file_path)
-    writer.write(entries)
+    app = application(os_family, os.environ)
+    app.export_entries(file_path)
     return 0
 
 
