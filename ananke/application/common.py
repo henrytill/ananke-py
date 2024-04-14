@@ -138,7 +138,7 @@ def target_matches(target: Target, entry: Entry) -> bool:
     """Match target against entry"""
     if isinstance(target, EntryId):
         return target == entry.entry_id
-    return target == entry.description
+    return target in entry.description
 
 
 def read(path: Path, reader: Callable[[Path], Optional[str]] = io.file_reader) -> list[Entry]:

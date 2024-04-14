@@ -1,10 +1,11 @@
+import copy
 from pathlib import Path
 from typing import Optional, Tuple
 
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, GpgCodec, Identity, Metadata, Plaintext, Timestamp
 from . import common
-from .common import Application, MultipleEntries, NoEntries, Query, Target
+from .common import Application, Query, Target
 
 
 class JsonApplication(Application):
@@ -19,6 +20,7 @@ class JsonApplication(Application):
 
         self.config = config
         self.codec = GpgCodec(self.config.key_id)
+        self.config.data_file.parent.mkdir(parents=True)
         self.entries = []
 
         if self.config.data_file.exists():
@@ -52,7 +54,7 @@ class JsonApplication(Application):
         query = Query(description=description, identity=maybe_identity)
         matcher = QueryMatcher(query)
         return [
-            (entry, self.codec.decode(entry.ciphertext))
+            (copy.deepcopy(entry), self.codec.decode(entry.ciphertext))
             for entry in self.entries
             if matcher.match_description(entry.description) and matcher.match_identity(entry)
         ]
@@ -70,28 +72,25 @@ class JsonApplication(Application):
         idxs_len = len(idxs)
 
         if idxs_len == 0:
-            raise NoEntries
+            raise ValueError(f"No entries match {target}")
 
         if idxs_len > 1:
-            raise MultipleEntries
+            raise ValueError(f"Multiple entries match {target}")
 
         idx = idxs[0]
 
         entry = self.entries.pop(idx)
-
+        entry.timestamp = Timestamp.now()
         if maybe_description is not None:
             entry.description = maybe_description
-
         if maybe_plaintext is not None:
             entry.ciphertext = self.codec.encode(maybe_plaintext)
-
         if maybe_identity is not None:
             entry.identity = maybe_identity
-
         if maybe_meta is not None:
             entry.meta = maybe_meta
-
         entry.normalize()
+
         self.entries.append(entry)
         common.write(self.config.data_file, self.entries)
 
@@ -100,10 +99,10 @@ class JsonApplication(Application):
         idxs_len = len(idxs)
 
         if idxs_len == 0:
-            raise NoEntries
+            raise ValueError(f"No entries match {target}")
 
         if idxs_len > 1:
-            raise MultipleEntries
+            raise ValueError(f"Multiple entries match {target}")
 
         idx = idxs[0]
 

@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, GpgCodec, Identity, Metadata, Plaintext, Timestamp
 from . import common
-from .common import Application, MultipleEntries, NoEntries, Query, Target
+from .common import Application, Query, Target
 
 CREATE_TABLE = """\
 CREATE TABLE IF NOT EXISTS entries (
@@ -34,6 +34,7 @@ class SqliteApplication(Application):
 
         self.config = config
         self.codec = GpgCodec(self.config.key_id)
+        self.config.data_file.parent.mkdir(parents=True)
         self.connection = sqlite3.connect(config.data_file)
 
         with closing(self.connection.cursor()) as cursor:
@@ -110,18 +111,19 @@ class SqliteApplication(Application):
         entries_len = len(entries)
 
         if entries_len == 0:
-            raise NoEntries
+            raise ValueError(f"No entries match {target}")
 
         if entries_len > 1:
-            raise MultipleEntries
+            raise ValueError(f"Multiple entries match {target}")
 
         entry: Entry = entries[0]
+        entry.timestamp = Timestamp.now()
         if maybe_description is not None:
             entry.description = maybe_description
-        if maybe_identity is not None:
-            entry.identity = maybe_identity
         if maybe_plaintext is not None:
             entry.ciphertext = self.codec.encode(maybe_plaintext)
+        if maybe_identity is not None:
+            entry.identity = maybe_identity
         if maybe_meta is not None:
             entry.meta = maybe_meta
         entry.normalize()
@@ -238,10 +240,11 @@ def _create_update(
     else:
         sets += ["meta = NULL"]
 
-    sets_str = "\n".join(sets)
+    sets_str = ",\n".join(sets)
     wheres_str = " AND ".join(wheres)
     sql = f"""\
     UPDATE entries
-    SET {sets_str} WHERE {wheres_str}
+    SET {sets_str}
+    WHERE {wheres_str}
     """
     return (sql, parameters)
