@@ -40,6 +40,7 @@ class SqliteApplication(Application):
             cursor.execute(CREATE_TABLE)
 
     def close(self) -> None:
+        """Closes the database connection"""
         self.connection.close()
 
     def add(
@@ -240,7 +241,7 @@ def _create_update(
     sets_str = "\n".join(sets)
     wheres_str = " AND ".join(wheres)
     sql = f"""\
-    UPDATE entries 
-    SET {sets_str} WHERE {wheres_str} 
+    UPDATE entries
+    SET {sets_str} WHERE {wheres_str}
     """
     return (sql, parameters)

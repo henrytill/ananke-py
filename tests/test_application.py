@@ -23,6 +23,7 @@ class TestApplication:
             raise NotImplementedError
 
 
+# pylint: disable=abstract-method
 class TestJsonApplication(TestApplication.Inner):
     def setUp(self) -> None:
         env = {
@@ -34,6 +35,7 @@ class TestJsonApplication(TestApplication.Inner):
         self.application = JsonApplication(self.config)
 
 
+# pylint: disable=abstract-method
 class TestSqliteApplication(TestApplication.Inner):
     def setUp(self) -> None:
         env = {

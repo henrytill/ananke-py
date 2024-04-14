@@ -45,7 +45,6 @@ class JsonApplication(Application):
         )
         self.entries.append(entry)
         common.write(self.config.data_file, self.entries)
-        return
 
     def lookup(
         self, description: Description, maybe_identity: Optional[Identity] = None
