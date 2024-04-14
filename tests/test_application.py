@@ -1,5 +1,6 @@
 import unittest
 from dataclasses import dataclass
+from typing import cast
 
 from ananke.application import Application, JsonApplication, SqliteApplication
 from ananke.config import Config, ConfigBuilder, OsFamily
@@ -42,3 +43,6 @@ class TestSqliteApplication(TestApplication.Inner):
         }
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
         self.application = SqliteApplication(self.config)
+
+    def tearDown(self) -> None:
+        cast(SqliteApplication, self.application).close()
