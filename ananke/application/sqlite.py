@@ -63,20 +63,7 @@ class SqliteApplication(Application):
             ciphertext=ciphertext,
             meta=maybe_meta,
         )
-        sql = """\
-        INSERT OR REPLACE INTO
-        entries(id, keyid, timestamp, description, identity, ciphertext, meta)
-        VALUES(:id, :keyid, :timestamp, :description, :identity, :ciphertext, :meta)
-        """
-        parameters = {
-            "id": str(entry.entry_id),
-            "keyid": entry.key_id,
-            "timestamp": entry.timestamp.isoformat(),
-            "description": entry.description,
-            "identity": entry.identity,
-            "ciphertext": str(entry.ciphertext.to_base64()),
-            "meta": entry.meta,
-        }
+        sql, parameters = _create_insert(entry)
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(sql, parameters)
         self.connection.commit()
@@ -150,20 +137,7 @@ class SqliteApplication(Application):
         entries: list[Entry] = common.read(path)
         with closing(self.connection.cursor()) as cursor:
             for entry in entries:
-                sql = """\
-                INSERT OR REPLACE INTO
-                entries(id, keyid, timestamp, description, identity, ciphertext, meta)
-                VALUES(:id, :keyid, :timestamp, :description, :identity, :ciphertext, :meta)
-                """
-                parameters = {
-                    "id": str(entry.entry_id),
-                    "keyid": entry.key_id,
-                    "timestamp": entry.timestamp.isoformat(),
-                    "description": entry.description,
-                    "identity": entry.identity,
-                    "ciphertext": str(entry.ciphertext.to_base64()),
-                    "meta": entry.meta,
-                }
+                sql, parameters = _create_insert(entry)
                 cursor.execute(sql, parameters)
         self.connection.commit()
 
@@ -176,6 +150,24 @@ class SqliteApplication(Application):
             for row in cursor.execute(sql):
                 entries.append(Entry.from_tuple(row))
         common.write(path, entries)
+
+
+def _create_insert(entry: Entry) -> Tuple[str, dict[str, Optional[str]]]:
+    sql: str = """\
+    INSERT OR REPLACE INTO
+    entries(id, keyid, timestamp, description, identity, ciphertext, meta)
+    VALUES(:id, :keyid, :timestamp, :description, :identity, :ciphertext, :meta)
+    """
+    parameters: dict[str, str | None] = {
+        "id": str(entry.entry_id),
+        "keyid": entry.key_id,
+        "timestamp": entry.timestamp.isoformat(),
+        "description": entry.description,
+        "identity": entry.identity,
+        "ciphertext": str(entry.ciphertext.to_base64()),
+        "meta": entry.meta,
+    }
+    return (sql, parameters)
 
 
 def _create_query(query: Query) -> Tuple[str, dict[str, str]]:
@@ -220,7 +212,7 @@ def _create_update(
     parameters["timestamp"] = entry.timestamp.isoformat()
 
     sets += ["keyid = :keyid"]
-    parameters["keyid"] = str(entry.key_id)
+    parameters["keyid"] = entry.key_id
 
     sets += ["description = :description"]
     parameters["description"] = entry.description
