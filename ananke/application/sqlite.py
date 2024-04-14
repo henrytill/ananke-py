@@ -95,29 +95,30 @@ class SqliteApplication(Application):
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql, parameters):
                 entries.append(Entry.from_tuple(row))
-        entries_len = len(entries)
 
-        if entries_len == 0:
-            raise ValueError(f"No entries match {target}")
+            entries_len = len(entries)
 
-        if entries_len > 1:
-            raise ValueError(f"Multiple entries match {target}")
+            if entries_len == 0:
+                raise ValueError(f"No entries match {target}")
 
-        entry: Entry = entries[0]
-        entry.timestamp = Timestamp.now()
-        if maybe_description is not None:
-            entry.description = maybe_description
-        if maybe_plaintext is not None:
-            entry.ciphertext = self.codec.encode(maybe_plaintext)
-        if maybe_identity is not None:
-            entry.identity = maybe_identity
-        if maybe_meta is not None:
-            entry.meta = maybe_meta
-        entry.normalize()
+            if entries_len > 1:
+                raise ValueError(f"Multiple entries match {target}")
 
-        sql, parameters = _create_update(target, entry)
-        with closing(self.connection.cursor()) as cursor:
+            entry: Entry = entries[0]
+            entry.timestamp = Timestamp.now()
+            if maybe_description is not None:
+                entry.description = maybe_description
+            if maybe_plaintext is not None:
+                entry.ciphertext = self.codec.encode(maybe_plaintext)
+            if maybe_identity is not None:
+                entry.identity = maybe_identity
+            if maybe_meta is not None:
+                entry.meta = maybe_meta
+            entry.normalize()
+
+            sql, parameters = _create_update(target, entry)
             cursor.execute(sql, parameters)
+
         self.connection.commit()
 
     def remove(self, target: Target) -> None:
