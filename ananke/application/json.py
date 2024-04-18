@@ -110,13 +110,15 @@ class JsonApplication(Application):
         common.write(self.config.data_file, self.entries)
 
     def import_entries(self, path: Optional[Path]) -> None:
-        if path is not None:
-            self.entries += common.read(path)
-            common.write(self.config.data_file, self.entries)
+        if path is None:
+            return
+        self.entries += common.read(path)
+        common.write(self.config.data_file, self.entries)
 
     def export_entries(self, path: Optional[Path]) -> None:
-        if path is not None:
-            common.write(path, self.entries)
+        if path is None:
+            return
+        common.write(path, self.entries)
 
 
 class QueryMatcher:
