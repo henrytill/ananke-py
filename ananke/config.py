@@ -270,6 +270,10 @@ class ConfigBuilder:
         Returns:
             The updated configuration.
         """
+        config_dir = env.get(Env.CONFIG_DIR)
+        if config_dir is not None:
+            self.config_dir = Path(config_dir)
+
         if self.config_dir is None:
             self.config_dir = _get_config_dir(os_family, env)
 

@@ -73,6 +73,7 @@ test: $(ENV_TARGET)
 	$(ACTIVATE)
 	$(PYTHON) -m unittest discover -v -s tests
 	$(PYTHON) -m doctest -v ananke/data/common.py
+	$(PYTHON) -m cram tests
 
 .PHONY: coverage
 coverage: $(ENV_TARGET)

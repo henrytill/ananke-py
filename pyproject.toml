@@ -18,7 +18,7 @@ dev = [
     "mypy>=1.8.0",
     "pylint>=2.16.2",
 ]
-test = ["coverage>=6.5.0"]
+test = ["coverage>=6.5.0", "cram>=0.7"]
 
 [project.scripts]
 ananke-py = "ananke.__main__:main"

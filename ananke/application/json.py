@@ -20,7 +20,7 @@ class JsonApplication(Application):
 
         self.config = config
         self.codec = GpgCodec(self.config.key_id)
-        self.config.data_file.parent.mkdir(parents=True)
+        self.config.data_file.parent.mkdir(parents=True, exist_ok=True)
         self.entries = []
 
         if self.config.data_file.exists():
@@ -112,6 +112,7 @@ class JsonApplication(Application):
     def import_entries(self, path: Optional[Path]) -> None:
         if path is not None:
             self.entries += common.read(path)
+            common.write(self.config.data_file, self.entries)
 
     def export_entries(self, path: Optional[Path]) -> None:
         if path is not None:
