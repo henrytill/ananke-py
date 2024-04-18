@@ -37,13 +37,9 @@ def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
     """
     cfg = ConfigBuilder().with_defaults(host_os, env).with_config().with_env(env).build()
 
-    dir_mode = 0o700
-    if not cfg.config_dir.exists():
-        cfg.config_dir.mkdir(mode=dir_mode)
-    if not cfg.data_dir.exists():
-        cfg.db_dir.mkdir(mode=dir_mode)
-    if not cfg.db_dir.exists():
-        cfg.db_dir.mkdir(mode=dir_mode)
+    for dir in [cfg.config_dir, cfg.data_dir, cfg.db_dir]:
+        if not dir.exists():
+            dir.mkdir(mode=0o700, exist_ok=True)
 
     schema_version = data.get_schema_version(cfg.schema_file)
     if schema_version < CURRENT_SCHEMA_VERSION:
