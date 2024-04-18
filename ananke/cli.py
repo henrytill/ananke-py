@@ -3,7 +3,7 @@
 import argparse
 import os
 from pathlib import Path
-from typing import Mapping, Tuple
+from typing import Mapping, Sequence, Tuple
 
 from . import data, version
 from .application import Application, JsonApplication, SqliteApplication
@@ -206,7 +206,7 @@ def cmd_export(args: argparse.Namespace) -> int:
     return 0
 
 
-def main() -> int:
+def main(args: Sequence[str]) -> int:
     """The main entry point for the command-line interface.
 
     Returns:
@@ -251,13 +251,16 @@ def main() -> int:
     parser_export.add_argument("file", type=Path, help="file to export to")
     parser_export.set_defaults(func=cmd_export)
 
-    args = parser.parse_args()
+    parsed = parser.parse_args(args)
 
-    if not hasattr(args, "func"):
+    if not hasattr(parsed, "func"):
         parser.print_help()
         return 2
 
-    ret = args.func(args)
+    if not callable(parsed.func):
+        raise TypeError(f"Expected callable")
+
+    ret = parsed.func(parsed)
     if not isinstance(ret, int):
         raise TypeError("Expected int")
 
