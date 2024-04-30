@@ -2,7 +2,7 @@
 
 import sys
 
-from . import cli
+from .cli import main
 
 if __name__ == "__main__":
-    sys.exit(cli.main(sys.argv[1:]))
+    sys.exit(main(sys.argv[1:]))

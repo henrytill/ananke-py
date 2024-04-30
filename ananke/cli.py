@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import sys
 from pathlib import Path
 from typing import Mapping, Sequence, Tuple
 
@@ -202,7 +203,7 @@ def cmd_export(args: argparse.Namespace) -> int:
     return 0
 
 
-def main(args: Sequence[str]) -> int:
+def main(args: Sequence[str] = sys.argv[1:]) -> int:
     """The main entry point for the command-line interface.
 
     Returns:
