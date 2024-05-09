@@ -1,4 +1,4 @@
-name: Test
+name: CI
 
 on:
   push:
@@ -7,15 +7,13 @@ on:
     branches: ['master']
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
-  build:
+  linux:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
@@ -30,8 +28,11 @@ jobs:
       - run: make venv
       - run: make check
       - run: make test
-  flake:
+  linux-flake:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
