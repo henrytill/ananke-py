@@ -16,8 +16,7 @@
         { }:
         let pkgs = nixpkgs.legacyPackages.${system};
         in pkgs.python3Packages.buildPythonApplication {
-          name = "ananke";
-          pname = "ananke";
+          name = "ananke-py";
           format = "pyproject";
           buildInputs = with pkgs.python3Packages; [ setuptools ];
           nativeCheckInputs = with pkgs; [ python3Packages.unittestCheckHook python3Packages.cram gnupg ];
