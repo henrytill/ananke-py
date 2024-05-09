@@ -1,8 +1,8 @@
 """The command line interface."""
 
-import argparse
 import os
 import sys
+from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from typing import Mapping, Sequence, Tuple
 
@@ -55,11 +55,11 @@ def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
             return SqliteApplication(cfg)
 
 
-def cmd_add(args: argparse.Namespace) -> int:
+def cmd_add(attrs: Namespace) -> int:
     """Handles the 'add' command.
 
     Args:
-        args: The command line arguments.
+        attrs: The namespace object containing parsed command-line arguments.
 
     Returns:
         The exit code of the application.
@@ -67,7 +67,7 @@ def cmd_add(args: argparse.Namespace) -> int:
     os_family = OsFamily.from_str(os.name)
     app = application(os_family, os.environ)
     user_plaintext = Plaintext(input("Enter plaintext: "))
-    app.add(args.description, user_plaintext, args.identity, args.meta)
+    app.add(attrs.description, user_plaintext, attrs.identity, attrs.meta)
     return 0
 
 
@@ -115,11 +115,11 @@ def format_results(results: list[Tuple[Entry, Plaintext]], verbose: bool) -> str
     return "\n".join(formatted_results)
 
 
-def cmd_lookup(args: argparse.Namespace) -> int:
+def cmd_lookup(attrs: Namespace) -> int:
     """Handles the 'lookup' command.
 
     Args:
-        args: The command line arguments.
+        attrs: The namespace object containing parsed command-line arguments.
 
     Returns:
         The exit code of the application.
@@ -127,56 +127,56 @@ def cmd_lookup(args: argparse.Namespace) -> int:
     os_family = OsFamily.from_str(os.name)
     results = []
     app = application(os_family, os.environ)
-    results = app.lookup(args.description, args.identity)
+    results = app.lookup(attrs.description, attrs.identity)
     if not results:
         return 1
-    print(format_results(results, args.verbose))
+    print(format_results(results, attrs.verbose))
     return 0
 
 
-def cmd_modify(args: argparse.Namespace) -> int:
+def cmd_modify(attrs: Namespace) -> int:
     """Handles the 'modify' command.
 
     Args:
-        args: The command line arguments.
+        attrs: The namespace object containing parsed command-line arguments.
 
     Returns:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
     app = application(os_family, os.environ)
-    target = args.description if args.description is not None else args.entry_id
-    maybe_plaintext = Plaintext(input("Enter plaintext: ")) if args.plaintext else None
-    app.modify(target, None, args.identity, maybe_plaintext, args.meta)
+    target = attrs.description if attrs.description is not None else attrs.entry_id
+    maybe_plaintext = Plaintext(input("Enter plaintext: ")) if attrs.plaintext else None
+    app.modify(target, None, attrs.identity, maybe_plaintext, attrs.meta)
     return 0
 
 
-def cmd_remove(args: argparse.Namespace) -> int:
+def cmd_remove(attrs: Namespace) -> int:
     """Handles the 'remove' command.
 
     Args:
-        args: The command line arguments.
+        attrs: The namespace object containing parsed command-line arguments.
 
     Returns:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
     app = application(os_family, os.environ)
-    target = args.description if args.description is not None else args.entry_id
+    target = attrs.description if attrs.description is not None else attrs.entry_id
     app.remove(target)
     return 0
 
 
-def cmd_import(args: argparse.Namespace) -> int:
+def cmd_import(attrs: Namespace) -> int:
     """Handles the 'import' command.
 
     Args:
-        args: The command line arguments.
+        attrs: The namespace object containing parsed command-line arguments.
 
     Returns:
         The exit code of the application.
     """
-    file_path = args.file
+    file_path = attrs.file
     if not isinstance(file_path, Path):
         raise TypeError("Expected Path")
     os_family = OsFamily.from_str(os.name)
@@ -185,16 +185,16 @@ def cmd_import(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_export(args: argparse.Namespace) -> int:
+def cmd_export(attrs: Namespace) -> int:
     """Handles the 'export' command.
 
     Args:
-        args: The command line arguments.
+        attrs: The namespace object containing parsed command-line arguments.
 
     Returns:
         The exit code of the application.
     """
-    file_path = args.file
+    file_path = attrs.file
     if not isinstance(file_path, Path):
         raise TypeError("Expected Path")
     os_family = OsFamily.from_str(os.name)
@@ -209,7 +209,7 @@ def main(args: Sequence[str] = sys.argv[1:]) -> int:
     Returns:
         An exit code.
     """
-    parser = argparse.ArgumentParser(description="A minimal password manager.")
+    parser = ArgumentParser(description="A minimal password manager.")
     parser.add_argument("--version", action="version", version=f"%(prog)s {version.__version__}")
     subparsers = parser.add_subparsers(help="Commands")
 
