@@ -38,9 +38,9 @@ def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
     """
     cfg = ConfigBuilder().with_defaults(host_os, env).with_config().with_env(env).build()
 
-    for dir in [cfg.config_dir, cfg.data_dir, cfg.db_dir]:
-        if not dir.exists():
-            dir.mkdir(mode=0o700, exist_ok=True)
+    for directory in [cfg.config_dir, cfg.data_dir, cfg.db_dir]:
+        if not directory.exists():
+            directory.mkdir(mode=0o700, exist_ok=True)
 
     schema_version = data.get_schema_version(cfg.schema_file)
     if schema_version < CURRENT_SCHEMA_VERSION:
@@ -255,7 +255,7 @@ def main(args: Sequence[str] = sys.argv[1:]) -> int:
         return 2
 
     if not callable(parsed.func):
-        raise TypeError(f"Expected callable")
+        raise TypeError("Expected callable")
 
     ret = parsed.func(parsed)
     if not isinstance(ret, int):
