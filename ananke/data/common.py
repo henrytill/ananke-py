@@ -1,5 +1,7 @@
 """Common datatypes and related functions."""
 
+import base64
+import binascii
 import hashlib
 import secrets
 import string
@@ -135,6 +137,39 @@ class Plaintext:
         ret = "".join(secrets.choice(chars) for _ in range(length))
 
         return cls(ret)
+
+
+class Ciphertext(bytes):
+    """An encrypted value of an 'Entry'."""
+
+    def __new__(cls, value: bytes) -> Self:
+        return super().__new__(cls, value)
+
+    @classmethod
+    def from_base64(cls, value: str) -> Self:
+        """Creates a Ciphertext object from a base64 encoded string.
+
+        Args:
+            value: The base64 encoded string.
+
+        Returns:
+            The Ciphertext object.
+
+        Raises:
+            ValueError: If the value is not a valid base64 encoded string.
+        """
+        try:
+            return cls(base64.b64decode(value.encode("ascii")))
+        except binascii.Error as exc:
+            raise ValueError("Invalid base64 string") from exc
+
+    def to_base64(self) -> str:
+        """Encodes the Ciphertext object as a base64 string.
+
+        Returns:
+            The base64 encoded string.
+        """
+        return base64.b64encode(self).decode("ascii")
 
 
 class EntryId:

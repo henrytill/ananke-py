@@ -1,46 +1,10 @@
 """Module for the 'Entry' class and related types."""
 
-import base64
-import binascii
 import functools
-import subprocess
 from typing import Any, Optional, Self, Tuple
 
 from . import common
-from .common import Description, EntryId, Identity, KeyId, Metadata, Plaintext, Timestamp
-
-
-class Ciphertext(bytes):
-    """An encrypted value of an 'Entry'."""
-
-    def __new__(cls, value: bytes) -> Self:
-        return super().__new__(cls, value)
-
-    @classmethod
-    def from_base64(cls, value: str) -> Self:
-        """Creates a Ciphertext object from a base64 encoded string.
-
-        Args:
-            value: The base64 encoded string.
-
-        Returns:
-            The Ciphertext object.
-
-        Raises:
-            ValueError: If the value is not a valid base64 encoded string.
-        """
-        try:
-            return cls(base64.b64decode(value.encode("ascii")))
-        except binascii.Error as exc:
-            raise ValueError("Invalid base64 string") from exc
-
-    def to_base64(self) -> str:
-        """Encodes the Ciphertext object as a base64 string.
-
-        Returns:
-            The base64 encoded string.
-        """
-        return base64.b64encode(self).decode("ascii")
+from .common import Ciphertext, Description, EntryId, Identity, KeyId, Metadata, Timestamp
 
 
 class Entry:
@@ -242,62 +206,3 @@ SNAKE_TO_CAMEL = {
 
 remap_keys_camel_to_snake = functools.partial(common.remap_keys, CAMEL_TO_SNAKE)
 remap_keys_snake_to_camel = functools.partial(common.remap_keys, SNAKE_TO_CAMEL)
-
-
-class GpgCodec:
-    """A GPG codec.
-
-    This class is used to encode Plaintexts and decode Ciphertexts using GPG.
-
-    Attributes:
-        key_id: The KeyId to use for encryption and decryption.
-    """
-
-    key_id: KeyId
-
-    def __init__(self, key_id: KeyId) -> None:
-        """Creates a new GpgCodec with the given KeyId.
-
-        Args:
-            key_id: The KeyId to use for encryption and decryption.
-        """
-        self.key_id = key_id
-
-    def encode(self, obj: Plaintext) -> Ciphertext:
-        """Encodes a Plaintext into a Ciphertext.
-
-        Args:
-            plaintext: The Plaintext to encode.
-
-        Returns:
-            The encoded Ciphertext.
-
-        Raises:
-            ValueError: If the Plaintext could not be encoded.
-        """
-        input_bytes = obj.encode("utf-8")
-        cmd = ["gpg", "--batch", "--encrypt", "--recipient", self.key_id]
-        try:
-            output_bytes = subprocess.run(cmd, input=input_bytes, capture_output=True, check=True).stdout
-            return Ciphertext(output_bytes)
-        except subprocess.CalledProcessError as exc:
-            raise ValueError(f'Could not encode Plaintext: {exc.stderr.decode("utf-8")}') from exc
-
-    def decode(self, ciphertext: Ciphertext) -> Plaintext:
-        """Decodes a Ciphertext into a Plaintext.
-
-        Args:
-            ciphertext: The Ciphertext to decode.
-
-        Returns:
-            The decoded Plaintext.
-
-        Raises:
-            ValueError: If the Ciphertext could not be decoded.
-        """
-        cmd = ["gpg", "--batch", "--decrypt"]
-        try:
-            output_bytes = subprocess.run(cmd, input=ciphertext, capture_output=True, check=True).stdout
-            return Plaintext(output_bytes.decode("utf-8"))
-        except subprocess.CalledProcessError as exc:
-            raise ValueError(f'Could not decode Ciphertext: {exc.stderr.decode("utf-8")}') from exc

@@ -5,7 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from ananke.data import Ciphertext, GpgCodec, KeyId, Plaintext
+from ananke.codec import GpgCodec
+from ananke.data import Ciphertext, KeyId, Plaintext
 from tests import RandomArgs
 
 

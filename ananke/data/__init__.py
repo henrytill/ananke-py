@@ -1,5 +1,6 @@
 """The data package."""
 
+from .common import Ciphertext as Ciphertext
 from .common import Description as Description
 from .common import EntryId as EntryId
 from .common import Identity as Identity
@@ -10,9 +11,7 @@ from .common import Timestamp as Timestamp
 from .common import get_optional as get_optional
 from .common import get_required as get_required
 from .common import remap_keys as remap_keys
-from .entry import Ciphertext as Ciphertext
 from .entry import Entry as Entry
-from .entry import GpgCodec as GpgCodec
 from .entry import remap_keys_camel_to_snake as remap_keys_camel_to_snake
 from .entry import remap_keys_snake_to_camel as remap_keys_snake_to_camel
 from .schema import CURRENT_SCHEMA_VERSION as CURRENT_SCHEMA_VERSION

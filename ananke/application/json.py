@@ -2,8 +2,9 @@ import copy
 from pathlib import Path
 from typing import Optional, Tuple
 
+from ..codec import GpgCodec
 from ..config import Backend, Config
-from ..data import Description, Entry, EntryId, GpgCodec, Identity, Metadata, Plaintext, Timestamp
+from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
 from . import common
 from .common import Application, Query, Target
 
