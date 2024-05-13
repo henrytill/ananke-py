@@ -6,12 +6,12 @@ Print usage string
 
   $ python3 -m ananke
   usage: __main__.py [-h] [--version]
-                     {add,lookup,modify,remove,import,export} ...
+                     {add,lookup,modify,remove,import,export,configure} ...
   
   A minimal password manager.
   
   positional arguments:
-    {add,lookup,modify,remove,import,export}
+    {add,lookup,modify,remove,import,export,configure}
                           Commands
       add                 add an entry
       lookup              lookup an entry
@@ -19,6 +19,7 @@ Print usage string
       remove              remove an entry
       import              import entries from JSON file
       export              export entries to JSON file
+      configure           create, modify, and list configuration variables
   
   options:
     -h, --help            show this help message and exit
@@ -61,6 +62,15 @@ Modify
 
   $ python3 -m ananke lookup bazlib
   quuxpass
+
+Configure
+
+  $ python3 -m ananke configure -l
+  config_dir = /tmp/.+ (re)
+  data_dir = /tmp/.+ (re)
+  backend = json
+  key_id = 371C136C
+  allow_multiple_keys = False
 
 # Local Variables:
 # mode: prog

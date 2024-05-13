@@ -12,6 +12,19 @@ from .config import Backend, Config, ConfigBuilder, OsFamily
 from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, Identity, Plaintext, SchemaVersion
 
 
+def configure(host_os: OsFamily, env: Mapping[str, str]) -> Config:
+    """Creates a `Config` object.
+
+    Args:
+        host_os: The host operating system, defaulting to the current OS.
+        env: The environment variables to be used for configuration.
+
+    Returns:
+        A `Config` object.
+    """
+    return ConfigBuilder().with_defaults(host_os, env).with_config().with_env(env).build()
+
+
 def migrate(cfg: Config, found: SchemaVersion) -> None:
     """Migrates the data to the current schema version.
 
@@ -36,7 +49,7 @@ def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
     Returns:
         The configured Application instance ready for use.
     """
-    cfg = ConfigBuilder().with_defaults(host_os, env).with_config().with_env(env).build()
+    cfg = configure(host_os, env)
 
     for directory in [cfg.config_dir, cfg.data_dir, cfg.db_dir]:
         if not directory.exists():
@@ -203,6 +216,22 @@ def cmd_export(attrs: Namespace) -> int:
     return 0
 
 
+def cmd_configure(attrs: Namespace) -> int:
+    """Handles the 'configure' command.
+
+    Args:
+        attrs: The namespace object containing parsed command-line arguments.
+
+    Returns:
+        The exit code of the application.
+    """
+    if attrs.list:
+        os_family = OsFamily.from_str(os.name)
+        cfg = configure(os_family, os.environ)
+        print(cfg.pretty_print())
+    return 0
+
+
 def main(args: Sequence[str] = sys.argv[1:]) -> int:
     """The main entry point for the command-line interface.
 
@@ -247,6 +276,10 @@ def main(args: Sequence[str] = sys.argv[1:]) -> int:
     parser_export = subparsers.add_parser("export", help="export entries to JSON file")
     parser_export.add_argument("file", type=Path, help="file to export to")
     parser_export.set_defaults(func=cmd_export)
+
+    parser_configure = subparsers.add_parser("configure", help="create, modify, and list configuration variables")
+    parser_configure.add_argument("-l", "--list", action="store_true", help="list the configuration")
+    parser_configure.set_defaults(func=cmd_configure)
 
     parsed = parser.parse_args(args)
 

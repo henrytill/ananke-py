@@ -162,6 +162,21 @@ class Config:
         """
         return self.data_dir / "db" / "schema"
 
+    def pretty_print(self) -> str:
+        """Returns a pretty-printed string.
+
+        Returns:
+            A pretty-printed string.
+        """
+        ret = f"""\
+config_dir = {self.config_dir}
+data_dir = {self.data_dir}
+backend = {self.backend}
+key_id = {self.key_id}
+allow_multiple_keys = {self.allow_multiple_keys}\
+"""
+        return ret
+
 
 class ConfigBuilder:
     """A configuration builder."""
