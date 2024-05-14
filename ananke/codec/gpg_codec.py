@@ -1,4 +1,5 @@
 import subprocess
+from typing import Optional
 
 from ..data import Ciphertext, KeyId, Plaintext
 from .common import Codec
@@ -59,3 +60,33 @@ class GpgCodec(Codec[Plaintext]):
             return Plaintext(output_bytes.decode("utf-8"))
         except subprocess.CalledProcessError as exc:
             raise ValueError(f'Could not decode Ciphertext: {exc.stderr.decode("utf-8")}') from exc
+
+    @staticmethod
+    def suggest_key() -> Optional[KeyId]:
+        """Suggests a `KeyId`"""
+        try:
+            # Try getting default public key
+            # https://lists.gnupg.org/pipermail/gnupg-devel/2011-November/026308.html
+            cmd = ["gpgconf", "--list-options", "gpg"]
+            output = subprocess.run(cmd, capture_output=True, check=True, text=True).stdout
+            for line in output.splitlines():
+                fields = line.split(":")
+                if fields[0] == "default-key":
+                    key = fields[9][1:]
+                    if len(key) != 0:
+                        return KeyId(key)
+                    break
+            # Fall back to getting first public key listed
+            cmd = ["gpg", "-k", "--with-colons"]
+            output = subprocess.run(cmd, capture_output=True, check=True, text=True).stdout
+            for line in output.splitlines():
+                fields = line.split(":")
+                if fields[0] == "pub":
+                    key = fields[4][-8:]
+                    if len(key) != 0:
+                        return KeyId(key)
+                    break
+            # No suitable candidate found
+            return None
+        except subprocess.CalledProcessError as exc:
+            raise ValueError(f'Failure occured trying to find a key: {exc.stderr.decode("utf-8")}') from exc

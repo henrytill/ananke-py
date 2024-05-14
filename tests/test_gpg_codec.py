@@ -93,6 +93,12 @@ class TestGpgCodec(unittest.TestCase):
         codec.key_id = KeyId("new_key_id")
         self.assertEqual(codec.key_id, KeyId("new_key_id"))
 
+    def test_suggest_key(self) -> None:
+        """Tests the suggest_key method."""
+        expected = self.key_id
+        actual = self.codec.suggest_key()
+        self.assertEqual(expected, actual)
+
 
 if __name__ == "__main__":
     unittest.main()
