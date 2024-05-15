@@ -202,6 +202,15 @@ class ConfigBuilder:
         self.key_id = key_id
         self.allow_multiple_keys = allow_multiple_keys
 
+    @property
+    def config_file(self) -> Optional[Path]:
+        """Returns the path to a possible configuration file, if one can be determined.
+
+        Returns:
+            The path to the configuration file.
+        """
+        return (self.config_dir / "ananke.ini") if self.config_dir else None
+
     def with_env(self, env: Mapping[str, str]) -> Self:
         """Updates attributes from environment variables.
 
@@ -335,6 +344,21 @@ class ConfigBuilder:
 
         # Return the configuration
         return config
+
+    def ini(self) -> str:
+        """Returns the given configuration formatted as the contents of an ini file.
+
+        Returns:
+            The ini-formatted string.
+        """
+        return f"""\
+[data]
+backend={self.backend}
+dir={self.data_dir}
+[gpg]
+key_id={self.key_id}
+allow_multiple_keys={str(self.allow_multiple_keys).lower()}
+"""
 
 
 def _get_config_dir(os_family: OsFamily, env: Mapping[str, str]) -> Path:

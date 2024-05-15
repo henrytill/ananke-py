@@ -8,8 +8,9 @@ from typing import Mapping, Sequence, Tuple
 
 from . import data, version
 from .application import Application, JsonApplication, SqliteApplication
+from .codec import GpgCodec
 from .config import Backend, Config, ConfigBuilder, OsFamily
-from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, Identity, Plaintext, SchemaVersion
+from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, Identity, KeyId, Plaintext, SchemaVersion
 
 
 def configure(host_os: OsFamily, env: Mapping[str, str]) -> Config:
@@ -225,10 +226,53 @@ def cmd_configure(attrs: Namespace) -> int:
     Returns:
         The exit code of the application.
     """
+    os_family = OsFamily.from_str(os.name)
+    env = os.environ
+
+    # Handle list flag
     if attrs.list:
-        os_family = OsFamily.from_str(os.name)
-        cfg = configure(os_family, os.environ)
-        print(cfg.pretty_print())
+        config = configure(os_family, env)
+        print(config.pretty_print())
+        return 0
+
+    # Build a partial config to check existence of config file
+    builder = ConfigBuilder().with_defaults(os_family, env).with_env(env)
+    maybe_config_file = builder.config_file
+    if maybe_config_file and maybe_config_file.exists():
+        print(f"Configuration file exists at: {maybe_config_file}.")
+        print("To view settings, run:\n  ananke configure --list")
+        return 0
+
+    # Prompt for key id
+    key_candidate = GpgCodec.suggest_key()
+    key_candidate_str = f"[{key_candidate}]" if key_candidate else ""
+    key_input = input(f"Enter GPG key id: {key_candidate_str} ")
+    if len(key_input) > 0:
+        key_candidate = KeyId(key_input)
+
+    # Prompt for backend
+    backend_candidate = None
+    while not backend_candidate:
+        print("Available backends:")
+        print("  1. SQLite (default)")
+        print("  2. JSON")
+        backend_input = input("Enter choice: [1] ")
+        try:
+            backend_candidate = Backend(backend_input) if len(backend_input) > 0 else Backend.SQLITE
+        except ValueError:
+            print("Invalid choice, try again.", file=sys.stderr)
+
+    # Create config
+    builder = ConfigBuilder(key_id=key_candidate, backend=backend_candidate).with_defaults(os_family, env).with_env(env)
+    for directory in [builder.config_dir, builder.data_dir]:
+        if directory and not directory.exists():
+            directory.mkdir(mode=0o700, exist_ok=True)
+    if not builder.config_file:
+        print("Configuration failed", file=sys.stderr)
+        return 1
+    with open(builder.config_file, "w", encoding="utf8") as file:
+        file.write(builder.ini())
+    print(f"Configuration file written to: {builder.config_file}")
     return 0
 
 
