@@ -19,7 +19,7 @@
           name = "ananke-py";
           format = "pyproject";
           buildInputs = with pkgs.python3Packages; [ setuptools ];
-          nativeCheckInputs = with pkgs; [ python3Packages.unittestCheckHook python3Packages.cram gnupg ];
+          nativeCheckInputs = with pkgs.python3Packages; [ unittestCheckHook cram pkgs.gnupg ];
           src = builtins.path {
             path = ./.;
             name = "ananke-py-src";
