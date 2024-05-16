@@ -135,7 +135,7 @@ class TestConfigBuilder(unittest.TestCase):
             "XDG_DATA_HOME": str(self.data_dir),
         }
 
-        test_config = ConfigBuilder(key_id=self.key_id).with_defaults(OsFamily.POSIX, env).build()
+        test_config = ConfigBuilder(key_id=self.key_id, backend=Backend.JSON).with_defaults(OsFamily.POSIX, env).build()
 
         self.assertEqual(test_config.data_dir, self.data_dir / "ananke")
         self.assertEqual(test_config.backend, Backend.JSON)
@@ -148,7 +148,7 @@ class TestConfigBuilder(unittest.TestCase):
             "LOCALAPPDATA": str(self.data_dir),
         }
 
-        test_config = ConfigBuilder(key_id=self.key_id).with_defaults(OsFamily.NT, env).build()
+        test_config = ConfigBuilder(key_id=self.key_id, backend=Backend.JSON).with_defaults(OsFamily.NT, env).build()
 
         self.assertEqual(test_config.data_dir, self.data_dir / "ananke")
         self.assertEqual(test_config.backend, Backend.JSON)

@@ -243,27 +243,31 @@ def cmd_configure(attrs: Namespace) -> int:
         print("To view settings, run:\n  ananke configure --list")
         return 0
 
-    # Prompt for key id
-    key_candidate = GpgCodec.suggest_key()
-    key_candidate_str = f"[{key_candidate}]" if key_candidate else ""
-    key_input = input(f"Enter GPG key id: {key_candidate_str} ")
-    if len(key_input) > 0:
-        key_candidate = KeyId(key_input)
+    if builder.key_id is None:
+        # Prompt for key id
+        key_candidate = GpgCodec.suggest_key()
+        key_candidate_str = f"[{key_candidate}]" if key_candidate else ""
+        key_input = input(f"Enter GPG key id: {key_candidate_str} ")
+        if len(key_input) > 0:
+            key_candidate = KeyId(key_input)
+        builder.key_id = key_candidate
 
-    # Prompt for backend
-    backend_candidate = None
-    while not backend_candidate:
-        print("Available backends:")
-        print("  1. SQLite (default)")
-        print("  2. JSON")
-        backend_input = input("Enter choice: [1] ")
-        try:
-            backend_candidate = Backend(backend_input) if len(backend_input) > 0 else Backend.SQLITE
-        except ValueError:
-            print("Invalid choice, try again.", file=sys.stderr)
+    if builder.backend is None:
+        # Prompt for backend
+        backend_candidate = None
+        while not backend_candidate:
+            default_backend = Backend.default()
+            print("Available backends:")
+            for backend in Backend:
+                print(f"  {backend.value}: {backend}")
+            backend_input = input(f"Enter choice: [{default_backend.value}] ")
+            try:
+                backend_candidate = Backend(backend_input) if len(backend_input) > 0 else default_backend
+            except ValueError:
+                print("Invalid choice, try again.", file=sys.stderr)
+        builder.backend = backend_candidate
 
-    # Create config
-    builder = ConfigBuilder(key_id=key_candidate, backend=backend_candidate).with_defaults(os_family, env).with_env(env)
+    # Create config file
     for directory in [builder.config_dir, builder.data_dir]:
         if directory and not directory.exists():
             directory.mkdir(mode=0o700, exist_ok=True)

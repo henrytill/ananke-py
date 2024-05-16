@@ -97,6 +97,10 @@ class Backend(Enum):
             case _:
                 raise ValueError(f"Invalid Backend string: {backend_str}")
 
+    @staticmethod
+    def default() -> "Backend":
+        return Backend.JSON
+
     def __str__(self) -> str:
         match self:
             case Backend.SQLITE:
@@ -303,9 +307,6 @@ class ConfigBuilder:
 
         if self.data_dir is None:
             self.data_dir = _get_data_dir(os_family, env)
-
-        if self.backend is None:
-            self.backend = Backend.JSON
 
         if self.allow_multiple_keys is None:
             self.allow_multiple_keys = False
