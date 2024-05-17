@@ -235,8 +235,10 @@ def cmd_configure(attrs: Namespace) -> int:
         print(config.pretty_print())
         return 0
 
-    # Build a partial config to check existence of config file
+    # Create object to carry hold config
     builder = ConfigBuilder().with_defaults(os_family, env).with_env(env)
+
+    # Check existence of config file
     maybe_config_file = builder.config_file
     if maybe_config_file and maybe_config_file.exists():
         print(f"Configuration file exists at: {maybe_config_file}.")
@@ -255,11 +257,14 @@ def cmd_configure(attrs: Namespace) -> int:
     if builder.backend is None:
         # Prompt for backend
         backend_candidate = None
+        default_backend = Backend.default()
         while not backend_candidate:
-            default_backend = Backend.default()
             print("Available backends:")
             for backend in Backend:
-                print(f"  {backend.value}: {backend}")
+                if backend == default_backend:
+                    print(f"  {backend.value}: {backend} (default)")
+                else:
+                    print(f"  {backend.value}: {backend}")
             backend_input = input(f"Enter choice: [{default_backend.value}] ")
             try:
                 backend_candidate = Backend(backend_input) if len(backend_input) > 0 else default_backend
@@ -267,15 +272,17 @@ def cmd_configure(attrs: Namespace) -> int:
                 print("Invalid choice, try again.", file=sys.stderr)
         builder.backend = backend_candidate
 
-    # Create config file
+    # Create config and data dirs
     for directory in [builder.config_dir, builder.data_dir]:
-        if directory and not directory.exists():
+        assert directory is not None
+        if not directory.exists():
             directory.mkdir(mode=0o700, exist_ok=True)
-    if not builder.config_file:
-        print("Configuration failed", file=sys.stderr)
-        return 1
+
+    # Write config file
+    assert builder.config_file is not None
     with open(builder.config_file, "w", encoding="utf8") as file:
         file.write(builder.ini())
+
     print(f"Configuration file written to: {builder.config_file}")
     return 0
 
