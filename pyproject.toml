@@ -7,6 +7,7 @@ name = "ananke"
 dynamic = ["version"]
 description = ""
 authors = [{ name = "Henry Till", email = "henrytill@gmail.com" }]
+license = {file = "COPYING"}
 readme = "README.md"
 requires-python = ">=3.11"
 
