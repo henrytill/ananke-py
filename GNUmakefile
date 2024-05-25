@@ -102,6 +102,8 @@ clean:
 	rm -rf $(VENV)
 	rm -rf dist
 	rm -rf *.egg-info
+	rm -rf .mypy_cache
+	rm -rf build
 	rm -f .coverage
 	rm -f coverage.xml
 	find . -type d -name '__pycache__' -exec rm -r {} +
