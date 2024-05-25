@@ -25,7 +25,7 @@ test = ["coverage>=6.5.0", "cram>=0.7"]
 ananke-py = "ananke.__main__:main"
 
 [tool.setuptools]
-packages = ["ananke", "ananke.application", "ananke.data"]
+packages = ["ananke", "ananke.application", "ananke.codec", "ananke.data"]
 
 [tool.setuptools.dynamic]
 version = { attr = "ananke.version.__version__" }
