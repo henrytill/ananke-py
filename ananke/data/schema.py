@@ -1,9 +1,7 @@
 """Schema management."""
 
 from pathlib import Path
-from typing import Callable, Optional, Self
-
-from .. import io
+from typing import Self
 
 
 class SchemaVersion:
@@ -53,11 +51,7 @@ class SchemaVersion:
 CURRENT_SCHEMA_VERSION = SchemaVersion(3)
 
 
-def get_schema_version(
-    schema_file: Path,
-    reader: Callable[[Path], Optional[str]] = io.file_reader,
-    writer: Callable[[Path, str], None] = io.file_writer,
-) -> SchemaVersion:
+def get_schema_version(schema_file: Path) -> SchemaVersion:
     """Read the schema version from a file.
 
     If the file does not exist, write the current schema version to the file.
@@ -70,8 +64,8 @@ def get_schema_version(
     Returns:
         The schema version.
     """
-    maybe_schema_version_str = reader(schema_file)
-    if maybe_schema_version_str is None:
-        writer(schema_file, str(CURRENT_SCHEMA_VERSION))
+    if not schema_file.exists():
+        schema_file.write_text(str(CURRENT_SCHEMA_VERSION), encoding="utf-8")
         return CURRENT_SCHEMA_VERSION
-    return SchemaVersion.from_str(maybe_schema_version_str)
+    schema_version_str = schema_file.read_text(encoding="utf-8")
+    return SchemaVersion.from_str(schema_version_str)

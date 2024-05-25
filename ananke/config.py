@@ -6,7 +6,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Callable, Mapping, Optional, Self
 
-from . import io
 from .data import KeyId
 
 
@@ -27,6 +26,18 @@ def strtobool(bool_str: str) -> bool:
     if bool_str.lower() in {"false", "no", "off", "0"}:
         return False
     raise ValueError(f"Invalid boolean string: {bool_str}")
+
+
+def _file_reader(path: Path) -> Optional[str]:
+    """Reads a file into a string.
+
+    Args:
+        path: The path to the file to read.
+
+    Returns:
+        The contents of the file or None if the file does not exist.
+    """
+    return path.read_text(encoding="utf-8") if path.exists() else None
 
 
 # pylint: disable=invalid-name
@@ -249,7 +260,7 @@ class ConfigBuilder:
 
         return self
 
-    def with_config(self, reader: Callable[[Path], Optional[str]] = io.file_reader) -> Self:
+    def with_config(self, reader: Callable[[Path], Optional[str]] = _file_reader) -> Self:
         """Updates attributes from the string representation of a configuration file.
 
         Args:

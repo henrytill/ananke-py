@@ -2,9 +2,9 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Optional, Tuple, TypeAlias, cast
+from typing import Any, Optional, Tuple, TypeAlias, cast
 
-from .. import data, io
+from .. import data
 from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext
 
 Target: TypeAlias = EntryId | Description
@@ -141,11 +141,11 @@ def target_matches(target: Target, entry: Entry) -> bool:
     return target in entry.description
 
 
-def read(path: Path, reader: Callable[[Path], Optional[str]] = io.file_reader) -> list[Entry]:
+def read(path: Path) -> list[Entry]:
     """Reads entries from a JSON file"""
-    json_data = reader(path)
-    if json_data is None:
+    if not path.exists():
         raise FileNotFoundError(f"File '{path}' does not exist")
+    json_data = path.read_text(encoding="utf-8")
     parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
     if not isinstance(parsed, list):
         raise TypeError("Expected a list")
@@ -157,9 +157,9 @@ def read(path: Path, reader: Callable[[Path], Optional[str]] = io.file_reader) -
     return ret
 
 
-def write(path: Path, writes: list[Entry], writer: Callable[[Path, str], None] = io.file_writer) -> None:
+def write(path: Path, writes: list[Entry]) -> None:
     """Writes entries to a JSON file"""
     writes.sort(key=lambda entry: entry.timestamp)
     dicts: list[dict[str, str]] = [data.remap_keys_snake_to_camel(entry.to_dict()) for entry in writes]
     json_str = json.dumps(dicts, indent=4)
-    writer(path, json_str)
+    path.write_text(json_str, encoding="utf-8")
