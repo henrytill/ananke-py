@@ -109,29 +109,17 @@ class Config:
 
     @property
     def config_file(self) -> Path:
-        """Returns the path to the configuration file.
-
-        Returns:
-            The path to the configuration file.
-        """
+        """Returns the path to the configuration file."""
         return self.config_dir / "ananke.ini"
 
     @property
     def db_dir(self) -> Path:
-        """Returns the path to db directory.
-
-        Returns:
-            The path to the db directory.
-        """
+        """Returns the path to db directory."""
         return self.data_dir / "db"
 
     @property
     def data_file(self) -> Path:
-        """Returns the path to the data file.
-
-        Returns:
-            The path to the data file.
-        """
+        """Returns the path to the data file."""
         match self.backend:
             case Backend.JSON:
                 return self.db_dir / "data.json"
@@ -140,19 +128,11 @@ class Config:
 
     @property
     def schema_file(self) -> Path:
-        """Returns the path to the schema file.
-
-        Returns:
-            The path to the schema file.
-        """
+        """Returns the path to the schema file."""
         return self.data_dir / "db" / "schema"
 
     def pretty_print(self) -> str:
-        """Returns a pretty-printed string.
-
-        Returns:
-            A pretty-printed string.
-        """
+        """Returns a pretty-printed string."""
         ret = f"""\
 config_dir = {self.config_dir}
 data_dir = {self.data_dir}
@@ -195,11 +175,7 @@ class ConfigBuilder:
 
     @property
     def config_file(self) -> Optional[Path]:
-        """Returns the path to a possible configuration file, if one can be determined.
-
-        Returns:
-            The path to the configuration file.
-        """
+        """Returns the path to a possible configuration file, if one can be determined."""
         return (self.config_dir / "ananke.ini") if self.config_dir else None
 
     def with_env(self, env: Mapping[str, str]) -> Self:
@@ -332,11 +308,7 @@ class ConfigBuilder:
         return config
 
     def ini(self) -> str:
-        """Returns the given configuration formatted as the contents of an ini file.
-
-        Returns:
-            The ini-formatted string.
-        """
+        """Returns the given configuration formatted as the contents of an ini file."""
         return f"""\
 [data]
 backend={self.backend}
