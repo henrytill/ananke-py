@@ -9,37 +9,6 @@ from typing import Callable, Mapping, Optional, Self
 from .data import KeyId
 
 
-def strtobool(bool_str: str) -> bool:
-    """Converts a string to a boolean.
-
-    Args:
-        bool_str: The string to convert.
-
-    Returns:
-        The converted boolean.
-
-    Raises:
-        ValueError: If the string is not a valid boolean.
-    """
-    if bool_str.lower() in {"true", "yes", "on", "1"}:
-        return True
-    if bool_str.lower() in {"false", "no", "off", "0"}:
-        return False
-    raise ValueError(f"Invalid boolean string: {bool_str}")
-
-
-def _file_reader(path: Path) -> Optional[str]:
-    """Reads a file into a string.
-
-    Args:
-        path: The path to the file to read.
-
-    Returns:
-        The contents of the file or None if the file does not exist.
-    """
-    return path.read_text(encoding="utf-8") if path.exists() else None
-
-
 # pylint: disable=invalid-name
 @dataclass(frozen=True)
 class Env:
@@ -117,6 +86,7 @@ class Backend(Enum):
 
     @staticmethod
     def default() -> "Backend":
+        """Returns default Backend."""
         return Backend.JSON
 
 
@@ -193,6 +163,10 @@ allow_multiple_keys = {self.allow_multiple_keys}\
         return ret
 
 
+def _file_reader(path: Path) -> Optional[str]:
+    return path.read_text(encoding="utf-8") if path.exists() else None
+
+
 class ConfigBuilder:
     """A configuration builder."""
 
@@ -254,7 +228,7 @@ class ConfigBuilder:
         allow_multiple_keys = env.get(Env.ALLOW_MULTIPLE_KEYS)
         if allow_multiple_keys is not None:
             try:
-                self.allow_multiple_keys = bool(strtobool(allow_multiple_keys))
+                self.allow_multiple_keys = bool(_strtobool(allow_multiple_keys))
             except ValueError:
                 self.allow_multiple_keys = False
 
@@ -411,3 +385,11 @@ def _get_data_dir(os_family: OsFamily, env: Mapping[str, str]) -> Path:
     xdg_data_home = env.get("XDG_DATA_HOME")
     data_dir = Path(xdg_data_home) if xdg_data_home else Path.home() / ".local" / "share"
     return data_dir / "ananke"
+
+
+def _strtobool(bool_str: str) -> bool:
+    if bool_str.lower() in {"true", "yes", "on", "1"}:
+        return True
+    if bool_str.lower() in {"false", "no", "off", "0"}:
+        return False
+    raise ValueError(f"Invalid boolean string: {bool_str}")
