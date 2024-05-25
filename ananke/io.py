@@ -13,11 +13,7 @@ def file_reader(path: Path) -> Optional[str]:
     Returns:
         The contents of the file or None if the file does not exist.
     """
-    if not path.exists():
-        return None
-    with open(path, encoding="utf-8") as file:
-        ret = file.read()
-        return ret
+    return path.read_text(encoding="utf-8") if path.exists() else None
 
 
 def file_writer(path: Path, contents: str) -> None:
@@ -27,5 +23,4 @@ def file_writer(path: Path, contents: str) -> None:
         path: The path to the file to write.
         contents: The contents to write to the file.
     """
-    with open(path, "w", encoding="utf-8") as file:
-        file.write(contents)
+    path.write_text(contents, encoding="utf-8")
