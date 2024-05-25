@@ -163,8 +163,10 @@ allow_multiple_keys = {self.allow_multiple_keys}\
         return ret
 
 
-def _file_reader(path: Path) -> Optional[str]:
-    return path.read_text(encoding="utf-8") if path.exists() else None
+def _file_reader(path: Path) -> str:
+    if not path.exists():
+        raise FileNotFoundError(f"File '{path}' does not exist")
+    return path.read_text(encoding="utf-8")
 
 
 class ConfigBuilder:
@@ -234,7 +236,7 @@ class ConfigBuilder:
 
         return self
 
-    def with_config(self, reader: Callable[[Path], Optional[str]] = _file_reader) -> Self:
+    def with_config(self, reader: Callable[[Path], str] = _file_reader) -> Self:
         """Updates attributes from the string representation of a configuration file.
 
         Args:
@@ -248,12 +250,10 @@ class ConfigBuilder:
             raise ValueError("config_dir is not set")
 
         config_file = self.config_dir / "ananke.ini"
-        maybe_config_str = reader(config_file)
-        if maybe_config_str is None:
-            raise ValueError(f"Configuration file does not exist: {config_file}")
+        config_str = reader(config_file)
 
         config_parser = configparser.ConfigParser()
-        config_parser.read_string(maybe_config_str)
+        config_parser.read_string(config_str)
 
         data_dir = config_parser.get("data", "dir", fallback=None)
         if data_dir is not None:
