@@ -332,7 +332,7 @@ def main(args: Sequence[str] = sys.argv[1:]) -> int:
     parser_export.add_argument("file", type=Path, help="file to export to")
     parser_export.set_defaults(func=cmd_export)
 
-    parser_configure = subparsers.add_parser("configure", help="create, modify, and list configuration variables")
+    parser_configure = subparsers.add_parser("configure", help="create, modify, and list configuration")
     parser_configure.add_argument("-l", "--list", action="store_true", help="list the configuration")
     parser_configure.set_defaults(func=cmd_configure)
 

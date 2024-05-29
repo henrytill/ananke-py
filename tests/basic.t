@@ -19,7 +19,7 @@ Print usage string
       remove              remove an entry
       import              import entries from JSON file
       export              export entries to JSON file
-      configure           create, modify, and list configuration variables
+      configure           create, modify, and list configuration
   
   options:
     -h, --help            show this help message and exit
