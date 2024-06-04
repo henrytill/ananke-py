@@ -12,10 +12,8 @@
 
   outputs = { self, nixpkgs, flake-utils, ... }:
     let
-      makeAnanke = system:
-        { }:
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in pkgs.python3Packages.buildPythonApplication {
+      makeAnanke = pkgs:
+        pkgs.python3Packages.buildPythonApplication {
           name = "ananke-py";
           format = "pyproject";
           buildInputs = with pkgs.python3Packages; [ setuptools ];
@@ -27,9 +25,9 @@
           preConfigure = "make GIT_REF=${self.shortRev or self.dirtyShortRev} generate";
         };
     in flake-utils.lib.eachDefaultSystem (system:
-      let ananke = makeAnanke system;
+      let pkgs = nixpkgs.legacyPackages.${system};
       in {
-        packages.ananke = ananke { };
+        packages.ananke = makeAnanke pkgs;
         packages.default = self.packages.${system}.ananke;
       });
 }
