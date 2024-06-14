@@ -31,7 +31,8 @@ Import example data
   $ python3 -m ananke import "${EXAMPLE_DIR}/db/data.json"
 
   $ python3 -m ananke lookup foomail
-  ASecretPassword
+  https://www.foomail.com quux ASecretPassword
+  https://www.foomail.com altquux ThisIsMyAltPassword
 
   $ python3 -m ananke lookup bazbank
   AnotherSecretPassword
@@ -43,6 +44,7 @@ Import example data
   https://www.foomail.com quux ASecretPassword
   https://www.bazbank.com quux AnotherSecretPassword
   https://www.barphone.com quux YetAnotherSecretPassword
+  https://www.foomail.com altquux ThisIsMyAltPassword
 
 Lookup non-existent entry and add it
 

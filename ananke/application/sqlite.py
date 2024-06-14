@@ -184,7 +184,7 @@ def _create_query(query: Query) -> Tuple[str, dict[str, str]]:
         parameters["description"] = f"%{query.description}%"
     if query.identity:
         wheres += ["identity LIKE :identity"]
-        parameters["identity"] = query.identity
+        parameters["identity"] = f"%{query.identity}%"
     if query.meta:
         wheres += ["meta LIKE :meta"]
         parameters["meta"] = query.meta

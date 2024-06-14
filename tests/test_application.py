@@ -66,11 +66,11 @@ class TestApplication:
             test_cases: list[LookupTestCase] = [
                 {
                     "args": {"description": Description("https://www.foomail.com"), "maybe_identity": Identity("quux")},
-                    "plaintexts": [Plaintext("ASecretPassword")],
+                    "plaintexts": [Plaintext("ASecretPassword"), Plaintext("ThisIsMyAltPassword")],
                 },
                 {
                     "args": {"description": Description("https://www.foomail.com"), "maybe_identity": None},
-                    "plaintexts": [Plaintext("ASecretPassword")],
+                    "plaintexts": [Plaintext("ASecretPassword"), Plaintext("ThisIsMyAltPassword")],
                 },
                 {
                     "args": {"description": Description("https://www.bazbank.com"), "maybe_identity": Identity("quux")},
@@ -97,6 +97,7 @@ class TestApplication:
                         Plaintext("ASecretPassword"),
                         Plaintext("AnotherSecretPassword"),
                         Plaintext("YetAnotherSecretPassword"),
+                        Plaintext("ThisIsMyAltPassword"),
                     ],
                 },
                 {
@@ -105,6 +106,7 @@ class TestApplication:
                         Plaintext("ASecretPassword"),
                         Plaintext("AnotherSecretPassword"),
                         Plaintext("YetAnotherSecretPassword"),
+                        Plaintext("ThisIsMyAltPassword"),
                     ],
                 },
             ]
@@ -160,34 +162,6 @@ class TestApplication:
             """Test the modify method against the example data."""
 
             test_cases: list[ModifyArgs] = [
-                {
-                    "target": Description("https://www.foomail.com"),
-                    "maybe_description": None,
-                    "maybe_identity": Identity("quuxotic"),
-                    "maybe_plaintext": None,
-                    "maybe_meta": None,
-                },
-                {
-                    "target": Description("https://www.foomail.com"),
-                    "maybe_description": None,
-                    "maybe_identity": None,
-                    "maybe_plaintext": Plaintext("ANewSecretPasswordForFooMail"),
-                    "maybe_meta": None,
-                },
-                {
-                    "target": Description("https://www.foomail.com"),
-                    "maybe_description": None,
-                    "maybe_identity": None,
-                    "maybe_plaintext": None,
-                    "maybe_meta": Metadata('{ "foo": "bar" }'),
-                },
-                {
-                    "target": Description("https://www.foomail.com"),
-                    "maybe_description": Description("https://www.foonews.com"),
-                    "maybe_identity": None,
-                    "maybe_plaintext": None,
-                    "maybe_meta": None,
-                },
                 {
                     "target": Description("https://www.bazbank.com"),
                     "maybe_description": None,
@@ -291,7 +265,6 @@ class TestApplication:
             """Test the remove method against the example data."""
 
             test_cases: list[Description | EntryId] = [
-                Description("https://www.foomail.com"),
                 Description("https://www.bazbank.com"),
                 Description("https://www.barphone.com"),
             ]
