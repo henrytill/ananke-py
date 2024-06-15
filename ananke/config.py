@@ -27,8 +27,8 @@ class OsFamily(Enum):
     POSIX = 1
     NT = 2
 
-    @staticmethod
-    def from_str(os_family_str: str) -> "OsFamily":
+    @classmethod
+    def from_str(cls, os_family_str: str) -> "OsFamily":
         """Creates an OsFamily from a string.
 
         Args:
@@ -39,9 +39,9 @@ class OsFamily(Enum):
         """
         match os_family_str:
             case "posix":
-                return OsFamily.POSIX
+                return cls.POSIX
             case "nt":
-                return OsFamily.NT
+                return cls.NT
             case _:
                 raise ValueError(f"Invalid OsFamily string: {os_family_str}")
 
@@ -59,8 +59,8 @@ class Backend(Enum):
     SQLITE = 1
     JSON = 2
 
-    @staticmethod
-    def from_str(backend_str: str) -> "Backend":
+    @classmethod
+    def from_str(cls, backend_str: str) -> "Backend":
         """Creates a Backend from a string.
 
         Args:
@@ -71,9 +71,9 @@ class Backend(Enum):
         """
         match backend_str:
             case "sqlite":
-                return Backend.SQLITE
+                return cls.SQLITE
             case "json":
-                return Backend.JSON
+                return cls.JSON
             case _:
                 raise ValueError(f"Invalid Backend string: {backend_str}")
 
@@ -84,10 +84,10 @@ class Backend(Enum):
             case Backend.JSON:
                 return "json"
 
-    @staticmethod
-    def default() -> "Backend":
+    @classmethod
+    def default(cls) -> "Backend":
         """Returns default Backend."""
-        return Backend.JSON
+        return cls.JSON
 
 
 @dataclass(frozen=True)
