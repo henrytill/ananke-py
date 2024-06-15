@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS entries (
-    id TEXT UNIQUE NOT NULL,
+    id TEXT PRIMARY KEY NOT NULL,
     keyid TEXT NOT NULL,
     timestamp TEXT NOT NULL,
     description TEXT NOT NULL,
