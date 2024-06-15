@@ -216,7 +216,7 @@ class TestApplication:
                     self.assertEqual(1, len(updated_results))
                     updated_entry, updated_plaintext = updated_results[0]
 
-                    self.assertNotEqual(entry.entry_id, updated_entry.entry_id, "entry_id should change")
+                    self.assertEqual(entry.entry_id, updated_entry.entry_id, "entry_id should not change")
                     self.assertNotEqual(entry.timestamp, updated_entry.timestamp, "timestamp should change")
 
                     self.assertEqual(self.config.key_id, updated_entry.key_id, "key_id should not change")

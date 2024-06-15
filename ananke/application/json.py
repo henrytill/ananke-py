@@ -35,7 +35,7 @@ class JsonApplication(Application):
         maybe_meta: Optional[Metadata] = None,
     ) -> None:
         timestamp = Timestamp.now()
-        entry_id = EntryId.generate(self.codec.key_id, timestamp, description, maybe_identity)
+        entry_id = EntryId.generate()
         ciphertext = self.codec.encode(plaintext)
         entry = Entry(
             entry_id=entry_id,
@@ -81,7 +81,6 @@ class JsonApplication(Application):
         idx = idxs[0]
 
         entry = self.entries.pop(idx)
-        entry.timestamp = Timestamp.now()
         if maybe_description is not None:
             entry.description = maybe_description
         if maybe_plaintext is not None:
@@ -90,7 +89,7 @@ class JsonApplication(Application):
             entry.identity = maybe_identity
         if maybe_meta is not None:
             entry.meta = maybe_meta
-        entry.normalize()
+        entry.update()
 
         self.entries.append(entry)
         common.write(self.config.data_file, self.entries)

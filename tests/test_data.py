@@ -3,11 +3,9 @@
 import string
 import unittest
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import List, LiteralString, TypedDict
 
 from ananke import data
-from ananke.application import common
 from ananke.data import Ciphertext, Description, Entry, EntryId, Identity, KeyId, Plaintext, Timestamp
 from tests import RandomArgs
 
@@ -156,7 +154,7 @@ class TestEntry(unittest.TestCase):
         """An Entry can be created from a dict."""
         entry_dict = {
             "timestamp": "2023-06-12T08:12:08.528402975Z",
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "id": "88a8b87f-01b1-4965-8362-6572951a0d2d",
             "key_id": "371C136C",
             "description": "https://www.foomail.com",
             "identity": "quux",
@@ -186,7 +184,7 @@ class TestEntry(unittest.TestCase):
         """An Entry cannot be created from an ill-typed dict."""
         entry_dict = {
             "timestamp": 0,
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "id": "88a8b87f-01b1-4965-8362-6572951a0d2d",
             "key_id": "371C136C",
             "description": "https://www.foomail.com",
             "identity": "quux",
@@ -200,7 +198,7 @@ class TestEntry(unittest.TestCase):
         """An Entry cannot be created from an ill-typed dict."""
         entry_dict = {
             "timestamp": "2023-06-12T08:12:08.528402975Z",
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "id": "88a8b87f-01b1-4965-8362-6572951a0d2d",
             "key_id": "371C136C",
             "description": "https://www.foomail.com",
             "identity": "quux",
@@ -215,7 +213,7 @@ class TestEntry(unittest.TestCase):
         """An Entry cannot be created from a dict with an invalid timestamp."""
         entry_dict = {
             "timestamp": "2023-06-12T",
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "id": "88a8b87f-01b1-4965-8362-6572951a0d2d",
             "key_id": "371C136C",
             "description": "https://www.foomail.com",
             "identity": "quux",
@@ -231,7 +229,7 @@ class TestEntry(unittest.TestCase):
         """An Entry cannot be created from a dict with an invalid ciphertext."""
         entry_dict = {
             "timestamp": "2023-06-12T08:12:08.528402975Z",
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "id": "88a8b87f-01b1-4965-8362-6572951a0d2d",
             "key_id": "371C136C",
             "description": "https://www.foomail.com",
             "identity": "quux",
@@ -247,7 +245,7 @@ class TestEntry(unittest.TestCase):
         """An Entry cannot be created from a dict with a missing required key."""
         base_dict = {
             "timestamp": "2023-06-12T08:12:08.528402975Z",
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "id": "88a8b87f-01b1-4965-8362-6572951a0d2d",
             "key_id": "371C136C",
             "description": "https://www.foomail.com",
             "identity": "quux",
@@ -269,7 +267,7 @@ class TestEntry(unittest.TestCase):
         """An Entry can be created from a dict and converted back to a dict."""
         entry_dict = {
             "timestamp": "2023-06-12T08:12:08.528402Z",
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "id": "88a8b87f-01b1-4965-8362-6572951a0d2d",
             "key_id": "371C136C",
             "description": "https://www.foomail.com",
             "identity": "quux",
@@ -282,7 +280,7 @@ class TestEntry(unittest.TestCase):
         """Two Entries are unequal if any of their attributes are unequal."""
         entry_dict = {
             "timestamp": "2023-06-12T08:12:08.528402Z",
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "id": "88a8b87f-01b1-4965-8362-6572951a0d2d",
             "key_id": "371C136C",
             "description": "https://www.foomail.com",
             "identity": "quux",
@@ -291,7 +289,7 @@ class TestEntry(unittest.TestCase):
 
         test_cases = {
             "timestamp": "2023-06-12T08:12:08.528401Z",
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295f",
+            "id": "f1e981ac-4d3d-4b1d-8ed5-9dd722ceab6a",
             "key_id": "371C136D",
             "description": "https://www.foomail.net",
             "identity": "qux",
@@ -309,7 +307,7 @@ class TestEntry(unittest.TestCase):
         """An Entry is unequal to a non-Entry."""
         entry_dict = {
             "timestamp": "2023-06-12T08:12:08.528402Z",
-            "id": "f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e",
+            "id": "88a8b87f-01b1-4965-8362-6572951a0d2d",
             "key_id": "371C136C",
             "description": "https://www.foomail.com",
             "identity": "quux",
@@ -356,20 +354,6 @@ class TestKeyConversion(unittest.TestCase):
                 input_dict = test_case["input_dict"]
                 expected_output = test_case["expected_output"]
                 self.assertEqual(expected_output, data.remap_keys(key_map, input_dict))
-
-
-class EntryIdGeneration(unittest.TestCase):
-    """Unit tests for EntryId#generate()"""
-
-    @unittest.skip("We've got id consistency problems across implementations")
-    def test_example_entry_ids(self) -> None:
-        """Checks the entry ids in example data"""
-        file: Path = Path("example") / "db" / "data.json"
-        entries: list[Entry] = common.read(file)
-        for i, entry in enumerate(entries):
-            with self.subTest(i=i):
-                fresh_id = entry.fresh_id()
-                self.assertEqual(entry.entry_id, fresh_id)
 
 
 if __name__ == "__main__":

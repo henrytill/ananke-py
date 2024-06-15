@@ -53,7 +53,7 @@ class SqliteApplication(Application):
         maybe_meta: Optional[Metadata] = None,
     ) -> None:
         timestamp = Timestamp.now()
-        entry_id = EntryId.generate(self.codec.key_id, timestamp, description, maybe_identity)
+        entry_id = EntryId.generate()
         ciphertext = self.codec.encode(plaintext)
         entry = Entry(
             entry_id=entry_id,
@@ -106,7 +106,6 @@ class SqliteApplication(Application):
                 raise ValueError(f"Multiple entries match {target}")
 
             entry: Entry = entries[0]
-            entry.timestamp = Timestamp.now()
             if maybe_description is not None:
                 entry.description = maybe_description
             if maybe_plaintext is not None:
@@ -115,7 +114,7 @@ class SqliteApplication(Application):
                 entry.identity = maybe_identity
             if maybe_meta is not None:
                 entry.meta = maybe_meta
-            entry.normalize()
+            entry.update()
 
             sql, parameters = _create_update(target, entry)
             cursor.execute(sql, parameters)

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS entries (
 
 INSERT INTO entries(id, keyid, timestamp, description, identity, ciphertext)
 VALUES(
-    '4de5e12a13844ff0685b2bd51381c5501ea69b6d',
+    '88a8b87f-01b1-4965-8362-6572951a0d2d',
     '371C136C',
     '2023-06-12T08:13:45.171872642Z',
     'https://www.foomail.com',
@@ -20,7 +20,7 @@ VALUES(
 
 INSERT INTO entries(id, keyid, timestamp, description, identity, ciphertext)
 VALUES(
-    'f06933b9b5d7dafc2ed65e7f6f629e8b72e3295e',
+    'f1e981ac-4d3d-4b1d-8ed5-9dd722ceab6a',
     '371C136C',
     '2023-06-12T08:14:19.928402975Z',
     'https://www.bazbank.com',
@@ -30,7 +30,7 @@ VALUES(
 
 INSERT INTO entries(id, keyid, timestamp, description, identity, ciphertext)
 VALUES(
-    '39d8363eda9253a779c7719997b1a2656af19af7',
+    'ba9d7666-f201-4d78-ae30-300ff236de7f',
     '371C136C',
     '2023-06-12T08:16:30.985240519Z',
     'https://www.barphone.com',
@@ -40,7 +40,7 @@ VALUES(
 
 INSERT INTO entries(id, keyid, timestamp, description, identity, ciphertext)
 VALUES(
-    '749e84d652be5dc7240833fe901b30e89946881d',
+    'ef745ae7-d3ff-4ecd-aa32-0e913f69b030',
     '371C136C',
     '2024-04-29T20:46:16.070012530Z',
     'https://www.foomail.com',

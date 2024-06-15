@@ -2,6 +2,7 @@
 
 import functools
 from typing import Any, Optional, Self, Tuple
+from uuid import UUID
 
 from . import common
 from .common import Ciphertext, Description, EntryId, Identity, KeyId, Metadata, Timestamp
@@ -66,27 +67,14 @@ class Entry:
             and self.meta == other.meta
         )
 
-    def normalize(self) -> Self:
-        """Regenerates the 'entry_id' attribute.
+    def update(self) -> Self:
+        """Updates the timestamp of an 'Entry'.
 
         Returns:
             The 'Entry'
         """
-        self.entry_id = self.fresh_id()
+        self.timestamp = Timestamp.now()
         return self
-
-    def fresh_id(self) -> EntryId:
-        """Generates a fresh 'EntryId'.
-
-        Returns:
-            The fresh 'EntryId'
-        """
-        return EntryId.generate(
-            key_id=self.key_id,
-            timestamp=self.timestamp,
-            description=self.description,
-            maybe_identity=self.identity,
-        )
 
     @classmethod
     def from_dict(cls, data: dict[Any, Any]) -> Self:
@@ -122,7 +110,7 @@ class Entry:
             raise ValueError("Invalid ciphertext format") from err
 
         return cls(
-            entry_id=EntryId(id_str),
+            entry_id=EntryId(UUID(id_str)),
             key_id=KeyId(key_id_str),
             timestamp=timestamp,
             description=Description(description_str),

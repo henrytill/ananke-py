@@ -2,11 +2,12 @@
 
 import base64
 import binascii
-import hashlib
 import secrets
 import string
+import uuid
 from datetime import datetime, timezone
 from typing import Any, NewType, Optional, Self
+from uuid import UUID
 
 KeyId = NewType("KeyId", str)
 """A Cryptographic Key Id."""
@@ -179,10 +180,13 @@ class EntryId:
         value: The entry id.
     """
 
-    value: str
+    value: UUID
 
-    def __init__(self, value: str) -> None:
-        self.value = value
+    def __init__(self, value: UUID | str) -> None:
+        if isinstance(value, UUID):
+            self.value = value
+        else:
+            self.value = UUID(value)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, EntryId):
@@ -195,36 +199,17 @@ class EntryId:
     def __repr__(self) -> str:
         return f"EntryId({self.value!r})"
 
-    def __len__(self) -> int:
-        return self.value.__len__()
-
     def __hash__(self) -> int:
         return self.value.__hash__()
 
     @classmethod
-    def generate(
-        cls,
-        key_id: KeyId,
-        timestamp: Timestamp,
-        description: Description,
-        maybe_identity: Optional[Identity] = None,
-    ) -> Self:
-        """Generates an EntryId from the given values.
-
-        Args:
-            key_id: The cryptographic key id used to encrypt the entry.
-            timestamp: The time the entry was created or updated.
-            description: Description of the entry. Can be a URI or a descriptive name.
-            maybe_identity: Optional identifying value, such as a username.
+    def generate(cls) -> Self:
+        """Generates an EntryId.
 
         Returns:
             The generated EntryId.
         """
-        input_str = f"{key_id}{timestamp.isoformat()}{description}"
-        if maybe_identity:
-            input_str += maybe_identity
-        sha_signature = hashlib.sha1(input_str.encode()).hexdigest()
-        return cls(sha_signature)
+        return cls(uuid.uuid4())
 
 
 def remap_keys(mapping: dict[str, str], data: dict[str, Any]) -> dict[str, Any]:
