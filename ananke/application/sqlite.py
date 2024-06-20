@@ -203,9 +203,6 @@ def _create_update(target: Target, entry: Entry) -> Tuple[str, dict[str, str]]:
 
     sets: list[str] = []
 
-    sets += ["id = :id"]
-    parameters["id"] = str(entry.entry_id)
-
     sets += ["timestamp = :timestamp"]
     parameters["timestamp"] = entry.timestamp.isoformat()
 
