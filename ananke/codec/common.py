@@ -8,7 +8,7 @@ from ..data import Ciphertext, KeyId
 T = TypeVar("T")
 
 
-# pylint: disable=unnecessary-ellipsis
+# pylint: disable=unnecessary-pass
 class Codec(ABC, Generic[T]):
     """The codec protocol."""
 
@@ -36,7 +36,7 @@ class Codec(ABC, Generic[T]):
 
         Raises:
             ValueError: If the object could not be encoded."""
-        ...
+        pass
 
     @abstractmethod
     def decode(self, ciphertext: Ciphertext) -> T:
@@ -51,4 +51,4 @@ class Codec(ABC, Generic[T]):
         Raises:
             ValueError: If the Ciphertext could not be decoded.
         """
-        ...
+        pass
