@@ -97,6 +97,12 @@ class Entry:
         maybe_identity: Optional[str] = common.get_optional(data, "identity", str)
         maybe_meta: Optional[str] = common.get_optional(data, "meta", str)
 
+        # Validate entry id
+        try:
+            uuid = UUID(id_str)
+        except ValueError as err:
+            raise ValueError("Invalid id format") from err
+
         # Validate timestamp
         try:
             timestamp = Timestamp.fromisoformat(timestamp_str)
@@ -110,7 +116,7 @@ class Entry:
             raise ValueError("Invalid ciphertext format") from err
 
         return cls(
-            entry_id=EntryId(UUID(id_str)),
+            entry_id=EntryId(uuid),
             key_id=KeyId(key_id_str),
             timestamp=timestamp,
             description=Description(description_str),
