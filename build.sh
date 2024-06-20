@@ -9,6 +9,7 @@ MYPY=mypy
 VENV=env
 
 USE_VENV=0
+VERBOSE=0
 
 generate() {
     local version="0.1.0"
@@ -20,7 +21,9 @@ generate() {
         version="${version}+${1}"
     fi
 
-    printf "version: %s\n" $version
+    if [ $VERBOSE -eq 1 ]; then
+        printf "version=%s\n" $version
+    fi
 
     cat <<EOF >ananke/version.py
 """This module contains version information."""
@@ -100,10 +103,13 @@ action() {
     exit 0
 }
 
-while getopts "e" name; do
+while getopts "ev" name; do
     case $name in
         e)
             USE_VENV=1
+            ;;
+        v)
+            VERBOSE=1
             ;;
     esac
 done
@@ -113,7 +119,9 @@ shift $(($OPTIND - 1))
 unset name
 unset OPTIND
 
-printf "USE_VENV=%d\n" $USE_VENV
+if [ $VERBOSE -eq 1 ]; then
+    printf "USE_VENV=%d\n" $USE_VENV
+fi
 
 if [ $# -eq 0 ]; then
     action default
