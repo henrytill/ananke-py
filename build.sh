@@ -41,6 +41,7 @@ activate() {
 
 create_env() {
     USE_VENV=1
+    generate
     $PYTHON -m venv $VENV
     activate
     which $PYTHON
