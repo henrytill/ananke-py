@@ -10,14 +10,24 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }:
     let
-      makeAnanke = pkgs:
+      makeAnanke =
+        pkgs:
         pkgs.python3Packages.buildPythonApplication {
           name = "ananke-py";
           format = "pyproject";
           buildInputs = with pkgs.python3Packages; [ setuptools ];
-          nativeCheckInputs = with pkgs.python3Packages; [ cram pkgs.gnupg ];
+          nativeCheckInputs = with pkgs.python3Packages; [
+            cram
+            pkgs.gnupg
+          ];
           src = builtins.path {
             path = ./.;
             name = "ananke-py-src";
@@ -26,10 +36,15 @@
           preConfigure = "./build.sh generate -g ${self.shortRev or self.dirtyShortRev}";
           checkPhase = "./build.sh test";
         };
-    in flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
-      in {
+    in
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
         packages.ananke = makeAnanke pkgs;
         packages.default = self.packages.${system}.ananke;
-      });
+      }
+    );
 }
