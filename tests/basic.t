@@ -68,8 +68,8 @@ Modify
 Configure
 
   $ python3 -m ananke configure -l
-  config_dir = /tmp/.+ (re)
-  data_dir = /tmp/.+ (re)
+  config_dir = .+ (re)
+  data_dir = .+ (re)
   backend = json
   key_id = 371C136C
   allow_multiple_keys = False

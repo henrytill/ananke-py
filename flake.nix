@@ -17,12 +17,14 @@
           name = "ananke-py";
           format = "pyproject";
           buildInputs = with pkgs.python3Packages; [ setuptools ];
-          nativeCheckInputs = with pkgs.python3Packages; [ unittestCheckHook cram pkgs.gnupg ];
+          nativeCheckInputs = with pkgs.python3Packages; [ cram pkgs.gnupg ];
           src = builtins.path {
             path = ./.;
             name = "ananke-py-src";
           };
-          preConfigure = "make GIT_REF=${self.shortRev or self.dirtyShortRev} generate";
+          patchPhase = "patchShebangs build.sh";
+          preConfigure = "./build.sh generate -g ${self.shortRev or self.dirtyShortRev}";
+          checkPhase = "./build.sh test";
         };
     in flake-utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages.${system};

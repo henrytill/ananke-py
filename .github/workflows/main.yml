@@ -18,16 +18,10 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
-      - name: configure
-        run: |
-          cat <<EOF >config.mk
-          BUILD_ENV = venv
-          EOF
-          cat config.mk
-      - run: make generate
-      - run: make venv
-      - run: make check
-      - run: make test
+      - run: ./build.sh generate
+      - run: ./build.sh create-env
+      - run: ./build.sh -e check
+      - run: ./build.sh -e test
   linux-flake:
     runs-on: ubuntu-latest
     permissions:
