@@ -17,7 +17,7 @@ generate() {
     if [ -n "$(command -v git)" -a -z "${1+x}" ]; then
         local git_ref=$(git rev-parse --short HEAD)
         version="${version}+${git_ref}"
-    elif [ -n "$1" ]; then
+    elif [ -n "${1+x}" ]; then
         version="${version}+${1}"
     fi
 
