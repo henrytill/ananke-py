@@ -48,7 +48,7 @@ class SchemaVersion:
         return cls(int(version))
 
 
-CURRENT_SCHEMA_VERSION = SchemaVersion(3)
+CURRENT_SCHEMA_VERSION = SchemaVersion(4)
 
 
 def get_schema_version(schema_file: Path) -> SchemaVersion:
