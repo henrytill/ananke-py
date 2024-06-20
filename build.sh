@@ -13,7 +13,7 @@ USE_VENV=0
 generate() {
     local version="0.1.0"
 
-    if [ -n "$(command -v git)" ] && [ -z "$1" ]; then
+    if [ -n "$(command -v git)" -a -z "${1+x}" ]; then
         local git_ref=$(git rev-parse --short HEAD)
         version="${version}+${git_ref}"
     elif [ -n "$1" ]; then
@@ -81,7 +81,7 @@ action() {
                         ;;
                 esac
             done
-            generate "$git_ref"
+            generate $git_ref
             ;;
         create-env)
             create_env
