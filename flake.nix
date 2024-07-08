@@ -22,8 +22,8 @@
         pkgs:
         pkgs.python3Packages.buildPythonApplication {
           name = "ananke-py";
-          format = "pyproject";
-          buildInputs = with pkgs.python3Packages; [ setuptools ];
+          pyproject = true;
+          build-system = with pkgs.python3Packages; [ setuptools ];
           nativeCheckInputs = with pkgs.python3Packages; [
             cram
             pkgs.gnupg
