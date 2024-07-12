@@ -2,7 +2,7 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, Tuple, TypeAlias, cast
+from typing import Any, Dict, List, Optional, Tuple, TypeAlias, cast
 
 from .. import data
 from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext
@@ -45,7 +45,7 @@ class Application(ABC):
         self,
         description: Description,
         maybe_identity: Optional[Identity] = None,
-    ) -> list[Tuple[Entry, Plaintext]]:
+    ) -> List[Tuple[Entry, Plaintext]]:
         """Lookup the plaintexts of the matching entries.
 
         Searches for entries that match the provided description and identity,
@@ -141,7 +141,7 @@ def target_matches(target: Target, entry: Entry) -> bool:
     return target in entry.description
 
 
-def read(path: Path) -> list[Entry]:
+def read(path: Path) -> List[Entry]:
     """Reads entries from a JSON file"""
     if not path.exists():
         raise FileNotFoundError(f"File '{path}' does not exist")
@@ -149,17 +149,17 @@ def read(path: Path) -> list[Entry]:
     parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
     if not isinstance(parsed, list):
         raise TypeError("Expected a list")
-    ret: list[Entry] = []
-    for item in cast(list[object], parsed):
+    ret: List[Entry] = []
+    for item in cast(List[object], parsed):
         if not isinstance(item, dict):
             raise TypeError("Expected a dictionary")
-        ret.append(Entry.from_dict(cast(dict[Any, Any], item)))
+        ret.append(Entry.from_dict(cast(Dict[Any, Any], item)))
     return ret
 
 
-def write(path: Path, writes: list[Entry]) -> None:
+def write(path: Path, writes: List[Entry]) -> None:
     """Writes entries to a JSON file"""
     writes.sort(key=lambda entry: entry.timestamp)
-    dicts: list[dict[str, str]] = [data.remap_keys_snake_to_camel(entry.to_dict()) for entry in writes]
+    dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(entry.to_dict()) for entry in writes]
     json_str = json.dumps(dicts, indent=4)
     path.write_text(json_str, encoding="utf-8")

@@ -6,7 +6,7 @@ import secrets
 import string
 import uuid
 from datetime import datetime, timezone
-from typing import Any, NewType, Optional, Self
+from typing import Any, Dict, NewType, Optional, Self
 from uuid import UUID
 
 KeyId = NewType("KeyId", str)
@@ -212,7 +212,7 @@ class EntryId:
         return cls(uuid.uuid4())
 
 
-def remap_keys(mapping: dict[str, str], data: dict[str, Any]) -> dict[str, Any]:
+def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
     """Maps the keys of a dictionary to a new set of keys.
 
     If a key is not present in the mapping, it is left unchanged.
@@ -235,7 +235,7 @@ def remap_keys(mapping: dict[str, str], data: dict[str, Any]) -> dict[str, Any]:
     return {mapping.get(key, key): value for key, value in data.items()}
 
 
-def get_required(d: dict[Any, Any], key: Any, value_type: type) -> Any:
+def get_required(d: Dict[Any, Any], key: Any, value_type: type) -> Any:
     """Gets a required value from a dictionary.
 
     Args:
@@ -266,7 +266,7 @@ def get_required(d: dict[Any, Any], key: Any, value_type: type) -> Any:
     return value
 
 
-def get_optional(d: dict[Any, Any], key: Any, value_type: type) -> Optional[Any]:
+def get_optional(d: Dict[Any, Any], key: Any, value_type: type) -> Optional[Any]:
     """Gets an optional value from a dictionary.
 
     Args:

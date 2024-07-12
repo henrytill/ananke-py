@@ -1,7 +1,7 @@
 """Module for the 'Entry' class and related types."""
 
 import functools
-from typing import Any, Optional, Self, Tuple
+from typing import Any, Dict, Optional, Self, Tuple
 from uuid import UUID
 
 from . import common
@@ -77,7 +77,7 @@ class Entry:
         return self
 
     @classmethod
-    def from_dict(cls, data: dict[Any, Any]) -> Self:
+    def from_dict(cls, data: Dict[Any, Any]) -> Self:
         """Creates an 'Entry' from a dictionary.
 
         Args:
@@ -148,7 +148,7 @@ class Entry:
             entry_dict["meta"] = row[6]
         return cls.from_dict(entry_dict)
 
-    def to_dict(self) -> dict[str, str]:
+    def to_dict(self) -> Dict[str, str]:
         """Converts the 'Entry' to a dictionary.
 
         Returns:

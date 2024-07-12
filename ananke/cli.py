@@ -4,7 +4,7 @@ import os
 import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-from typing import Mapping, Sequence, Tuple
+from typing import List, Mapping, Sequence, Tuple
 
 from . import data, version
 from .application import Application, JsonApplication, SqliteApplication
@@ -108,7 +108,7 @@ def format_verbose(entry: Entry, plaintext: Plaintext) -> str:
     return " ".join(elements)
 
 
-def format_results(results: list[Tuple[Entry, Plaintext]], verbose: bool) -> str:
+def format_results(results: List[Tuple[Entry, Plaintext]], verbose: bool) -> str:
     """Formats the results of a lookup.
 
     Args:
@@ -122,7 +122,7 @@ def format_results(results: list[Tuple[Entry, Plaintext]], verbose: bool) -> str
         entry, plaintext = results[0]
         return format_verbose(entry, plaintext) if verbose else str(plaintext)
 
-    formatted_results: list[str] = []
+    formatted_results: List[str] = []
     for entry, plaintext in results:
         formatted = format_verbose(entry, plaintext) if verbose else f"{entry.description} {entry.identity} {plaintext}"
         formatted_results.append(formatted)

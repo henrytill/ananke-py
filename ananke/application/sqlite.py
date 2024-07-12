@@ -2,7 +2,7 @@ import sqlite3
 from contextlib import closing
 from pathlib import Path
 from sqlite3 import Connection
-from typing import Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from ..codec import GpgCodec
 from ..config import Backend, Config
@@ -71,10 +71,10 @@ class SqliteApplication(Application):
 
     def lookup(
         self, description: Description, maybe_identity: Optional[Identity] = None
-    ) -> list[Tuple[Entry, Plaintext]]:
+    ) -> List[Tuple[Entry, Plaintext]]:
         query = Query(description=description, identity=maybe_identity)
         sql, parameters = _create_query(query)
-        ret: list[Tuple[Entry, Plaintext]] = []
+        ret: List[Tuple[Entry, Plaintext]] = []
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql, parameters):
                 entry = Entry.from_tuple(row)
@@ -92,7 +92,7 @@ class SqliteApplication(Application):
     ) -> None:
         query = Query(entry_id=target) if isinstance(target, EntryId) else Query(description=target)
         sql, parameters = _create_query(query)
-        entries: list[Entry] = []
+        entries: List[Entry] = []
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql, parameters):
                 entries.append(Entry.from_tuple(row))
@@ -135,7 +135,7 @@ class SqliteApplication(Application):
     def import_entries(self, path: Optional[Path]) -> None:
         if path is None:
             return
-        entries: list[Entry] = common.read(path)
+        entries: List[Entry] = common.read(path)
         with closing(self.connection.cursor()) as cursor:
             for entry in entries:
                 sql, parameters = _create_insert(entry)
@@ -146,20 +146,20 @@ class SqliteApplication(Application):
         if path is None:
             return
         sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries"
-        entries: list[Entry] = []
+        entries: List[Entry] = []
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql):
                 entries.append(Entry.from_tuple(row))
         common.write(path, entries)
 
 
-def _create_insert(entry: Entry) -> Tuple[str, dict[str, Optional[str]]]:
+def _create_insert(entry: Entry) -> Tuple[str, Dict[str, Optional[str]]]:
     sql: str = """\
     INSERT OR REPLACE INTO
     entries(id, keyid, timestamp, description, identity, ciphertext, meta)
     VALUES(:id, :keyid, :timestamp, :description, :identity, :ciphertext, :meta)
     """
-    parameters: dict[str, str | None] = {
+    parameters: Dict[str, str | None] = {
         "id": str(entry.entry_id),
         "keyid": entry.key_id,
         "timestamp": entry.timestamp.isoformat(),
@@ -171,10 +171,10 @@ def _create_insert(entry: Entry) -> Tuple[str, dict[str, Optional[str]]]:
     return (sql, parameters)
 
 
-def _create_query(query: Query) -> Tuple[str, dict[str, str]]:
+def _create_query(query: Query) -> Tuple[str, Dict[str, str]]:
     sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries WHERE "
-    wheres: list[str] = []
-    parameters: dict[str, str] = {}
+    wheres: List[str] = []
+    parameters: Dict[str, str] = {}
     if query.entry_id:
         wheres += ["id LIKE :id"]
         parameters["id"] = str(query.entry_id)
@@ -191,17 +191,17 @@ def _create_query(query: Query) -> Tuple[str, dict[str, str]]:
     return (sql, parameters)
 
 
-def _create_update(target: Target, entry: Entry) -> Tuple[str, dict[str, str]]:
-    parameters: dict[str, str] = {}
+def _create_update(target: Target, entry: Entry) -> Tuple[str, Dict[str, str]]:
+    parameters: Dict[str, str] = {}
 
-    wheres: list[str] = []
+    wheres: List[str] = []
     if isinstance(target, EntryId):
         wheres += ["entries.id = :target"]
     else:
         wheres += ["entries.description LIKE :target"]
     parameters["target"] = str(target)
 
-    sets: list[str] = []
+    sets: List[str] = []
 
     sets += ["timestamp = :timestamp"]
     parameters["timestamp"] = entry.timestamp.isoformat()

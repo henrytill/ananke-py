@@ -1,6 +1,6 @@
 import copy
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from ..codec import GpgCodec
 from ..config import Backend, Config
@@ -14,7 +14,7 @@ class JsonApplication(Application):
 
     config: Config
     codec: GpgCodec
-    entries: list[Entry]
+    entries: List[Entry]
 
     def __init__(self, config: Config) -> None:
         assert config.backend == Backend.JSON
@@ -51,7 +51,7 @@ class JsonApplication(Application):
 
     def lookup(
         self, description: Description, maybe_identity: Optional[Identity] = None
-    ) -> list[Tuple[Entry, Plaintext]]:
+    ) -> List[Tuple[Entry, Plaintext]]:
         query = Query(description=description, identity=maybe_identity)
         matcher = QueryMatcher(query)
         return [

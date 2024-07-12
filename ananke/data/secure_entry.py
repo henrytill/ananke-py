@@ -2,7 +2,7 @@
 
 # pylint: disable=duplicate-code
 import functools
-from typing import Any, NewType, Optional, Self
+from typing import Any, Dict, NewType, Optional, Self
 
 from . import common
 from .common import Description, Identity, Metadata, Plaintext, Timestamp
@@ -58,7 +58,7 @@ class SecureEntry:
         )
 
     @classmethod
-    def from_dict(cls, data: dict[Any, Any]) -> Self:
+    def from_dict(cls, data: Dict[Any, Any]) -> Self:
         """Creates a 'SecretEntry' from a dictionary.
 
         Args:
@@ -90,7 +90,7 @@ class SecureEntry:
             meta=Metadata(maybe_meta) if maybe_meta else None,
         )
 
-    def to_dict(self) -> dict[str, str]:
+    def to_dict(self) -> Dict[str, str]:
         """Converts the 'SecretEntry' to a dictionary.
 
         Returns:
