@@ -24,11 +24,8 @@ jobs:
       - run: ./build.sh -e test
   linux-flake:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
-      - run: nix build
+      - run: nix build -L
