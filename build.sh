@@ -61,6 +61,12 @@ lint() {
   $PYTHON -m pylint ananke tests
 }
 
+fmt() {
+  activate
+  $PYTHON -m isort ananke tests
+  $PYTHON -m black ananke tests
+}
+
 test() {
   activate
   $PYTHON -m unittest discover -v -s tests
@@ -95,6 +101,9 @@ action() {
       ;;
     lint)
       lint
+      ;;
+    fmt)
+      fmt
       ;;
     test)
       test
