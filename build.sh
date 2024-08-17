@@ -51,8 +51,8 @@ create_env() {
 
 check() {
   activate
-  $MYPY ananke
-  $MYPY tests
+  $MYPY --no-color-output ananke
+  $MYPY --no-color-output tests
 }
 
 lint() {
