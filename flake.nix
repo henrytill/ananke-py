@@ -26,6 +26,7 @@
           build-system = with pkgs.python3Packages; [ setuptools ];
           nativeCheckInputs = with pkgs.python3Packages; [
             cram
+            mypy
             pkgs.gnupg
           ];
           src = builtins.path {
@@ -34,7 +35,10 @@
           };
           patchPhase = "patchShebangs build.sh";
           preConfigure = "./build.sh generate -g ${self.shortRev or self.dirtyShortRev}";
-          checkPhase = "./build.sh test";
+          checkPhase = ''
+            ./build.sh check
+            ./build.sh test
+          '';
         };
     in
     flake-utils.lib.eachDefaultSystem (
