@@ -55,6 +55,7 @@ class TestApplication:
         def setUp(self) -> None:
             # pylint: disable=consider-using-with
             self.dir = TemporaryDirectory(prefix="ananke")
+            os.environ["GNUPGHOME"] = str(Path.cwd() / "example" / "gnupg")
 
         def tearDown(self) -> None:
             self.dir.cleanup()
@@ -295,7 +296,6 @@ class TestJsonApplication(TestApplication.Inner):
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
         self.application = JsonApplication(self.config)
         self.application.import_entries(EXAMPLE_DATA)
-        os.environ["GNUPGHOME"] = "./example/gnupg"
 
 
 class TestSqliteApplication(TestApplication.Inner):
@@ -310,7 +310,6 @@ class TestSqliteApplication(TestApplication.Inner):
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
         self.application = SqliteApplication(self.config)
         self.application.import_entries(EXAMPLE_DATA)
-        os.environ["GNUPGHOME"] = "./example/gnupg"
 
     def tearDown(self) -> None:
         cast(SqliteApplication, self.application).close()
