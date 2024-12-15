@@ -24,7 +24,7 @@ class Cipher(ABC, Generic[T]):
         self._key_id = key_id
 
     @abstractmethod
-    def encrypt(self, obj: Plaintext) -> T:
+    def encrypt(self, plaintext: Plaintext) -> T:
         """Encrypts a Plaintext into an object.
 
         Args:
@@ -37,7 +37,7 @@ class Cipher(ABC, Generic[T]):
             ValueError: If the Plaintext could not be encrypted."""
 
     @abstractmethod
-    def decrypt(self, ciphertext: T) -> Plaintext:
+    def decrypt(self, obj: T) -> Plaintext:
         """Decrypts an object into a Plaintext.
 
         Args:

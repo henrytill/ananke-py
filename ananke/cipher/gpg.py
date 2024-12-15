@@ -22,7 +22,7 @@ class Binary(Cipher[Ciphertext]):
         """
         self.key_id = key_id
 
-    def encrypt(self, obj: Plaintext) -> Ciphertext:
+    def encrypt(self, plaintext: Plaintext) -> Ciphertext:
         """Encodes a Plaintext into a Ciphertext.
 
         Args:
@@ -34,7 +34,7 @@ class Binary(Cipher[Ciphertext]):
         Raises:
             ValueError: If the Plaintext could not be encrypted.
         """
-        input_bytes = obj.encode("utf-8")
+        input_bytes = plaintext.encode("utf-8")
         cmd = ["gpg", "--batch", "--encrypt", "--recipient", self.key_id]
         try:
             output_bytes = subprocess.run(cmd, input=input_bytes, capture_output=True, check=True).stdout
@@ -42,7 +42,7 @@ class Binary(Cipher[Ciphertext]):
         except subprocess.CalledProcessError as exc:
             raise ValueError(f'Could not encrypt Plaintext: {exc.stderr.decode("utf-8")}') from exc
 
-    def decrypt(self, ciphertext: Ciphertext) -> Plaintext:
+    def decrypt(self, obj: Ciphertext) -> Plaintext:
         """Decodes a Ciphertext into a Plaintext.
 
         Args:
@@ -56,7 +56,7 @@ class Binary(Cipher[Ciphertext]):
         """
         cmd = ["gpg", "--batch", "--decrypt"]
         try:
-            output_bytes = subprocess.run(cmd, input=ciphertext, capture_output=True, check=True).stdout
+            output_bytes = subprocess.run(cmd, input=obj, capture_output=True, check=True).stdout
             return Plaintext(output_bytes.decode("utf-8"))
         except subprocess.CalledProcessError as exc:
             raise ValueError(f'Could not decrypt Ciphertext: {exc.stderr.decode("utf-8")}') from exc
