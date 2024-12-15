@@ -81,7 +81,6 @@ class SqliteApplication(Application):
                 ret.append((entry, self.cipher.decrypt(entry.ciphertext)))
         return ret
 
-    # pylint: disable=too-many-arguments
     def modify(
         self,
         target: Target,

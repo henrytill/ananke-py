@@ -60,7 +60,6 @@ class JsonApplication(Application):
             if matcher.match_description(entry.description) and matcher.match_identity(entry)
         ]
 
-    # pylint: disable=too-many-arguments
     def modify(
         self,
         target: Target,

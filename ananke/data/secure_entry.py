@@ -33,7 +33,6 @@ class SecureEntry:
     plaintext: Plaintext
     meta: Optional[Metadata]
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         entry_id: EntryId,

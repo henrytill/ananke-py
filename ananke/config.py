@@ -158,7 +158,6 @@ class ConfigBuilder:
     key_id: Optional[KeyId]
     allow_multiple_keys: Optional[bool]
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         config_dir: Optional[Path] = None,

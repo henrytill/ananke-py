@@ -57,7 +57,6 @@ class Application(ABC):
             A list of the matching entries and their corresponding plaintexts.
         """
 
-    # pylint: disable=too-many-arguments
     @abstractmethod
     def modify(
         self,
