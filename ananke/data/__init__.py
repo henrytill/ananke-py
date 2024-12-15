@@ -19,3 +19,4 @@ from .schema import SchemaVersion as SchemaVersion
 from .schema import get_schema_version as get_schema_version
 from .secure_entry import ArmoredCiphertext as ArmoredCiphertext
 from .secure_entry import SecureEntry as SecureEntry
+from .secure_entry import SecureIndexElement as SecureIndexElement

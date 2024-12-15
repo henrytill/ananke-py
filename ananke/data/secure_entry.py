@@ -2,6 +2,7 @@
 
 # pylint: disable=duplicate-code
 import functools
+from dataclasses import dataclass
 from typing import Any, Dict, NewType, Optional, Self
 from uuid import UUID
 
@@ -10,6 +11,21 @@ from .common import Description, EntryId, Identity, KeyId, Metadata, Plaintext, 
 
 ArmoredCiphertext = NewType("ArmoredCiphertext", str)
 """An armored ciphertext value of an 'SecureEntry'."""
+
+
+@dataclass
+class SecureIndexElement:
+    """A record used to index collections of SecureEntry.
+
+    Attributes:
+        entry_id: Uniquely identifies the entry.
+        key_id: The GPG Key Id used for encryption.
+        description: Description of the entry. Can be a URI or a descriptive name.
+    """
+
+    entry_id: EntryId
+    key_id: KeyId
+    description: Description
 
 
 class SecureEntry:
