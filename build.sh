@@ -105,7 +105,7 @@ run_tests() {
 }
 
 usage() {
-    cat >&2 <<EOF
+    cat <<EOF >&2
 Usage: $0 [-e] [-v] <command>
 
 Options:
