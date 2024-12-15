@@ -17,4 +17,5 @@ from .entry import remap_keys_snake_to_camel as remap_keys_snake_to_camel
 from .schema import CURRENT_SCHEMA_VERSION as CURRENT_SCHEMA_VERSION
 from .schema import SchemaVersion as SchemaVersion
 from .schema import get_schema_version as get_schema_version
+from .secure_entry import ArmoredCiphertext as ArmoredCiphertext
 from .secure_entry import SecureEntry as SecureEntry

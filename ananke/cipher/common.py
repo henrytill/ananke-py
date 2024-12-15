@@ -1,9 +1,9 @@
 """The Cipher class."""
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, Optional, TypeVar
 
-from ..data import Plaintext, KeyId
+from ..data import KeyId, Plaintext
 
 T = TypeVar("T")
 
@@ -49,3 +49,7 @@ class Cipher(ABC, Generic[T]):
         Raises:
             ValueError: If the object could not be decrypted.
         """
+
+    @staticmethod
+    def suggest_key() -> Optional[KeyId]:
+        """Suggests a KeyId"""
