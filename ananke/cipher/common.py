@@ -8,7 +8,6 @@ from ..data import Plaintext, KeyId
 T = TypeVar("T")
 
 
-# pylint: disable=unnecessary-pass
 class Cipher(ABC, Generic[T]):
     """The Cipher protocol."""
 
@@ -36,7 +35,6 @@ class Cipher(ABC, Generic[T]):
 
         Raises:
             ValueError: If the object could not be encrypted."""
-        pass
 
     @abstractmethod
     def decrypt(self, ciphertext: T) -> Plaintext:
@@ -51,4 +49,3 @@ class Cipher(ABC, Generic[T]):
         Raises:
             ValueError: If the Ciphertext could not be decrypted.
         """
-        pass

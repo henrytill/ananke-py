@@ -18,7 +18,6 @@ class MultipleEntries(Exception):
     """Signals that multiple entries match a given query"""
 
 
-# pylint: disable=unnecessary-pass
 class Application(ABC):
     """The main application class"""
 
@@ -38,7 +37,6 @@ class Application(ABC):
             maybe_identity: The identity of the entry.
             maybe_meta: The metadata of the entry.
         """
-        pass
 
     @abstractmethod
     def lookup(
@@ -58,7 +56,6 @@ class Application(ABC):
         Returns:
             A list of the matching entries and their corresponding plaintexts.
         """
-        pass
 
     # pylint: disable=too-many-arguments
     @abstractmethod
@@ -79,7 +76,6 @@ class Application(ABC):
             maybe_plaintext: The new plaintext of the entry.
             maybe_meta: The new metadata of the entry.
         """
-        pass
 
     @abstractmethod
     def remove(self, target: Target) -> None:
@@ -88,7 +84,6 @@ class Application(ABC):
         Args:
             target: The entry to remove.
         """
-        pass
 
     @abstractmethod
     def import_entries(self, path: Optional[Path]) -> None:
@@ -97,7 +92,6 @@ class Application(ABC):
         Args:
             path: The path to the JSON file.
         """
-        pass
 
     @abstractmethod
     def export_entries(self, path: Optional[Path]) -> None:
@@ -106,7 +100,6 @@ class Application(ABC):
         Args:
             path: The path to the JSON file.
         """
-        pass
 
 
 @dataclass(frozen=True)
