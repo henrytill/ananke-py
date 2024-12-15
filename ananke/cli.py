@@ -14,14 +14,14 @@ from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, Identity,
 
 
 def configure(host_os: OsFamily, env: Mapping[str, str]) -> Config:
-    """Creates a `Config` object.
+    """Creates a Config object.
 
     Args:
         host_os: The host operating system, defaulting to the current OS.
         env: The environment variables to be used for configuration.
 
     Returns:
-        A `Config` object.
+        A Config object.
     """
     return ConfigBuilder().with_defaults(host_os, env).with_config().with_env(env).build()
 
