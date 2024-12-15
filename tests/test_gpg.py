@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from ananke.cipher import Binary
+from ananke.cipher.gpg import Binary
 from ananke.data import Ciphertext, KeyId, Plaintext
 from tests import RandomArgs
 

@@ -8,7 +8,7 @@ from typing import List, Mapping, Sequence, Tuple
 
 from . import data, version
 from .application import Application, JsonApplication, SqliteApplication
-from .cipher import Binary
+from .cipher.gpg import Binary
 from .config import Backend, Config, ConfigBuilder, OsFamily
 from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, Identity, KeyId, Plaintext, SchemaVersion
 

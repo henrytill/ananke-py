@@ -2,7 +2,7 @@ import copy
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from ..cipher import Binary
+from ..cipher.gpg import Binary
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
 from . import common

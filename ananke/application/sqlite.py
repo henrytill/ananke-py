@@ -4,7 +4,7 @@ from pathlib import Path
 from sqlite3 import Connection
 from typing import Dict, List, Optional, Tuple
 
-from ..cipher import Binary
+from ..cipher.gpg import Binary
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
 from . import common
