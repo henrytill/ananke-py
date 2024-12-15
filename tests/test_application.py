@@ -114,7 +114,7 @@ class TestApplication:
 
             for test_case in test_cases:
                 with self.subTest(test_case=test_case):
-                    plaintexts = [plaintext for _, plaintext in self.application.lookup(**test_case["args"])]
+                    plaintexts = [record.plaintext for record in self.application.lookup(**test_case["args"])]
                     self.assertEqual(test_case["plaintexts"], plaintexts)
 
         def test_add(self) -> None:
@@ -150,14 +150,14 @@ class TestApplication:
             for test_case in test_cases:
                 with self.subTest(test_case=test_case):
                     self.application.add(**test_case)
-                    results = self.application.lookup(test_case["description"], test_case["maybe_identity"])
-                    self.assertEqual(1, len(results))
-                    entry, plaintext = results[0]
-                    self.assertEqual(self.config.key_id, entry.key_id)
-                    self.assertEqual(test_case["description"], entry.description)
-                    self.assertEqual(test_case["maybe_identity"], entry.identity)
-                    self.assertEqual(test_case["plaintext"], plaintext)
-                    self.assertEqual(test_case["maybe_meta"], entry.meta)
+                    records = self.application.lookup(test_case["description"], test_case["maybe_identity"])
+                    self.assertEqual(1, len(records))
+                    record = records[0]
+                    self.assertEqual(self.config.key_id, record.key_id)
+                    self.assertEqual(test_case["description"], record.description)
+                    self.assertEqual(test_case["maybe_identity"], record.identity)
+                    self.assertEqual(test_case["plaintext"], record.plaintext)
+                    self.assertEqual(test_case["maybe_meta"], record.meta)
 
         def test_modify(self) -> None:
             """Test the modify method against the example data."""
@@ -204,41 +204,41 @@ class TestApplication:
                     if isinstance(target, EntryId):
                         raise NotImplementedError
 
-                    results = self.application.lookup(target)
-                    self.assertEqual(1, len(results))
-                    entry, plaintext = results[0]
+                    records = self.application.lookup(target)
+                    self.assertEqual(1, len(records))
+                    record = records[0]
 
                     self.application.modify(**test_case)
 
-                    updated_results = self.application.lookup(
+                    updated_records = self.application.lookup(
                         maybe_description if maybe_description is not None else target,
                         maybe_identity,
                     )
-                    self.assertEqual(1, len(updated_results))
-                    updated_entry, updated_plaintext = updated_results[0]
+                    self.assertEqual(1, len(updated_records))
+                    updated_record = updated_records[0]
 
-                    self.assertEqual(entry.entry_id, updated_entry.entry_id, "entry_id should not change")
-                    self.assertNotEqual(entry.timestamp, updated_entry.timestamp, "timestamp should change")
+                    self.assertEqual(record.entry_id, updated_record.entry_id, "entry_id should not change")
+                    self.assertNotEqual(record.timestamp, updated_record.timestamp, "timestamp should change")
 
-                    self.assertEqual(self.config.key_id, updated_entry.key_id, "key_id should not change")
+                    self.assertEqual(self.config.key_id, updated_record.key_id, "key_id should not change")
                     self.assertEqual(
-                        maybe_description if maybe_description is not None else entry.description,
-                        updated_entry.description,
+                        maybe_description if maybe_description is not None else record.description,
+                        updated_record.description,
                         "description should change if provided",
                     )
                     self.assertEqual(
-                        maybe_identity if maybe_identity is not None else entry.identity,
-                        updated_entry.identity,
+                        maybe_identity if maybe_identity is not None else record.identity,
+                        updated_record.identity,
                         "identity should change if provided",
                     )
                     self.assertEqual(
-                        maybe_plaintext if maybe_plaintext is not None else plaintext,
-                        updated_plaintext,
+                        maybe_plaintext if maybe_plaintext is not None else record.plaintext,
+                        updated_record.plaintext,
                         "plaintext should change if provided",
                     )
                     self.assertEqual(
-                        maybe_meta if maybe_meta is not None else entry.meta,
-                        updated_entry.meta,
+                        maybe_meta if maybe_meta is not None else record.meta,
+                        updated_record.meta,
                         "meta should change if provided",
                     )
 
@@ -275,13 +275,13 @@ class TestApplication:
                     if isinstance(test_case, EntryId):
                         raise NotImplementedError
 
-                    results = self.application.lookup(test_case)
-                    self.assertEqual(1, len(results))
-                    entry, _ = results[0]
+                    records = self.application.lookup(test_case)
+                    self.assertEqual(1, len(records))
+                    record = records[0]
 
-                    self.application.remove(entry.entry_id)
-                    results = self.application.lookup(test_case)
-                    self.assertEqual(0, len(results))
+                    self.application.remove(record.entry_id)
+                    records = self.application.lookup(test_case)
+                    self.assertEqual(0, len(records))
 
 
 class TestJsonApplication(TestApplication.Inner):

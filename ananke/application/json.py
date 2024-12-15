@@ -1,12 +1,11 @@
-import copy
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from ..cipher.gpg import Binary
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
 from . import common
-from .common import Application, Query, Target
+from .common import Application, Query, Record, Target
 
 
 class JsonApplication(Application):
@@ -49,13 +48,19 @@ class JsonApplication(Application):
         self.entries.append(entry)
         common.write(self.config.data_file, self.entries)
 
-    def lookup(
-        self, description: Description, maybe_identity: Optional[Identity] = None
-    ) -> List[Tuple[Entry, Plaintext]]:
+    def lookup(self, description: Description, maybe_identity: Optional[Identity] = None) -> List[Record]:
         query = Query(description=description, identity=maybe_identity)
         matcher = QueryMatcher(query)
         return [
-            (copy.deepcopy(entry), self.cipher.decrypt(entry.ciphertext))
+            Record(
+                entry_id=entry.entry_id,
+                key_id=entry.key_id,
+                timestamp=entry.timestamp,
+                description=entry.description,
+                identity=entry.identity,
+                plaintext=self.cipher.decrypt(entry.ciphertext),
+                meta=entry.meta,
+            )
             for entry in self.entries
             if matcher.match_description(entry.description) and matcher.match_identity(entry)
         ]

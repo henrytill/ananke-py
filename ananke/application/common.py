@@ -2,10 +2,10 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, TypeAlias, cast
+from typing import Any, Dict, List, Optional, TypeAlias, cast
 
 from .. import data
-from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext
+from ..data import Description, Entry, EntryId, Identity, KeyId, Metadata, Plaintext, Timestamp
 
 Target: TypeAlias = EntryId | Description
 
@@ -16,6 +16,19 @@ class NoEntries(Exception):
 
 class MultipleEntries(Exception):
     """Signals that multiple entries match a given query"""
+
+
+@dataclass(frozen=True)
+class Record:
+    """The result of a lookup"""
+
+    entry_id: EntryId
+    key_id: KeyId
+    timestamp: Timestamp
+    description: Description
+    identity: Optional[Identity]
+    plaintext: Plaintext
+    meta: Optional[Metadata]
 
 
 class Application(ABC):
@@ -43,7 +56,7 @@ class Application(ABC):
         self,
         description: Description,
         maybe_identity: Optional[Identity] = None,
-    ) -> List[Tuple[Entry, Plaintext]]:
+    ) -> List[Record]:
         """Lookup the plaintexts of the matching entries.
 
         Searches for entries that match the provided description and identity,
@@ -54,7 +67,7 @@ class Application(ABC):
             maybe_identity: The identity to search for.
 
         Returns:
-            A list of the matching entries and their corresponding plaintexts.
+            A list of the matching records.
         """
 
     @abstractmethod

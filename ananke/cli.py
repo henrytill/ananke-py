@@ -4,13 +4,13 @@ import os
 import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-from typing import List, Mapping, Sequence, Tuple
+from typing import List, Mapping, Sequence
 
 from . import data, version
-from .application import Application, JsonApplication, SqliteApplication
+from .application import Application, JsonApplication, Record, SqliteApplication
 from .cipher.gpg import Binary
 from .config import Backend, Config, ConfigBuilder, OsFamily
-from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, Identity, KeyId, Plaintext, SchemaVersion
+from .data import CURRENT_SCHEMA_VERSION, Description, EntryId, Identity, KeyId, Plaintext, SchemaVersion
 
 
 def configure(host_os: OsFamily, env: Mapping[str, str]) -> Config:
@@ -85,46 +85,46 @@ def cmd_add(attrs: Namespace) -> int:
     return 0
 
 
-def format_verbose(entry: Entry, plaintext: Plaintext) -> str:
-    """Formats an entry in verbose mode.
+def format_verbose(record: Record) -> str:
+    """Formats a record in verbose mode.
 
     Args:
-        entry: The entry to format.
+        record: The record to format.
         plaintext: The plaintext to format.
 
     Returns:
-        The formatted entry.
+        The formatted record.
     """
-    elements = [entry.timestamp.isoformat(), str(entry.entry_id), entry.key_id, entry.description]
+    elements = [record.timestamp.isoformat(), str(record.entry_id), record.key_id, record.description]
 
-    if entry.identity is not None:
-        elements.append(entry.identity)
+    if record.identity is not None:
+        elements.append(record.identity)
 
-    elements.append(str(plaintext))
+    elements.append(str(record.plaintext))
 
-    if entry.meta is not None:
-        elements.append(f'"{entry.meta}"')
+    if record.meta is not None:
+        elements.append(f'"{record.meta}"')
 
     return " ".join(elements)
 
 
-def format_results(results: List[Tuple[Entry, Plaintext]], verbose: bool) -> str:
+def format_results(records: List[Record], verbose: bool) -> str:
     """Formats the results of a lookup.
 
     Args:
-        results: The results to format.
-        verbose: Whether to format the results in verbose mode.
+        records: The records to format.
+        verbose: Whether to format the records in verbose mode.
 
     Returns:
-        The formatted results.
+        The formatted records.
     """
-    if len(results) == 1:
-        entry, plaintext = results[0]
-        return format_verbose(entry, plaintext) if verbose else str(plaintext)
+    if len(records) == 1:
+        record = records[0]
+        return format_verbose(record) if verbose else str(record.plaintext)
 
     formatted_results: List[str] = []
-    for entry, plaintext in results:
-        formatted = format_verbose(entry, plaintext) if verbose else f"{entry.description} {entry.identity} {plaintext}"
+    for record in records:
+        formatted = format_verbose(record) if verbose else f"{record.description} {record.identity} {record.plaintext}"
         formatted_results.append(formatted)
     return "\n".join(formatted_results)
 
@@ -139,12 +139,12 @@ def cmd_lookup(attrs: Namespace) -> int:
         The exit code of the application.
     """
     os_family = OsFamily.from_str(os.name)
-    results = []
+    records = []
     app = application(os_family, os.environ)
-    results = app.lookup(attrs.description, attrs.identity)
-    if not results:
+    records = app.lookup(attrs.description, attrs.identity)
+    if not records:
         return 1
-    print(format_results(results, attrs.verbose))
+    print(format_results(records, attrs.verbose))
     return 0
 
 

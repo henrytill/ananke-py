@@ -8,7 +8,7 @@ from ..cipher.gpg import Binary
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
 from . import common
-from .common import Application, Query, Target
+from .common import Application, Query, Record, Target
 
 CREATE_TABLE = """\
 CREATE TABLE IF NOT EXISTS entries (
@@ -69,16 +69,23 @@ class SqliteApplication(Application):
             cursor.execute(sql, parameters)
         self.connection.commit()
 
-    def lookup(
-        self, description: Description, maybe_identity: Optional[Identity] = None
-    ) -> List[Tuple[Entry, Plaintext]]:
+    def lookup(self, description: Description, maybe_identity: Optional[Identity] = None) -> List[Record]:
         query = Query(description=description, identity=maybe_identity)
         sql, parameters = _create_query(query)
-        ret: List[Tuple[Entry, Plaintext]] = []
+        ret: List[Record] = []
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql, parameters):
                 entry = Entry.from_tuple(row)
-                ret.append((entry, self.cipher.decrypt(entry.ciphertext)))
+                record = Record(
+                    entry_id=entry.entry_id,
+                    key_id=entry.key_id,
+                    timestamp=entry.timestamp,
+                    description=entry.description,
+                    identity=entry.identity,
+                    plaintext=self.cipher.decrypt(entry.ciphertext),
+                    meta=entry.meta,
+                )
+                ret.append(record)
         return ret
 
     def modify(
