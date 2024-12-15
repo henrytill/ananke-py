@@ -1,4 +1,4 @@
-"""The Cipher protocol."""
+"""The Cipher class."""
 
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
@@ -9,7 +9,7 @@ T = TypeVar("T")
 
 
 class Cipher(ABC, Generic[T]):
-    """The Cipher protocol."""
+    """The Cipher class."""
 
     _key_id: KeyId
 
@@ -25,27 +25,27 @@ class Cipher(ABC, Generic[T]):
 
     @abstractmethod
     def encrypt(self, obj: Plaintext) -> T:
-        """Encrypts an object into a Ciphertext.
+        """Encrypts a Plaintext into an object.
 
         Args:
-            obj: The object to encrypt.
+            obj: The Plaintext to encrypt.
 
         Returns:
             The encrypted object.
 
         Raises:
-            ValueError: If the object could not be encrypted."""
+            ValueError: If the Plaintext could not be encrypted."""
 
     @abstractmethod
     def decrypt(self, ciphertext: T) -> Plaintext:
-        """Decrypts a Ciphertext into an object.
+        """Decrypts an object into a Plaintext.
 
         Args:
             ciphertext: The object to decrypt.
 
         Returns:
-            The decrypted object.
+            The decrypted Plaintext.
 
         Raises:
-            ValueError: If the Ciphertext could not be decrypted.
+            ValueError: If the object could not be decrypted.
         """
