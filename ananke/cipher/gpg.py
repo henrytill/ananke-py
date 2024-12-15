@@ -5,7 +5,7 @@ from ..data import Ciphertext, KeyId, Plaintext
 from .common import Cipher
 
 
-class Binary(Cipher[Plaintext]):
+class Binary(Cipher[Ciphertext]):
     """A GPG cipher.
 
     This class is used to encode Plaintexts and decode Ciphertexts using GPG.
