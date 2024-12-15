@@ -2,7 +2,7 @@ import copy
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from ..codec import GpgCodec
+from ..cipher import Binary
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
 from . import common
@@ -13,14 +13,14 @@ class JsonApplication(Application):
     """A JSON Application"""
 
     config: Config
-    codec: GpgCodec
+    cipher: Binary
     entries: List[Entry]
 
     def __init__(self, config: Config) -> None:
         assert config.backend == Backend.JSON
 
         self.config = config
-        self.codec = GpgCodec(self.config.key_id)
+        self.cipher = Binary(self.config.key_id)
         self.config.data_file.parent.mkdir(parents=True, exist_ok=True)
         self.entries = []
 
@@ -36,10 +36,10 @@ class JsonApplication(Application):
     ) -> None:
         timestamp = Timestamp.now()
         entry_id = EntryId.generate()
-        ciphertext = self.codec.encode(plaintext)
+        ciphertext = self.cipher.encrypt(plaintext)
         entry = Entry(
             entry_id=entry_id,
-            key_id=self.codec.key_id,
+            key_id=self.cipher.key_id,
             timestamp=timestamp,
             description=description,
             identity=maybe_identity,
@@ -55,7 +55,7 @@ class JsonApplication(Application):
         query = Query(description=description, identity=maybe_identity)
         matcher = QueryMatcher(query)
         return [
-            (copy.deepcopy(entry), self.codec.decode(entry.ciphertext))
+            (copy.deepcopy(entry), self.cipher.decrypt(entry.ciphertext))
             for entry in self.entries
             if matcher.match_description(entry.description) and matcher.match_identity(entry)
         ]
@@ -84,7 +84,7 @@ class JsonApplication(Application):
         if maybe_description is not None:
             entry.description = maybe_description
         if maybe_plaintext is not None:
-            entry.ciphertext = self.codec.encode(maybe_plaintext)
+            entry.ciphertext = self.cipher.encrypt(maybe_plaintext)
         if maybe_identity is not None:
             entry.identity = maybe_identity
         if maybe_meta is not None:

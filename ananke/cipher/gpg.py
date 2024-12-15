@@ -2,11 +2,11 @@ import subprocess
 from typing import Optional
 
 from ..data import Ciphertext, KeyId, Plaintext
-from .common import Codec
+from .common import Cipher
 
 
-class GpgCodec(Codec[Plaintext]):
-    """A GPG codec.
+class Binary(Cipher[Plaintext]):
+    """A GPG cipher.
 
     This class is used to encode Plaintexts and decode Ciphertexts using GPG.
 
@@ -15,24 +15,24 @@ class GpgCodec(Codec[Plaintext]):
     """
 
     def __init__(self, key_id: KeyId) -> None:
-        """Creates a new GpgCodec with the given KeyId.
+        """Creates a new Binary encrypt with the given KeyId.
 
         Args:
             key_id: The KeyId to use for encryption and decryption.
         """
         self.key_id = key_id
 
-    def encode(self, obj: Plaintext) -> Ciphertext:
+    def encrypt(self, obj: Plaintext) -> Ciphertext:
         """Encodes a Plaintext into a Ciphertext.
 
         Args:
-            plaintext: The Plaintext to encode.
+            plaintext: The Plaintext to encrypt.
 
         Returns:
-            The encoded Ciphertext.
+            The encrypted Ciphertext.
 
         Raises:
-            ValueError: If the Plaintext could not be encoded.
+            ValueError: If the Plaintext could not be encrypted.
         """
         input_bytes = obj.encode("utf-8")
         cmd = ["gpg", "--batch", "--encrypt", "--recipient", self.key_id]
@@ -40,26 +40,26 @@ class GpgCodec(Codec[Plaintext]):
             output_bytes = subprocess.run(cmd, input=input_bytes, capture_output=True, check=True).stdout
             return Ciphertext(output_bytes)
         except subprocess.CalledProcessError as exc:
-            raise ValueError(f'Could not encode Plaintext: {exc.stderr.decode("utf-8")}') from exc
+            raise ValueError(f'Could not encrypt Plaintext: {exc.stderr.decode("utf-8")}') from exc
 
-    def decode(self, ciphertext: Ciphertext) -> Plaintext:
+    def decrypt(self, ciphertext: Ciphertext) -> Plaintext:
         """Decodes a Ciphertext into a Plaintext.
 
         Args:
-            ciphertext: The Ciphertext to decode.
+            ciphertext: The Ciphertext to decrypt.
 
         Returns:
-            The decoded Plaintext.
+            The decrypted Plaintext.
 
         Raises:
-            ValueError: If the Ciphertext could not be decoded.
+            ValueError: If the Ciphertext could not be decrypted.
         """
         cmd = ["gpg", "--batch", "--decrypt"]
         try:
             output_bytes = subprocess.run(cmd, input=ciphertext, capture_output=True, check=True).stdout
             return Plaintext(output_bytes.decode("utf-8"))
         except subprocess.CalledProcessError as exc:
-            raise ValueError(f'Could not decode Ciphertext: {exc.stderr.decode("utf-8")}') from exc
+            raise ValueError(f'Could not decrypt Ciphertext: {exc.stderr.decode("utf-8")}') from exc
 
     @staticmethod
     def suggest_key() -> Optional[KeyId]:

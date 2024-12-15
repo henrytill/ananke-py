@@ -8,7 +8,7 @@ from typing import List, Mapping, Sequence, Tuple
 
 from . import data, version
 from .application import Application, JsonApplication, SqliteApplication
-from .codec import GpgCodec
+from .cipher import Binary
 from .config import Backend, Config, ConfigBuilder, OsFamily
 from .data import CURRENT_SCHEMA_VERSION, Description, Entry, EntryId, Identity, KeyId, Plaintext, SchemaVersion
 
@@ -41,7 +41,7 @@ def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
 
     This includes setting up an in-memory store, creating a configuration object
     using environment variables, initializing file reader and writer, and
-    setting up a GPG codec for encryption and decryption.
+    setting up a GPG cipher for encryption and decryption.
 
     Args:
         host_os: The host operating system, defaulting to the current OS.
@@ -247,7 +247,7 @@ def cmd_configure(attrs: Namespace) -> int:
 
     if builder.key_id is None:
         # Prompt for key id
-        key_candidate = GpgCodec.suggest_key()
+        key_candidate = Binary.suggest_key()
         key_candidate_str = f"[{key_candidate}]" if key_candidate else ""
         key_input = input(f"Enter GPG key id: {key_candidate_str} ")
         if len(key_input) > 0:

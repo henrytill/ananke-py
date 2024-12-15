@@ -4,7 +4,7 @@ from pathlib import Path
 from sqlite3 import Connection
 from typing import Dict, List, Optional, Tuple
 
-from ..codec import GpgCodec
+from ..cipher import Binary
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
 from . import common
@@ -27,14 +27,14 @@ class SqliteApplication(Application):
     """A SQLite Application"""
 
     config: Config
-    codec: GpgCodec
+    cipher: Binary
     connection: Connection
 
     def __init__(self, config: Config) -> None:
         assert config.backend == Backend.SQLITE
 
         self.config = config
-        self.codec = GpgCodec(self.config.key_id)
+        self.cipher = Binary(self.config.key_id)
         self.config.data_file.parent.mkdir(parents=True)
         self.connection = sqlite3.connect(config.data_file)
 
@@ -54,10 +54,10 @@ class SqliteApplication(Application):
     ) -> None:
         timestamp = Timestamp.now()
         entry_id = EntryId.generate()
-        ciphertext = self.codec.encode(plaintext)
+        ciphertext = self.cipher.encrypt(plaintext)
         entry = Entry(
             entry_id=entry_id,
-            key_id=self.codec.key_id,
+            key_id=self.cipher.key_id,
             timestamp=timestamp,
             description=description,
             identity=maybe_identity,
@@ -78,7 +78,7 @@ class SqliteApplication(Application):
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql, parameters):
                 entry = Entry.from_tuple(row)
-                ret.append((entry, self.codec.decode(entry.ciphertext)))
+                ret.append((entry, self.cipher.decrypt(entry.ciphertext)))
         return ret
 
     # pylint: disable=too-many-arguments
@@ -109,7 +109,7 @@ class SqliteApplication(Application):
             if maybe_description is not None:
                 entry.description = maybe_description
             if maybe_plaintext is not None:
-                entry.ciphertext = self.codec.encode(maybe_plaintext)
+                entry.ciphertext = self.cipher.encrypt(maybe_plaintext)
             if maybe_identity is not None:
                 entry.identity = maybe_identity
             if maybe_meta is not None:
