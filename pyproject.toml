@@ -12,13 +12,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
-dev = [
-    "black>=23.1.0",
-    "flake8>=5.0.4",
-    "isort>=5.13.2",
-    "mypy>=1.8.0",
-    "pylint>=2.16.2",
-]
+dev = ["black>=23.1.0", "flake8>=5.0.4", "isort>=5.13.2", "mypy>=1.8.0", "pylint>=2.16.2"]
 test = ["coverage>=6.5.0", "cram>=0.7"]
 
 [project.scripts]
