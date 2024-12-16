@@ -1,11 +1,13 @@
+import copy
 from pathlib import Path
 from typing import List, Optional
 
+from ..cipher import Plaintext
 from ..cipher.gpg import Binary
 from ..config import Backend, Config
-from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
+from ..data import Description, Entry, EntryId, Identity, Metadata, Record, Timestamp
 from . import common
-from .common import Application, Query, Record, Target
+from .common import Application, Query, Target
 
 
 class JsonApplication(Application):
@@ -52,15 +54,7 @@ class JsonApplication(Application):
         query = Query(description=description, identity=maybe_identity)
         matcher = QueryMatcher(query)
         return [
-            Record(
-                entry_id=entry.entry_id,
-                key_id=entry.key_id,
-                timestamp=entry.timestamp,
-                description=entry.description,
-                identity=entry.identity,
-                plaintext=self.cipher.decrypt(entry.ciphertext),
-                meta=entry.meta,
-            )
+            copy.deepcopy(entry).with_cipher(self.cipher)
             for entry in self.entries
             if matcher.match_description(entry.description) and matcher.match_identity(entry)
         ]

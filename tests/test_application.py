@@ -6,8 +6,9 @@ from tempfile import TemporaryDirectory
 from typing import Optional, TypedDict, cast
 
 from ananke.application import Application, JsonApplication, SqliteApplication, Target
+from ananke.cipher import Plaintext
 from ananke.config import Config, ConfigBuilder, OsFamily
-from ananke.data import Description, EntryId, Identity, Metadata, Plaintext
+from ananke.data import Description, EntryId, Identity, Metadata
 
 EXAMPLE_DATA: Path = Path("example") / "db" / "data.json"
 

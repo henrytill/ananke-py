@@ -7,10 +7,11 @@ from pathlib import Path
 from typing import List, Mapping, Sequence
 
 from . import data, version
-from .application import Application, JsonApplication, Record, SqliteApplication
+from .application import Application, JsonApplication, SqliteApplication
+from .cipher import KeyId, Plaintext
 from .cipher.gpg import Binary
 from .config import Backend, Config, ConfigBuilder, OsFamily
-from .data import CURRENT_SCHEMA_VERSION, Description, EntryId, Identity, KeyId, Plaintext, SchemaVersion
+from .data import CURRENT_SCHEMA_VERSION, Description, EntryId, Identity, Record, SchemaVersion
 
 
 def configure(host_os: OsFamily, env: Mapping[str, str]) -> Config:

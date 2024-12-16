@@ -100,7 +100,6 @@ run_tests() {
     log "Running tests..."
     activate_venv
     $PYTHON -m unittest discover -v -s "$TEST_DIR"
-    $PYTHON -m doctest -v ananke/data/common.py
     $PYTHON -m cram tests
 }
 

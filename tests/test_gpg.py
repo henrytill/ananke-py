@@ -7,9 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Generic, Optional, TypeVar
 
-from ananke.cipher import Cipher
+from ananke.cipher import ArmoredCiphertext, Cipher, Ciphertext, KeyId, Plaintext
 from ananke.cipher.gpg import Binary, Text
-from ananke.data import ArmoredCiphertext, Ciphertext, KeyId, Plaintext
 from tests import RandomArgs
 
 T = TypeVar("T")

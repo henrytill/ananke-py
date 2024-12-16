@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, TypeAlias, cast
 
 from .. import data
-from ..data import Description, Entry, EntryId, Identity, KeyId, Metadata, Plaintext, Timestamp
+from ..cipher import Plaintext
+from ..data import Description, Entry, EntryId, Identity, Metadata, Record
 
 Target: TypeAlias = EntryId | Description
 
@@ -16,19 +17,6 @@ class NoEntries(Exception):
 
 class MultipleEntries(Exception):
     """Signals that multiple entries match a given query"""
-
-
-@dataclass(frozen=True)
-class Record:
-    """The result of a lookup"""
-
-    entry_id: EntryId
-    key_id: KeyId
-    timestamp: Timestamp
-    description: Description
-    identity: Optional[Identity]
-    plaintext: Plaintext
-    meta: Optional[Metadata]
 
 
 class Application(ABC):

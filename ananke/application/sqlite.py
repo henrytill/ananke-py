@@ -4,11 +4,12 @@ from pathlib import Path
 from sqlite3 import Connection
 from typing import Dict, List, Optional, Tuple
 
+from ..cipher import Plaintext
 from ..cipher.gpg import Binary
 from ..config import Backend, Config
-from ..data import Description, Entry, EntryId, Identity, Metadata, Plaintext, Timestamp
+from ..data import Description, Entry, EntryId, Identity, Metadata, Record, Timestamp
 from . import common
-from .common import Application, Query, Record, Target
+from .common import Application, Query, Target
 
 CREATE_TABLE = """\
 CREATE TABLE IF NOT EXISTS entries (
@@ -75,17 +76,8 @@ class SqliteApplication(Application):
         ret: List[Record] = []
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql, parameters):
-                entry = Entry.from_tuple(row)
-                record = Record(
-                    entry_id=entry.entry_id,
-                    key_id=entry.key_id,
-                    timestamp=entry.timestamp,
-                    description=entry.description,
-                    identity=entry.identity,
-                    plaintext=self.cipher.decrypt(entry.ciphertext),
-                    meta=entry.meta,
-                )
-                ret.append(record)
+                entry = Entry.from_tuple(row).with_cipher(self.cipher)
+                ret.append(entry)
         return ret
 
     def modify(

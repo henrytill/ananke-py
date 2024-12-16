@@ -1,8 +1,7 @@
 import subprocess
 from typing import Optional
 
-from ..data import ArmoredCiphertext, Ciphertext, KeyId, Plaintext
-from .common import Cipher
+from .common import ArmoredCiphertext, Cipher, Ciphertext, KeyId, Plaintext
 
 
 class Binary(Cipher[Ciphertext]):

@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Callable, Mapping, Optional, Self
 
-from .data import KeyId
+from .cipher import KeyId
 
 
 # pylint: disable=invalid-name

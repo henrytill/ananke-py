@@ -6,7 +6,8 @@ from datetime import datetime, timezone
 from typing import List, LiteralString, TypedDict
 
 from ananke import data
-from ananke.data import Ciphertext, Description, Entry, EntryId, Identity, KeyId, Plaintext, Timestamp
+from ananke.cipher import Ciphertext, KeyId, Plaintext
+from ananke.data import Description, Entry, EntryId, Identity, Timestamp
 from tests import RandomArgs
 
 

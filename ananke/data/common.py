@@ -1,16 +1,11 @@
 """Common datatypes and related functions."""
 
-import base64
-import binascii
-import secrets
-import string
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, NewType, Optional, Self
 from uuid import UUID
 
-KeyId = NewType("KeyId", str)
-"""A Cryptographic Key Id."""
+from ..cipher import KeyId, Plaintext
 
 Description = NewType("Description", str)
 """Describes an 'Entry'. Can be a URI or a descriptive name."""
@@ -69,110 +64,6 @@ class Timestamp:
         return self.value.isoformat().replace("+00:00", "Z")
 
 
-class Plaintext:
-    """A plaintext value.
-
-    Attributes:
-        value: The plaintext value.
-    """
-
-    value: str
-
-    def __init__(self, value: str) -> None:
-        self.value = value
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Plaintext):
-            return False
-        return self.value.__eq__(other.value)
-
-    def __str__(self) -> str:
-        return self.value.__str__()
-
-    def __repr__(self) -> str:
-        return f"Plaintext({self.value!r})"
-
-    def __len__(self) -> int:
-        return self.value.__len__()
-
-    def encode(self, encoding: str = "utf-8", errors: str = "strict") -> bytes:
-        """Encodes the plaintext value using the specified encoding.
-
-        Args:
-            encoding: The encoding to use.
-            errors: The error handling scheme to use for encoding errors.
-
-        Returns:
-            The encoded value.
-        """
-        return self.value.encode(encoding, errors)
-
-    @classmethod
-    def random(
-        cls,
-        length: int,
-        use_uppercase: bool = True,
-        use_digits: bool = True,
-        use_punctuation: bool = False,
-    ) -> Self:
-        """Generates a random Plaintext of a given length.
-
-        Args:
-            length: The length of the generated string.
-            use_lowercase: Whether to use lowercase letters.
-            use_uppercase: Whether to use uppercase letters.
-            use_digits: Whether to use digits.
-            use_punctuation: Whether to use punctuation.
-
-        Returns:
-            A random Plaintext of the specified length.
-        """
-        chars = string.ascii_lowercase
-        if use_uppercase:
-            chars += string.ascii_uppercase
-        if use_digits:
-            chars += string.digits
-        if use_punctuation:
-            chars += string.punctuation
-
-        ret = "".join(secrets.choice(chars) for _ in range(length))
-
-        return cls(ret)
-
-
-class Ciphertext(bytes):
-    """An encrypted value of an 'Entry'."""
-
-    def __new__(cls, value: bytes) -> Self:
-        return super().__new__(cls, value)
-
-    @classmethod
-    def from_base64(cls, value: str) -> Self:
-        """Creates a Ciphertext object from a base64 encoded string.
-
-        Args:
-            value: The base64 encoded string.
-
-        Returns:
-            The Ciphertext object.
-
-        Raises:
-            ValueError: If the value is not a valid base64 encoded string.
-        """
-        try:
-            return cls(base64.b64decode(value.encode("ascii")))
-        except binascii.Error as exc:
-            raise ValueError("Invalid base64 string") from exc
-
-    def to_base64(self) -> str:
-        """Encodes the Ciphertext object as a base64 string.
-
-        Returns:
-            The base64 encoded string.
-        """
-        return base64.b64encode(self).decode("ascii")
-
-
 class EntryId:
     """Uniquely identifies an 'Entry'.
 
@@ -210,6 +101,33 @@ class EntryId:
             The generated EntryId.
         """
         return cls(uuid.uuid4())
+
+
+# pylint: disable=too-few-public-methods
+class Record:
+    """The result of a lookup
+
+    Attributes:
+        entry_id: Uniquely identifies the entry.
+        key_id: The GPG Key Id used for encryption.
+        timestamp: The time the entry was created.
+        description: Description of the entry. Can be a URI or a descriptive name.
+        identity: Optional identifying value, such as a username.
+        plaintext: The plaintext value.
+        meta: Optional field for additional non-specific information.
+    """
+
+    entry_id: EntryId
+    key_id: KeyId
+    timestamp: Timestamp
+    description: Description
+    identity: Optional[Identity]
+    meta: Optional[Metadata]
+
+    @property
+    def plaintext(self) -> Plaintext:
+        """Returns the plaintext associated with this record."""
+        raise NotImplementedError()
 
 
 def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:

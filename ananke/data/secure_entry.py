@@ -3,14 +3,12 @@
 # pylint: disable=duplicate-code
 import functools
 from dataclasses import dataclass
-from typing import Any, Dict, NewType, Optional, Self
+from typing import Any, Dict, Optional, Self
 from uuid import UUID
 
+from ..cipher import KeyId, Plaintext
 from . import common
-from .common import Description, EntryId, Identity, KeyId, Metadata, Plaintext, Timestamp
-
-ArmoredCiphertext = NewType("ArmoredCiphertext", str)
-"""An armored ciphertext value of an 'SecureEntry'."""
+from .common import Description, EntryId, Identity, Metadata, Record, Timestamp
 
 
 @dataclass
@@ -28,26 +26,11 @@ class SecureIndexElement:
     description: Description
 
 
-class SecureEntry:
-    """A record that stores a plaintext value along with associated information.
+# pylint: disable=too-many-instance-attributes
+class SecureEntry(Record):
+    """A record that stores a plaintext value along with associated information."""
 
-    Attributes:
-        entry_id: Uniquely identifies the entry.
-        key_id: The GPG Key Id used for encryption.
-        timestamp: The time the entry was created.
-        description: Description of the entry. Can be a URI or a descriptive name.
-        identity: Optional identifying value, such as a username.
-        plaintext: The plaintext value.
-        meta: Optional field for additional non-specific information.
-    """
-
-    entry_id: EntryId
-    key_id: KeyId
-    timestamp: Timestamp
-    description: Description
-    identity: Optional[Identity]
-    plaintext: Plaintext
-    meta: Optional[Metadata]
+    _plaintext: Plaintext
 
     def __init__(
         self,
@@ -85,6 +68,14 @@ class SecureEntry:
             and self.plaintext == other.plaintext
             and self.meta == other.meta
         )
+
+    @property
+    def plaintext(self) -> Plaintext:
+        return self._plaintext
+
+    @plaintext.setter
+    def plaintext(self, plaintext: Plaintext) -> None:
+        self._plaintext = plaintext
 
     @classmethod
     def from_dict(cls, data: Dict[Any, Any]) -> Self:

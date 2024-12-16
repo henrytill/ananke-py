@@ -4,8 +4,8 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from ananke.cipher import KeyId
 from ananke.config import Backend, ConfigBuilder, Env, OsFamily
-from ananke.data import KeyId
 
 
 # pylint: disable=too-few-public-methods

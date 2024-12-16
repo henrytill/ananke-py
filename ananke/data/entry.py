@@ -4,30 +4,17 @@ import functools
 from typing import Any, Dict, Optional, Self, Tuple
 from uuid import UUID
 
+from ..cipher import Cipher, Ciphertext, KeyId, Plaintext
 from . import common
-from .common import Ciphertext, Description, EntryId, Identity, KeyId, Metadata, Timestamp
+from .common import Description, EntryId, Identity, Metadata, Record, Timestamp
 
 
-class Entry:
-    """A record that stores an encrypted value along with associated information.
+# pylint: disable=too-many-instance-attributes
+class Entry(Record):
+    """A record that stores an encrypted value along with associated information."""
 
-    Attributes:
-        entry_id: Uniquely identifies the entry.
-        key_id: The GPG Key Id used for encryption.
-        timestamp: The time the entry was created.
-        description: Description of the entry. Can be a URI or a descriptive name.
-        identity: Optional identifying value, such as a username.
-        ciphertext: The encrypted value.
-        meta: Optional field for additional non-specific information.
-    """
-
-    entry_id: EntryId
-    key_id: KeyId
-    timestamp: Timestamp
-    description: Description
-    identity: Optional[Identity]
+    cipher: Optional[Cipher[Ciphertext]]
     ciphertext: Ciphertext
-    meta: Optional[Metadata]
 
     def __init__(
         self,
@@ -44,8 +31,20 @@ class Entry:
         self.timestamp = timestamp
         self.description = description
         self.identity = identity
+        self.cipher = None
         self.ciphertext = ciphertext
         self.meta = meta
+
+    def with_cipher(self, cipher: Cipher[Ciphertext]) -> Self:
+        """Associates a cipher with this entry. Required before accessing plaintext.
+
+        Args:
+            cipher: Cipher to use for this entry
+        Returns:
+            self: This entry for chaining
+        """
+        self.cipher = cipher
+        return self
 
     def __repr__(self) -> str:
         return f"Entry({self.entry_id})"
@@ -65,6 +64,12 @@ class Entry:
             and self.ciphertext == other.ciphertext
             and self.meta == other.meta
         )
+
+    @property
+    def plaintext(self) -> Plaintext:
+        if self.cipher is None:
+            raise AttributeError("cipher must be set using with_cipher() before accessing plaintext")
+        return self.cipher.decrypt(self.ciphertext)
 
     def update(self) -> Self:
         """Updates the timestamp of an 'Entry'.
