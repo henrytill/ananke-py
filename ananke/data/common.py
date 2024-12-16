@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, NewType, Optional, Self
+from typing import Any, Dict, NewType, Optional, Self, TypeVar
 from uuid import UUID
 
 from ..cipher import KeyId, Plaintext
@@ -153,38 +153,11 @@ def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
     return {mapping.get(key, key): value for key, value in data.items()}
 
 
-def get_required(d: Dict[Any, Any], key: Any, value_type: type) -> Any:
-    """Gets a required value from a dictionary.
-
-    Args:
-        d: The dictionary to get the value from.
-        key: The key to get the value for.
-        value_type: The type of the value.
-
-    Returns:
-        The value.
-
-    Examples:
-    >>> get_required({"a": 1}, "a", int)
-    1
-    >>> get_required({"a": 1}, "a", str)
-    Traceback (most recent call last):
-    ...
-    TypeError: Invalid a: expected a value of type <class 'str'>
-    >>> get_required({"a": 1}, "b", int)
-    Traceback (most recent call last):
-    ...
-    KeyError: 'Invalid entry: missing required key: b'
-    """
-    value = d.get(key)
-    if value is None:
-        raise KeyError(f"Invalid entry: missing required key: {key}")
-    if not isinstance(value, value_type):
-        raise TypeError(f"Invalid {key}: expected a value of type {value_type}")
-    return value
+K = TypeVar("K")
+V = TypeVar("V")
 
 
-def get_optional(d: Dict[Any, Any], key: Any, value_type: type) -> Optional[Any]:
+def get_optional(d: Dict[K, Any], key: Any, value_type: type[V]) -> Optional[V]:
     """Gets an optional value from a dictionary.
 
     Args:
@@ -210,4 +183,33 @@ def get_optional(d: Dict[Any, Any], key: Any, value_type: type) -> Optional[Any]
         return None
     if not isinstance(value, value_type):
         raise TypeError(f"Invalid {key}: expected a value of type {value_type}")
+    return value
+
+
+def get_required(d: Dict[K, Any], key: Any, value_type: type[V]) -> V:
+    """Gets a required value from a dictionary.
+
+    Args:
+        d: The dictionary to get the value from.
+        key: The key to get the value for.
+        value_type: The type of the value.
+
+    Returns:
+        The value.
+
+    Examples:
+    >>> get_required({"a": 1}, "a", int)
+    1
+    >>> get_required({"a": 1}, "a", str)
+    Traceback (most recent call last):
+    ...
+    TypeError: Invalid a: expected a value of type <class 'str'>
+    >>> get_required({"a": 1}, "b", int)
+    Traceback (most recent call last):
+    ...
+    KeyError: 'Invalid entry: missing required key: b'
+    """
+    value = get_optional(d, key, value_type)
+    if value is None:
+        raise KeyError(f"Invalid entry: missing required key: {key}")
     return value

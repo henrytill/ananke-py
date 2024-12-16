@@ -91,15 +91,15 @@ class Entry(Record):
             The created 'Entry'.
         """
         # Get required keys
-        id_str: str = common.get_required(data, "id", str)
-        key_id_str: str = common.get_required(data, "key_id", str)
-        timestamp_str: str = common.get_required(data, "timestamp", str)
-        description_str: str = common.get_required(data, "description", str)
-        ciphertext_str: str = common.get_required(data, "ciphertext", str)
+        id_str = common.get_required(data, "id", str)
+        key_id_str = common.get_required(data, "key_id", str)
+        timestamp_str = common.get_required(data, "timestamp", str)
+        description_str = common.get_required(data, "description", str)
+        ciphertext_str = common.get_required(data, "ciphertext", str)
 
         # Get optional keys
-        maybe_identity: Optional[str] = common.get_optional(data, "identity", str)
-        maybe_meta: Optional[str] = common.get_optional(data, "meta", str)
+        maybe_identity = common.get_optional(data, "identity", str)
+        maybe_meta = common.get_optional(data, "meta", str)
 
         # Validate entry id
         try:

@@ -88,8 +88,8 @@ class SecureEntry(Record):
             The created 'SecretEntry'.
         """
         # Get required keys
-        id_str: str = common.get_required(data, "id", str)
-        key_id_str: str = common.get_required(data, "key_id", str)
+        id_str = common.get_required(data, "id", str)
+        key_id_str = common.get_required(data, "key_id", str)
         timestamp_str = common.get_required(data, "timestamp", str)
         description_str = common.get_required(data, "description", str)
         plaintext_str = common.get_required(data, "plaintext", str)
