@@ -2,7 +2,7 @@
   <h1>ananke-py</h1>
   <p><strong>A password manager</strong></p>
   <p>
-    <a href="https://github.com/henrytill/ananke-py/actions/workflows/main.yml"><img src="https://github.com/henrytill/ananke-py/actions/workflows/main.yml/badge.svg" alt="CI" /></a>
+    <a href="https://github.com/henrytill/ananke-py/actions/workflows/ci.yml"><img src="https://github.com/henrytill/ananke-py/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   </p>
 </div>
 
