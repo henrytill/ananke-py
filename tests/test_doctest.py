@@ -2,15 +2,12 @@
 
 import doctest
 import unittest
+from typing import Optional
 
 from ananke.data import common
 
 
-def load_tests(
-    _loader: unittest.TestLoader,
-    tests: unittest.TestSuite,
-    _pattern: str | None,
-) -> unittest.TestSuite:
+def load_tests(_loader: unittest.TestLoader, tests: unittest.TestSuite, _pattern: Optional[str]) -> unittest.TestSuite:
     """Load doctests into unittest's test suite."""
     tests.addTests(doctest.DocTestSuite(common))
     return tests
