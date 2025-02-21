@@ -1,6 +1,7 @@
 """The data package."""
 
 from .common import Description as Description
+from .common import Dictable as Dictable
 from .common import EntryId as EntryId
 from .common import Identity as Identity
 from .common import Metadata as Metadata

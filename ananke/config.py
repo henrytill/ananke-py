@@ -58,6 +58,7 @@ class Backend(Enum):
 
     SQLITE = 1
     JSON = 2
+    TEXT = 3
 
     @classmethod
     def from_str(cls, backend_str: str) -> "Backend":
@@ -74,6 +75,8 @@ class Backend(Enum):
                 return cls.SQLITE
             case "json":
                 return cls.JSON
+            case "text":
+                return cls.TEXT
             case _:
                 raise ValueError(f"Invalid Backend string: {backend_str}")
 
@@ -83,11 +86,13 @@ class Backend(Enum):
                 return "sqlite"
             case Backend.JSON:
                 return "json"
+            case Backend.TEXT:
+                return "text"
 
     @classmethod
     def default(cls) -> "Backend":
         """Returns default Backend."""
-        return cls.JSON
+        return cls.TEXT
 
 
 @dataclass(frozen=True)
@@ -125,6 +130,8 @@ class Config:
                 return self.db_dir / "data.json"
             case Backend.SQLITE:
                 return self.db_dir / "db.sqlite"
+            case Backend.TEXT:
+                return self.db_dir / "index.asc"
 
     @property
     def schema_file(self) -> Path:

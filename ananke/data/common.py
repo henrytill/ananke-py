@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, NewType, Optional, Self, TypeVar
+from typing import Any, Dict, NewType, Optional, Protocol, Self, TypeVar
 from uuid import UUID
 
 from ..cipher import KeyId, Plaintext
@@ -101,6 +101,20 @@ class EntryId:
             The generated EntryId.
         """
         return cls(uuid.uuid4())
+
+
+# pylint: disable=unnecessary-ellipsis
+class Dictable(Protocol):
+    """A protocol for objects that can be converted to and from dictionaries."""
+
+    @classmethod
+    def from_dict(cls, data: Dict[Any, Any]) -> Self:
+        """Creates an instance from a dictionary."""
+        ...
+
+    def to_dict(self) -> Dict[str, str]:
+        """Converts the instance to a dictionary."""
+        ...
 
 
 # pylint: disable=too-few-public-methods

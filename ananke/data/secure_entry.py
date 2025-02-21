@@ -25,6 +25,45 @@ class SecureIndexElement:
     key_id: KeyId
     description: Description
 
+    @classmethod
+    def from_dict(cls, data: Dict[Any, Any]) -> Self:
+        """Creates a 'SecureIndexElement' from a dictionary.
+
+        Args:
+            data: The dictionary to create the 'SecureIndexElement' from.
+
+        Returns:
+            The created 'SecureIndexElement'.
+        """
+        # Get required keys
+        id_str = common.get_required(data, "id", str)
+        key_id_str = common.get_required(data, "key_id", str)
+        description_str = common.get_required(data, "description", str)
+
+        # Validate entry id
+        try:
+            uuid = UUID(id_str)
+        except ValueError as err:
+            raise ValueError("Invalid id format") from err
+
+        return cls(
+            entry_id=EntryId(uuid),
+            key_id=KeyId(key_id_str),
+            description=Description(description_str),
+        )
+
+    def to_dict(self) -> Dict[str, str]:
+        """Converts the 'SecureIndexElement' to a dictionary.
+
+        Returns:
+            The converted 'SecureIndexElement'.
+        """
+        return {
+            "id": str(self.entry_id),
+            "key_id": self.key_id,
+            "description": self.description,
+        }
+
 
 # pylint: disable=too-many-instance-attributes
 class SecureEntry(Record):

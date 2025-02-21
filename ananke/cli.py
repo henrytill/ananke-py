@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List, Mapping, Sequence
 
 from . import data, version
-from .application import Application, JsonApplication, SqliteApplication
+from .application import Application, JsonApplication, SqliteApplication, TextApplication
 from .cipher import KeyId, Plaintext
 from .cipher.gpg import Binary
 from .config import Backend, Config, ConfigBuilder, OsFamily
@@ -68,6 +68,8 @@ def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
             return JsonApplication(cfg)
         case Backend.SQLITE:
             return SqliteApplication(cfg)
+        case Backend.TEXT:
+            return TextApplication(cfg)
 
 
 def cmd_add(attrs: Namespace) -> int:

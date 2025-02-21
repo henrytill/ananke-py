@@ -1,7 +1,9 @@
 import copy
+import json
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, cast
 
+from .. import data
 from ..cipher import Plaintext
 from ..cipher.gpg import Binary
 from ..config import Backend, Config
@@ -26,7 +28,7 @@ class JsonApplication(Application):
         self.entries = []
 
         if self.config.data_file.exists():
-            self.entries += common.read(self.config.data_file)
+            self.entries += _read(self.config.data_file)
 
     def add(
         self,
@@ -48,7 +50,7 @@ class JsonApplication(Application):
             meta=maybe_meta,
         )
         self.entries.append(entry)
-        common.write(self.config.data_file, self.entries)
+        _write(self.config.data_file, self.entries)
 
     def lookup(self, description: Description, maybe_identity: Optional[Identity] = None) -> List[Record]:
         query = Query(description=description, identity=maybe_identity)
@@ -90,7 +92,7 @@ class JsonApplication(Application):
         entry.update()
 
         self.entries.append(entry)
-        common.write(self.config.data_file, self.entries)
+        _write(self.config.data_file, self.entries)
 
     def remove(self, target: Target) -> None:
         idxs = [i for i, entry in enumerate(self.entries) if common.target_matches(target, entry)]
@@ -105,18 +107,18 @@ class JsonApplication(Application):
         idx = idxs[0]
 
         del self.entries[idx]
-        common.write(self.config.data_file, self.entries)
+        _write(self.config.data_file, self.entries)
 
     def import_entries(self, path: Optional[Path]) -> None:
         if path is None:
             return
-        self.entries += common.read(path)
-        common.write(self.config.data_file, self.entries)
+        self.entries += _read(path)
+        _write(self.config.data_file, self.entries)
 
     def export_entries(self, path: Optional[Path]) -> None:
         if path is None:
             return
-        common.write(path, self.entries)
+        _write(path, self.entries)
 
 
 class QueryMatcher:
@@ -146,3 +148,27 @@ class QueryMatcher:
         if entry.identity is None:
             return False
         return self.query.identity.lower() in entry.identity.lower()
+
+
+def _read(path: Path) -> List[Entry]:
+    """Reads entries from a JSON file"""
+    if not path.exists():
+        raise FileNotFoundError(f"File '{path}' does not exist")
+    json_data = path.read_text(encoding="utf-8")
+    parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
+    if not isinstance(parsed, list):
+        raise TypeError("Expected a list")
+    ret: List[Entry] = []
+    for item in cast(List[object], parsed):
+        if not isinstance(item, dict):
+            raise TypeError("Expected a dictionary")
+        ret.append(Entry.from_dict(cast(Dict[Any, Any], item)))
+    return ret
+
+
+def _write(path: Path, writes: List[Entry]) -> None:
+    """Writes entries to a JSON file"""
+    writes.sort(key=lambda entry: entry.timestamp)
+    dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(entry.to_dict()) for entry in writes]
+    json_str = json.dumps(dicts, indent=4)
+    path.write_text(json_str, encoding="utf-8")
