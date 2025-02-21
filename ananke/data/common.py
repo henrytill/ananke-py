@@ -171,7 +171,7 @@ K = TypeVar("K")
 V = TypeVar("V")
 
 
-def get_optional(d: Dict[K, Any], key: Any, value_type: type[V]) -> Optional[V]:
+def get_optional(d: Dict[K, Any], key: K, value_type: type[V]) -> Optional[V]:
     """Gets an optional value from a dictionary.
 
     Args:
@@ -200,7 +200,7 @@ def get_optional(d: Dict[K, Any], key: Any, value_type: type[V]) -> Optional[V]:
     return value
 
 
-def get_required(d: Dict[K, Any], key: Any, value_type: type[V]) -> V:
+def get_required(d: Dict[K, Any], key: K, value_type: type[V]) -> V:
     """Gets a required value from a dictionary.
 
     Args:
