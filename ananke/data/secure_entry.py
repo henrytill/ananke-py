@@ -26,7 +26,7 @@ class SecureIndexElement:
     description: Description
 
     @classmethod
-    def from_dict(cls, data: Dict[Any, Any]) -> Self:
+    def from_dict(cls, data: Dict[str, Any]) -> Self:
         """Creates a 'SecureIndexElement' from a dictionary.
 
         Args:
@@ -117,7 +117,7 @@ class SecureEntry(Record):
         self._plaintext = plaintext
 
     @classmethod
-    def from_dict(cls, data: Dict[Any, Any]) -> Self:
+    def from_dict(cls, data: Dict[str, Any]) -> Self:
         """Creates a 'SecretEntry' from a dictionary.
 
         Args:

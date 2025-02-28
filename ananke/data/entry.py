@@ -81,7 +81,7 @@ class Entry(Record):
         return self
 
     @classmethod
-    def from_dict(cls, data: Dict[Any, Any]) -> Self:
+    def from_dict(cls, data: Dict[str, Any]) -> Self:
         """Creates an 'Entry' from a dictionary.
 
         Args:

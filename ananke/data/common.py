@@ -108,7 +108,7 @@ class Dictable(Protocol):
     """A protocol for objects that can be converted to and from dictionaries."""
 
     @classmethod
-    def from_dict(cls, data: Dict[Any, Any]) -> Self:
+    def from_dict(cls, data: Dict[str, Any]) -> Self:
         """Creates an instance from a dictionary."""
         ...
 

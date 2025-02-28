@@ -146,7 +146,7 @@ def read(path: Path) -> List[Entry]:
     for item in cast(List[object], parsed):
         if not isinstance(item, dict):
             raise TypeError("Expected a dictionary")
-        ret.append(Entry.from_dict(cast(Dict[Any, Any], item)))
+        ret.append(Entry.from_dict(cast(Dict[str, Any], item)))
     return ret
 
 

@@ -80,7 +80,7 @@ def read(cls: Type[T], cipher: Text, path: Path) -> List[T]:
     for item in cast(List[object], parsed):
         if not isinstance(item, dict):
             raise TypeError("Expected a dictionary")
-        ret.append(cls.from_dict(cast(Dict[Any, Any], item)))
+        ret.append(cls.from_dict(cast(Dict[str, Any], item)))
     return ret
 
 
