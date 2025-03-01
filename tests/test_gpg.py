@@ -5,18 +5,16 @@ import tempfile
 import unittest
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generic, Optional, TypeVar
+from typing import Optional
 
 from ananke.cipher import ArmoredCiphertext, Cipher, Ciphertext, KeyId, Plaintext
 from ananke.cipher.gpg import Binary, Text
 from tests import RandomArgs
 
-T = TypeVar("T")
-
 
 @dataclass(frozen=True)
 class TestCipher:
-    class Inner(Generic[T], unittest.TestCase):
+    class Inner[T](unittest.TestCase):
         """Base test class for GPG cipher implementations."""
 
         key_id: KeyId

@@ -5,7 +5,7 @@ import binascii
 import secrets
 import string
 from abc import ABC, abstractmethod
-from typing import Generic, NewType, Optional, Self, TypeVar
+from typing import NewType, Optional, Self
 
 
 class Plaintext:
@@ -120,10 +120,7 @@ KeyId = NewType("KeyId", str)
 """A Cryptographic Key Id."""
 
 
-T = TypeVar("T")
-
-
-class Cipher(ABC, Generic[T]):
+class Cipher[T](ABC):
     """The Cipher class."""
 
     _key_id: KeyId

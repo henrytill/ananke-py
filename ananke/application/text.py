@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type, TypeVar, cast
+from typing import Any, Dict, List, Optional, Type, cast
 
 from .. import data
 from ..cipher import ArmoredCiphertext, Plaintext
@@ -64,10 +64,7 @@ class TextApplication(Application):
         raise NotImplementedError
 
 
-T = TypeVar("T", bound=Dictable)
-
-
-def read(cls: Type[T], cipher: Text, path: Path) -> List[T]:
+def read[T: Dictable](cls: Type[T], cipher: Text, path: Path) -> List[T]:
     """Reads objects from a text file"""
     if not path.exists():
         raise FileNotFoundError(f"File '{path}' does not exist")
