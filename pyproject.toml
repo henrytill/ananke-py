@@ -47,6 +47,7 @@ disable = [
     "R0801", # duplicate-code, no thanks
     "R0913", # too-many-arguments, i know
     "R0917", # too-many-positional-arguments, you are told me thanks
+    "W2301", # unnecessary-ellipsis, yes but i want them
 ]
 
 [tool.pyright]

@@ -103,7 +103,6 @@ class EntryId:
         return cls(uuid.uuid4())
 
 
-# pylint: disable=unnecessary-ellipsis
 class Dictable(Protocol):
     """A protocol for objects that can be converted to and from dictionaries."""
 
