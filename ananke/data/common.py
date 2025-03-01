@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, NewType, Optional, Protocol, Self
+from typing import Any, Dict, NewType, Optional, Protocol, Self, Type
 from uuid import UUID
 
 from ..cipher import KeyId, Plaintext
@@ -167,7 +167,7 @@ def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
     return {mapping.get(key, key): value for key, value in data.items()}
 
 
-def get_optional[K, V](d: Dict[K, Any], key: K, value_type: type[V]) -> Optional[V]:
+def get_optional[K, V](d: Dict[K, Any], key: K, value_type: Type[V]) -> Optional[V]:
     """Gets an optional value from a dictionary.
 
     Args:
@@ -196,7 +196,7 @@ def get_optional[K, V](d: Dict[K, Any], key: K, value_type: type[V]) -> Optional
     return value
 
 
-def get_required[K, V](d: Dict[K, Any], key: K, value_type: type[V]) -> V:
+def get_required[K, V](d: Dict[K, Any], key: K, value_type: Type[V]) -> V:
     """Gets a required value from a dictionary.
 
     Args:
