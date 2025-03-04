@@ -1,6 +1,7 @@
 """Common datatypes and related functions."""
 
 import uuid
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, NewType, Optional, Protocol, Self, Type
 from uuid import UUID
@@ -104,25 +105,16 @@ class Dictable(Protocol):
         ...
 
 
-# pylint: disable=too-few-public-methods
+@dataclass
 class Record:
     """The result of a lookup"""
 
-    def __init__(
-        self,
-        entry_id: EntryId,
-        key_id: KeyId,
-        timestamp: Timestamp,
-        description: Description,
-        identity: Optional[Identity],
-        meta: Optional[Metadata],
-    ) -> None:
-        self.entry_id = entry_id
-        self.key_id = key_id
-        self.timestamp = timestamp
-        self.description = description
-        self.identity = identity
-        self.meta = meta
+    entry_id: EntryId
+    key_id: KeyId
+    timestamp: Timestamp
+    description: Description
+    identity: Optional[Identity]
+    meta: Optional[Metadata]
 
     @property
     def plaintext(self) -> Plaintext:
