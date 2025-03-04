@@ -204,7 +204,7 @@ SNAKE_TO_CAMEL = {
     "key_id": "keyId",
     "description": "description",
     "identity": "identity",
-    "ciphertext": "ciphertext",
+    "plaintext": "plaintext",
     "meta": "meta",
 }
 
