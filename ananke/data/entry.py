@@ -51,6 +51,9 @@ class Entry(Record):
     def __hash__(self) -> int:
         return hash(self.entry_id)
 
+    def __lt__(self, other: Self) -> bool:
+        return self.timestamp < other.timestamp
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Entry):
             return False

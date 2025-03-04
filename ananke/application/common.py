@@ -2,11 +2,11 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Protocol, Sequence, Type, cast
 
 from .. import data
 from ..cipher import Plaintext
-from ..data import Description, Entry, EntryId, Identity, Metadata, Record
+from ..data import Description, Dictable, Entry, EntryId, Identity, Metadata, Record, Sortable
 
 type Target = EntryId | Description
 
@@ -134,25 +134,34 @@ def target_matches(target: Target, entry: Entry) -> bool:
     return target in entry.description
 
 
-def read(path: Path) -> List[Entry]:
-    """Reads entries from a JSON file"""
-    if not path.exists():
-        raise FileNotFoundError(f"File '{path}' does not exist")
-    json_data = path.read_text(encoding="utf-8")
-    parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
+def _read_json[T: Dictable](cls: Type[T], s: str) -> List[T]:
+    """Reads objects from a JSON string"""
+    parsed = json.loads(s, object_hook=data.remap_keys_camel_to_snake)
     if not isinstance(parsed, list):
         raise TypeError("Expected a list")
-    ret: List[Entry] = []
+    ret: List[T] = []
     for item in cast(List[object], parsed):
         if not isinstance(item, dict):
             raise TypeError("Expected a dictionary")
-        ret.append(Entry.from_dict(cast(Dict[str, Any], item)))
+        ret.append(cls.from_dict(cast(Dict[str, Any], item)))
     return ret
 
 
-def write(path: Path, writes: List[Entry]) -> None:
+def read[T: Dictable](cls: Type[T], path: Path) -> List[T]:
+    """Reads objects from a JSON file"""
+    if not path.exists():
+        raise FileNotFoundError(f"File '{path}' does not exist")
+    json_data = path.read_text(encoding="utf-8")
+    return _read_json(cls, json_data)
+
+
+class Writable(Dictable, Sortable, Protocol):
+    """A protocol for objects that can be written to a JSON file"""
+
+
+def write[T: Writable](path: Path, writes: Sequence[T]) -> None:
     """Writes entries to a JSON file"""
-    writes.sort(key=lambda entry: entry.timestamp)
-    dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(entry.to_dict()) for entry in writes]
+    sorted_writes = sorted(writes)
+    dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in sorted_writes]
     json_str = json.dumps(dicts, indent=4)
     path.write_text(json_str, encoding="utf-8")

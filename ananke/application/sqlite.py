@@ -128,7 +128,7 @@ class SqliteApplication(Application):
     def import_entries(self, path: Optional[Path]) -> None:
         if path is None:
             return
-        entries: List[Entry] = common.read(path)
+        entries: List[Entry] = common.read(Entry, path)
         with closing(self.connection.cursor()) as cursor:
             for entry in entries:
                 sql, parameters = _create_insert(entry)

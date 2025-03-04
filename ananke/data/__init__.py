@@ -6,6 +6,7 @@ from .common import EntryId as EntryId
 from .common import Identity as Identity
 from .common import Metadata as Metadata
 from .common import Record as Record
+from .common import Sortable as Sortable
 from .common import Timestamp as Timestamp
 from .common import get_optional as get_optional
 from .common import get_required as get_required
