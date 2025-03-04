@@ -2,13 +2,13 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TypeAlias, cast
+from typing import Any, Dict, List, Optional, cast
 
 from .. import data
 from ..cipher import Plaintext
 from ..data import Description, Entry, EntryId, Identity, Metadata, Record
 
-Target: TypeAlias = EntryId | Description
+type Target = EntryId | Description
 
 
 class NoEntries(Exception):
