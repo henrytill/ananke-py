@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from ananke.cipher import ArmoredCiphertext, Cipher, Ciphertext, KeyId, Plaintext
 from ananke.cipher.gpg import Binary, Text
@@ -47,7 +47,7 @@ class TestCipher:
 
         def test_encode_decode_random(self) -> None:
             """Tests the encode and decode methods with random data."""
-            test_cases: list[RandomArgs] = [
+            test_cases: List[RandomArgs] = [
                 # length = 24
                 {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": True},
                 {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": False},

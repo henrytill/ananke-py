@@ -3,7 +3,7 @@
 import string
 import unittest
 from datetime import datetime, timezone
-from typing import List, LiteralString, TypedDict
+from typing import Dict, List, LiteralString, TypedDict
 
 from ananke import data
 from ananke.cipher import Ciphertext, KeyId, Plaintext
@@ -322,7 +322,7 @@ class TestKeyConversion(unittest.TestCase):
 
     def test_remap_keys(self) -> None:
         """Keys can be remapped in a dict."""
-        test_cases: list[dict[str, dict[str, str]]] = [
+        test_cases: List[Dict[str, Dict[str, str]]] = [
             {
                 "key_map": {"foo": "bar", "baz": "quux"},
                 "input_dict": {"foo": "a", "baz": "b"},

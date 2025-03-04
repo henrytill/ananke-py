@@ -3,7 +3,7 @@ import unittest
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Optional, TypedDict, cast
+from typing import List, Optional, TypedDict, cast
 
 from ananke.application import Application, JsonApplication, SqliteApplication, Target
 from ananke.cipher import Plaintext
@@ -24,7 +24,7 @@ class LookupTestCase(TypedDict):
     """A type hint class for testing lookup."""
 
     args: LookupArgs
-    plaintexts: list[Plaintext]
+    plaintexts: List[Plaintext]
 
 
 class AddArgs(TypedDict):
@@ -79,7 +79,7 @@ class TestApplication:
             """Test the lookup method against the example data."""
 
             # see example/data.json for the test data
-            test_cases: list[LookupTestCase] = [
+            test_cases: List[LookupTestCase] = [
                 {
                     "args": {"description": Description("https://www.foomail.com"), "maybe_identity": Identity("quux")},
                     "plaintexts": [Plaintext("ASecretPassword"), Plaintext("ThisIsMyAltPassword")],
@@ -135,7 +135,7 @@ class TestApplication:
         def test_add(self) -> None:
             """Test the add method against the example data."""
 
-            test_cases: list[AddArgs] = [
+            test_cases: List[AddArgs] = [
                 {
                     "description": Description("https://www.foonews.com"),
                     "plaintext": Plaintext("FooNewsSecretPassword"),
@@ -177,7 +177,7 @@ class TestApplication:
         def test_modify(self) -> None:
             """Test the modify method against the example data."""
 
-            test_cases: list[ModifyArgs] = [
+            test_cases: List[ModifyArgs] = [
                 {
                     "target": Description("https://www.bazbank.com"),
                     "maybe_description": None,
@@ -280,7 +280,7 @@ class TestApplication:
         def test_remove(self) -> None:
             """Test the remove method against the example data."""
 
-            test_cases: list[Description | EntryId] = [
+            test_cases: List[Description | EntryId] = [
                 Description("https://www.bazbank.com"),
                 Description("https://www.barphone.com"),
             ]
