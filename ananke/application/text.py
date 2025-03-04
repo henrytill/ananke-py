@@ -13,18 +13,13 @@ from .common import Application, Target
 class TextApplication(Application):
     """A Text Application"""
 
-    config: Config
-    cipher: Text
-    elements: List[SecureIndexElement]
-
     def __init__(self, config: Config) -> None:
         assert config.backend == Backend.TEXT
 
         self.config = config
-        self.cipher = Text(self.config.key_id)
         self.config.data_file.parent.mkdir(parents=True, exist_ok=True)
-        self.elements = []
-
+        self.cipher = Text(self.config.key_id)
+        self.elements: List[SecureIndexElement] = []
         if self.config.data_file.exists():
             self.elements += read(SecureIndexElement, self.cipher, self.config.data_file)
 

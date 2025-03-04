@@ -5,13 +5,7 @@ from typing import Self
 
 
 class SchemaVersion:
-    """Schema version.
-
-    Attributes:
-        value: The version number.
-    """
-
-    value: int
+    """Schema version."""
 
     def __init__(self, value: int) -> None:
         self.value = value

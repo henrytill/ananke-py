@@ -15,18 +15,13 @@ from .common import Application, Query, Target
 class JsonApplication(Application):
     """A JSON Application"""
 
-    config: Config
-    cipher: Binary
-    entries: List[Entry]
-
     def __init__(self, config: Config) -> None:
         assert config.backend == Backend.JSON
 
         self.config = config
-        self.cipher = Binary(self.config.key_id)
         self.config.data_file.parent.mkdir(parents=True, exist_ok=True)
-        self.entries = []
-
+        self.cipher = Binary(self.config.key_id)
+        self.entries: List[Entry] = []
         if self.config.data_file.exists():
             self.entries += _read(self.config.data_file)
 
@@ -125,12 +120,7 @@ class QueryMatcher:
     """A query matcher.
 
     This class is used to filter entries.
-
-    Attributes:
-        query: The query to match.
     """
-
-    query: Query
 
     def __init__(self, query: Query) -> None:
         self.query = query

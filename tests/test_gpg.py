@@ -17,12 +17,17 @@ class TestCipher:
     class Inner[T](unittest.TestCase):
         """Base test class for GPG cipher implementations."""
 
-        key_id: KeyId
-        cipher: Cipher[T]
-
         def setUp(self) -> None:
             self.key_id = KeyId("371C136C")
             os.environ["GNUPGHOME"] = str(Path.cwd() / "example" / "gnupg")
+
+        @property
+        def cipher(self) -> Cipher[T]:
+            return self._cipher
+
+        @cipher.setter
+        def cipher(self, cipher: Cipher[T]) -> None:
+            self._cipher = cipher
 
         def test_encode_decode(self) -> None:
             """Tests the encode and decode methods."""

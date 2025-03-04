@@ -69,8 +69,6 @@ class SecureIndexElement:
 class SecureEntry(Record):
     """A record that stores a plaintext value along with associated information."""
 
-    _plaintext: Plaintext
-
     def __init__(
         self,
         entry_id: EntryId,
@@ -81,12 +79,15 @@ class SecureEntry(Record):
         plaintext: Plaintext,
         meta: Optional[Metadata],
     ) -> None:
-        self.entry_id = entry_id
-        self.key_id = key_id
-        self.timestamp = timestamp
-        self.description = description
-        self.identity = identity
-        self.plaintext = plaintext
+        super().__init__(
+            entry_id=entry_id,
+            key_id=key_id,
+            timestamp=timestamp,
+            description=description,
+            identity=identity,
+            meta=meta,
+        )
+        self._plaintext = plaintext
         self.meta = meta
 
     def __repr__(self) -> str:

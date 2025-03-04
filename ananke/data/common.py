@@ -18,13 +18,7 @@ Metadata = NewType("Metadata", str)
 
 
 class Timestamp:
-    """A UTC timestamp.
-
-    Attributes:
-        value: The datetime object.
-    """
-
-    value: datetime
+    """A UTC timestamp."""
 
     def __init__(self, value: datetime) -> None:
         self.value = value
@@ -65,13 +59,7 @@ class Timestamp:
 
 
 class EntryId:
-    """Uniquely identifies an 'Entry'.
-
-    Attributes:
-        value: The entry id.
-    """
-
-    value: UUID
+    """Uniquely identifies an 'Entry'."""
 
     def __init__(self, value: UUID | str) -> None:
         if isinstance(value, UUID):
@@ -118,24 +106,23 @@ class Dictable(Protocol):
 
 # pylint: disable=too-few-public-methods
 class Record:
-    """The result of a lookup
+    """The result of a lookup"""
 
-    Attributes:
-        entry_id: Uniquely identifies the entry.
-        key_id: The GPG Key Id used for encryption.
-        timestamp: The time the entry was created.
-        description: Description of the entry. Can be a URI or a descriptive name.
-        identity: Optional identifying value, such as a username.
-        plaintext: The plaintext value.
-        meta: Optional field for additional non-specific information.
-    """
-
-    entry_id: EntryId
-    key_id: KeyId
-    timestamp: Timestamp
-    description: Description
-    identity: Optional[Identity]
-    meta: Optional[Metadata]
+    def __init__(
+        self,
+        entry_id: EntryId,
+        key_id: KeyId,
+        timestamp: Timestamp,
+        description: Description,
+        identity: Optional[Identity],
+        meta: Optional[Metadata],
+    ) -> None:
+        self.entry_id = entry_id
+        self.key_id = key_id
+        self.timestamp = timestamp
+        self.description = description
+        self.identity = identity
+        self.meta = meta
 
     @property
     def plaintext(self) -> Plaintext:

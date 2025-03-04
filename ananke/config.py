@@ -159,12 +159,6 @@ def _file_reader(path: Path) -> str:
 class ConfigBuilder:
     """A configuration builder."""
 
-    config_dir: Optional[Path]
-    data_dir: Optional[Path]
-    backend: Optional[Backend]
-    key_id: Optional[KeyId]
-    allow_multiple_keys: Optional[bool]
-
     def __init__(
         self,
         config_dir: Optional[Path] = None,

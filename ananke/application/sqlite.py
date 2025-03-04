@@ -27,18 +27,13 @@ CREATE TABLE IF NOT EXISTS entries (
 class SqliteApplication(Application):
     """A SQLite Application"""
 
-    config: Config
-    cipher: Binary
-    connection: Connection
-
     def __init__(self, config: Config) -> None:
         assert config.backend == Backend.SQLITE
 
         self.config = config
-        self.cipher = Binary(self.config.key_id)
         self.config.data_file.parent.mkdir(parents=True)
-        self.connection = sqlite3.connect(config.data_file)
-
+        self.cipher = Binary(self.config.key_id)
+        self.connection: Connection = sqlite3.connect(config.data_file)
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(CREATE_TABLE)
 

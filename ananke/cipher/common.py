@@ -9,13 +9,7 @@ from typing import NewType, Optional, Self
 
 
 class Plaintext:
-    """A plaintext value.
-
-    Attributes:
-        value: The plaintext value.
-    """
-
-    value: str
+    """A plaintext value."""
 
     def __init__(self, value: str) -> None:
         self.value = value
@@ -122,8 +116,6 @@ KeyId = NewType("KeyId", str)
 
 class Cipher[T](ABC):
     """The Cipher class."""
-
-    _key_id: KeyId
 
     @property
     def key_id(self) -> KeyId:

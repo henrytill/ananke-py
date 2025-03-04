@@ -13,9 +13,6 @@ from .common import Description, EntryId, Identity, Metadata, Record, Timestamp
 class Entry(Record):
     """A record that stores an encrypted value along with associated information."""
 
-    cipher: Optional[Cipher[Ciphertext]]
-    ciphertext: Ciphertext
-
     def __init__(
         self,
         entry_id: EntryId,
@@ -26,14 +23,16 @@ class Entry(Record):
         ciphertext: Ciphertext,
         meta: Optional[Metadata],
     ) -> None:
-        self.entry_id = entry_id
-        self.key_id = key_id
-        self.timestamp = timestamp
-        self.description = description
-        self.identity = identity
-        self.cipher = None
+        super().__init__(
+            entry_id=entry_id,
+            key_id=key_id,
+            timestamp=timestamp,
+            description=description,
+            identity=identity,
+            meta=meta,
+        )
         self.ciphertext = ciphertext
-        self.meta = meta
+        self.cipher: Optional[Cipher[Ciphertext]] = None
 
     def with_cipher(self, cipher: Cipher[Ciphertext]) -> Self:
         """Associates a cipher with this entry. Required before accessing plaintext.

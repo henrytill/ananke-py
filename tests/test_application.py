@@ -49,10 +49,6 @@ class ModifyArgs(TypedDict):
 @dataclass(frozen=True)
 class TestApplication:
     class Inner(unittest.TestCase):
-        dir: TemporaryDirectory[str]
-        config: Config
-        application: Application
-
         def setUp(self) -> None:
             # pylint: disable=consider-using-with
             self.dir = TemporaryDirectory(prefix="ananke")
@@ -60,6 +56,22 @@ class TestApplication:
 
         def tearDown(self) -> None:
             self.dir.cleanup()
+
+        @property
+        def config(self) -> Config:
+            return self._config
+
+        @config.setter
+        def config(self, config: Config) -> None:
+            self._config = config
+
+        @property
+        def application(self) -> Application:
+            return self._application
+
+        @application.setter
+        def application(self, application: Application) -> None:
+            self._application = application
 
         def test_lookup(self) -> None:
             """Test the lookup method against the example data."""
