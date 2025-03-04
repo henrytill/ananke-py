@@ -22,6 +22,7 @@ class Entry(Record):
         identity: Optional[Identity],
         ciphertext: Ciphertext,
         meta: Optional[Metadata],
+        cipher: Optional[Cipher[Ciphertext]] = None,
     ) -> None:
         super().__init__(
             entry_id=entry_id,
@@ -32,7 +33,7 @@ class Entry(Record):
             meta=meta,
         )
         self.ciphertext = ciphertext
-        self.cipher: Optional[Cipher[Ciphertext]] = None
+        self.cipher = cipher
 
     def with_cipher(self, cipher: Cipher[Ciphertext]) -> Self:
         """Associates a cipher with this entry. Required before accessing plaintext.
