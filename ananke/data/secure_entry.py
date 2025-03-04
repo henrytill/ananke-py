@@ -88,7 +88,6 @@ class SecureEntry(Record):
             meta=meta,
         )
         self._plaintext = plaintext
-        self.meta = meta
 
     def __repr__(self) -> str:
         return f"SecureEntry({self.entry_id})"
