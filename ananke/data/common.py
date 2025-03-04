@@ -63,10 +63,7 @@ class EntryId:
     """Uniquely identifies an 'Entry'."""
 
     def __init__(self, value: UUID | str) -> None:
-        if isinstance(value, UUID):
-            self.value = value
-        else:
-            self.value = UUID(value)
+        self.value = value if isinstance(value, UUID) else UUID(value)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, EntryId):
