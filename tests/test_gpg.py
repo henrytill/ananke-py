@@ -23,6 +23,7 @@ class TestCipher:
 
         @property
         def cipher(self) -> Cipher[T]:
+            """The cipher to test."""
             return self._cipher
 
         @cipher.setter

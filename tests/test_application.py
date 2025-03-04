@@ -59,6 +59,7 @@ class TestApplication:
 
         @property
         def config(self) -> Config:
+            """The configuration to test."""
             return self._config
 
         @config.setter
@@ -67,6 +68,7 @@ class TestApplication:
 
         @property
         def application(self) -> Application:
+            """The application to test."""
             return self._application
 
         @application.setter
