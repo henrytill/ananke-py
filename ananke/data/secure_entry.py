@@ -181,6 +181,15 @@ class SecureEntry(Record):
             ret["meta"] = self.meta
         return ret
 
+    def update(self) -> Self:
+        """Updates the timestamp of an 'Entry'.
+
+        Returns:
+            The 'Entry'
+        """
+        self.timestamp = Timestamp.now()
+        return self
+
 
 CAMEL_TO_SNAKE = {
     # camelCase

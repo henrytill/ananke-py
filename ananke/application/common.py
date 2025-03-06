@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Sequence, Type, cast
 from .. import data
 from ..cipher import ArmoredCiphertext, Plaintext
 from ..cipher.gpg import Text
-from ..data import Description, Dictable, Entry, EntryId, Identity, Metadata, Record
+from ..data import Description, Dictable, Entry, EntryId, Identity, Metadata, Record, SecureIndexElement
 
 type Target = EntryId | Description
 
@@ -132,7 +132,7 @@ class Query:
         return self.entry_id is None and self.description is None and self.identity is None and self.meta is None
 
 
-def target_matches(target: Target, entry: Entry) -> bool:
+def target_matches(target: Target, entry: Entry | SecureIndexElement) -> bool:
     """Match target against entry"""
     if isinstance(target, EntryId):
         return target == entry.entry_id
@@ -164,7 +164,7 @@ def read[T: Dictable](cls: Type[T], path: Path, cipher: Optional[Text] = None) -
 def write[T: Dictable](path: Path, writes: Sequence[T], cipher: Optional[Text] = None) -> None:
     """Writes entries to a JSON file"""
     dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in writes]
-    json_str = json.dumps(dicts, indent=4)
+    json_str = json.dumps(dicts, indent=2)
     text = json_str if cipher is None else cipher.encrypt(Plaintext(json_str))
     if not path.parent.exists():
         path.parent.mkdir(parents=True, exist_ok=False)

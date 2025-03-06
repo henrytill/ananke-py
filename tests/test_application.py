@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import List, Optional, TypedDict, cast
 
-from ananke.application import Application, JsonApplication, SqliteApplication, Target
+from ananke.application import Application, JsonApplication, SqliteApplication, Target, TextApplication
 from ananke.cipher import Plaintext
 from ananke.config import Config, ConfigBuilder, OsFamily
 from ananke.data import Description, EntryId, Identity, Metadata
@@ -347,3 +347,17 @@ class TestSqliteApplication(TestApplication.Inner):
     def tearDown(self) -> None:
         cast(SqliteApplication, self.application).close()
         return super().tearDown()
+
+
+class TestTextApplication(TestApplication.Inner):
+    def setUp(self) -> None:
+        super().setUp()
+        env = {
+            "ANANKE_CONFIG_DIR": f"{self.dir.name}",
+            "ANANKE_DATA_DIR": f"{self.dir.name}",
+            "ANANKE_KEY_ID": "371C136C",
+            "ANANKE_BACKEND": "text",
+        }
+        self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
+        self.application = TextApplication(self.config)
+        self.application.import_entries(EXPORT_ASC)
