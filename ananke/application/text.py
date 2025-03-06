@@ -75,12 +75,12 @@ class TextApplication(Application):
         maybe_meta: Optional[Metadata],
     ) -> None:
         idxs = [i for i, elem in enumerate(self.elements) if common.target_matches(target, elem)]
-        idx_len = len(idxs)
+        idxs_len = len(idxs)
 
-        if idx_len == 0:
+        if idxs_len == 0:
             raise ValueError(f"No entries match {target}")
 
-        if idx_len > 1:
+        if idxs_len > 1:
             raise ValueError(f"Multiple entries match {target}")
 
         idx = idxs[0]
@@ -104,12 +104,12 @@ class TextApplication(Application):
 
     def remove(self, target: Target) -> None:
         idxs = [i for i, elem in enumerate(self.elements) if common.target_matches(target, elem)]
-        idx_len = len(idxs)
+        idxs_len = len(idxs)
 
-        if idx_len == 0:
+        if idxs_len == 0:
             raise ValueError(f"No entries match {target}")
 
-        if idx_len > 1:
+        if idxs_len > 1:
             raise ValueError(f"Multiple entries match {target}")
 
         idx = idxs[0]
