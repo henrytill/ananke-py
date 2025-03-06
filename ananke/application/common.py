@@ -153,8 +153,8 @@ def read[T: Dictable](cls: Type[T], path: Path, cipher: Optional[Text] = None) -
     if not path.exists():
         raise FileNotFoundError(f"File '{path}' does not exist")
     text = path.read_text(encoding="utf-8")
-    json_data = text if cipher is None else cipher.decrypt(ArmoredCiphertext(text)).value
-    return _read_json(cls, json_data)
+    json_str = text if cipher is None else cipher.decrypt(ArmoredCiphertext(text)).value
+    return _read_json(cls, json_str)
 
 
 class Writable(Dictable, Sortable, Protocol):
@@ -163,8 +163,7 @@ class Writable(Dictable, Sortable, Protocol):
 
 def write[T: Writable](path: Path, writes: Sequence[T], cipher: Optional[Text] = None) -> None:
     """Writes entries to a JSON file"""
-    sorted_writes = sorted(writes)
-    dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in sorted_writes]
+    dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in sorted(writes)]
     json_str = json.dumps(dicts, indent=4)
     text = json_str if cipher is None else cipher.encrypt(Plaintext(json_str))
     if not path.parent.exists():
