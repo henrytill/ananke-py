@@ -5,9 +5,9 @@ from sqlite3 import Connection
 from typing import Dict, List, Optional, Tuple
 
 from ..cipher import Plaintext
-from ..cipher.gpg import Binary
+from ..cipher.gpg import Binary, Text
 from ..config import Backend, Config
-from ..data import Description, Entry, EntryId, Identity, Metadata, Record, Timestamp
+from ..data import Description, Entry, EntryId, Identity, Metadata, Record, SecureEntry, Timestamp
 from . import common
 from .common import Application, Query, Target
 
@@ -128,9 +128,10 @@ class SqliteApplication(Application):
     def import_entries(self, path: Optional[Path]) -> None:
         if path is None:
             return
-        entries: List[Entry] = common.read(Entry, path)
+        secure_entries: List[SecureEntry] = common.read(SecureEntry, path, Text(self.config.key_id))
         with closing(self.connection.cursor()) as cursor:
-            for entry in entries:
+            for secure_entry in secure_entries:
+                entry = Entry.from_secure_entry(secure_entry, self.cipher)
                 sql, parameters = _create_insert(entry)
                 cursor.execute(sql, parameters)
         self.connection.commit()
@@ -139,11 +140,13 @@ class SqliteApplication(Application):
         if path is None:
             return
         sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries"
-        entries: List[Entry] = []
+        secure_entries: List[SecureEntry] = []
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql):
-                entries.append(Entry.from_tuple(row))
-        common.write(path, entries)
+                entry = Entry.from_tuple(row).with_cipher(self.cipher)
+                secure_entries.append(entry.to_secure_entry())
+        cipher = Text(self.config.key_id)
+        common.write(path, secure_entries, cipher)
 
 
 def _create_insert(entry: Entry) -> Tuple[str, Dict[str, Optional[str]]]:

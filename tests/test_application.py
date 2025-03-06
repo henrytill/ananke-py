@@ -10,7 +10,7 @@ from ananke.cipher import Plaintext
 from ananke.config import Config, ConfigBuilder, OsFamily
 from ananke.data import Description, EntryId, Identity, Metadata
 
-EXAMPLE_DATA: Path = Path("example") / "db" / "data.json"
+EXPORT_ASC: Path = Path("example") / "export.asc"
 
 
 class LookupArgs(TypedDict):
@@ -310,7 +310,7 @@ class TestJsonApplication(TestApplication.Inner):
         }
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
         self.application = JsonApplication(self.config)
-        self.application.import_entries(EXAMPLE_DATA)
+        self.application.import_entries(EXPORT_ASC)
 
 
 class TestSqliteApplication(TestApplication.Inner):
@@ -324,7 +324,7 @@ class TestSqliteApplication(TestApplication.Inner):
         }
         self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
         self.application = SqliteApplication(self.config)
-        self.application.import_entries(EXAMPLE_DATA)
+        self.application.import_entries(EXPORT_ASC)
 
     def tearDown(self) -> None:
         cast(SqliteApplication, self.application).close()

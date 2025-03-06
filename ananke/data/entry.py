@@ -5,8 +5,10 @@ from typing import Any, Dict, Optional, Self, Tuple
 from uuid import UUID
 
 from ..cipher import Cipher, Ciphertext, KeyId, Plaintext
+from ..cipher.gpg import Binary
 from . import common
 from .common import Description, EntryId, Identity, Metadata, Record, Timestamp
+from .secure_entry import SecureEntry
 
 
 # pylint: disable=too-many-instance-attributes
@@ -82,6 +84,48 @@ class Entry(Record):
         """
         self.timestamp = Timestamp.now()
         return self
+
+    @classmethod
+    def from_secure_entry(cls, secure_entry: SecureEntry, cipher: Binary) -> Self:
+        """Creates an 'Entry' from a 'SecureEntry'.
+
+        Args:
+            secure_entry: The 'SecureEntry' to create the 'Entry' from.
+            cipher: The cipher to use for the 'Entry'.
+
+        Returns:
+            The created 'Entry'.
+        """
+        ciphertext = cipher.encrypt(secure_entry.plaintext)
+        return cls(
+            entry_id=secure_entry.entry_id,
+            key_id=secure_entry.key_id,
+            timestamp=secure_entry.timestamp,
+            description=secure_entry.description,
+            identity=secure_entry.identity,
+            ciphertext=ciphertext,
+            meta=secure_entry.meta,
+            cipher=cipher,
+        )
+
+    def to_secure_entry(self) -> SecureEntry:
+        """Converts the 'Entry' to a 'SecureEntry'.
+
+        Returns:
+            The converted 'SecureEntry'.
+        """
+        if self.cipher is None:
+            raise AttributeError("cipher must be set using with_cipher() before converting to SecureEntry")
+        plaintext = self.cipher.decrypt(self.ciphertext)
+        return SecureEntry(
+            entry_id=self.entry_id,
+            key_id=self.key_id,
+            timestamp=self.timestamp,
+            description=self.description,
+            identity=self.identity,
+            plaintext=plaintext,
+            meta=self.meta,
+        )
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> Self:

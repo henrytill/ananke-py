@@ -28,7 +28,7 @@ Print usage string
 
 Import example data
 
-  $ python3 -m ananke import "${EXAMPLE_DIR}/db/data.json"
+  $ python3 -m ananke import "${EXAMPLE_DIR}/export.asc"
 
   $ python3 -m ananke lookup foomail
   https://www.foomail.com quux ASecretPassword

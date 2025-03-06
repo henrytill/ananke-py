@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import List, Optional
 
 from ..cipher import Plaintext
-from ..cipher.gpg import Binary
+from ..cipher.gpg import Binary, Text
 from ..config import Backend, Config
-from ..data import Description, Entry, EntryId, Identity, Metadata, Record, Timestamp
+from ..data import Description, Entry, EntryId, Identity, Metadata, Record, SecureEntry, Timestamp
 from . import common
 from .common import Application, Query, Target
 
@@ -105,13 +105,15 @@ class JsonApplication(Application):
     def import_entries(self, path: Optional[Path]) -> None:
         if path is None:
             return
-        self.entries += common.read(Entry, path)
+        secure_entries: List[SecureEntry] = common.read(SecureEntry, path, Text(self.config.key_id))
+        self.entries += [Entry.from_secure_entry(secure_entry, self.cipher) for secure_entry in secure_entries]
         common.write(self.config.data_file, self.entries)
 
     def export_entries(self, path: Optional[Path]) -> None:
         if path is None:
             return
-        common.write(path, self.entries)
+        secure_entries = [entry.with_cipher(self.cipher).to_secure_entry() for entry in self.entries]
+        common.write(path, secure_entries, Text(self.config.key_id))
 
 
 class QueryMatcher:
