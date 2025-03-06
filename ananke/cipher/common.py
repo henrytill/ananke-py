@@ -117,6 +117,9 @@ KeyId = NewType("KeyId", str)
 class Cipher[T](ABC):
     """The Cipher class."""
 
+    @abstractmethod
+    def __eq__(self, value: object) -> bool: ...
+
     @property
     def key_id(self) -> KeyId:
         """Returns the cryptographic key used by the cipher"""

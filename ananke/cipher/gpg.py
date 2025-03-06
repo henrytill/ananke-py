@@ -21,6 +21,11 @@ class Binary(Cipher[Ciphertext]):
         """
         self.key_id = key_id
 
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Binary):
+            return False
+        return self.key_id == value.key_id
+
     def encrypt(self, plaintext: Plaintext) -> Ciphertext:
         """Encodes a Plaintext into a Ciphertext.
 
@@ -82,6 +87,11 @@ class Text(Cipher[ArmoredCiphertext]):
             key_id: The KeyId to use for encryption and decryption.
         """
         self.key_id = key_id
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Text):
+            return False
+        return self.key_id == value.key_id
 
     def encrypt(self, plaintext: Plaintext) -> ArmoredCiphertext:
         """Encodes a Plaintext into a Ciphertext.

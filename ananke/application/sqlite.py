@@ -148,6 +148,12 @@ class SqliteApplication(Application):
         cipher = Text(self.config.key_id)
         common.write(path, secure_entries, cipher)
 
+    def clear(self) -> None:
+        sql = "DELETE FROM entries"
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(sql)
+        self.connection.commit()
+
 
 def _create_insert(entry: Entry) -> Tuple[str, Dict[str, Optional[str]]]:
     sql: str = """\

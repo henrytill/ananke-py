@@ -56,3 +56,6 @@ class TextApplication(Application):
 
     def export_entries(self, path: Optional[Path]) -> None:
         raise NotImplementedError
+
+    def clear(self) -> None:
+        raise NotImplementedError

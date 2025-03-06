@@ -298,6 +298,24 @@ class TestApplication:
                     records = self.application.lookup(test_case)
                     self.assertEqual(0, len(records))
 
+        def test_export_import(self) -> None:
+            """Test that exported data can be re-imported."""
+
+            entries = self.application.lookup(Description("www"))
+            self.assertEqual(4, len(entries))
+
+            file = Path(self.dir.name) / "export.asc"
+            self.application.export_entries(file)
+            self.assertTrue(file.exists())
+
+            self.application.clear()
+            self.assertEqual(0, len(self.application.lookup(Description("www"))))
+
+            self.application.import_entries(file)
+            imported_entries = self.application.lookup(Description("www"))
+            self.assertEqual(4, len(imported_entries))
+            self.assertEqual(entries, imported_entries)
+
 
 class TestJsonApplication(TestApplication.Inner):
     def setUp(self) -> None:

@@ -102,6 +102,10 @@ class Application(ABC):
             path: The path to the JSON file.
         """
 
+    @abstractmethod
+    def clear(self) -> None:
+        """Clear all entries."""
+
 
 @dataclass(frozen=True)
 class Query:

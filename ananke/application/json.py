@@ -115,6 +115,10 @@ class JsonApplication(Application):
         secure_entries = [entry.with_cipher(self.cipher).to_secure_entry() for entry in self.entries]
         common.write(path, secure_entries, Text(self.config.key_id))
 
+    def clear(self) -> None:
+        self.entries.clear()
+        common.write(self.config.data_file, self.entries)
+
 
 class QueryMatcher:
     """A query matcher.

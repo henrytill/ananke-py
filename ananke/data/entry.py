@@ -60,6 +60,21 @@ class Entry(Record):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Entry):
             return False
+
+        if self.cipher is not None and other.cipher is not None:
+            plaintext = self.cipher.decrypt(self.ciphertext)
+            other_plaintext = other.cipher.decrypt(other.ciphertext)
+            return (
+                self.timestamp == other.timestamp
+                and self.entry_id == other.entry_id
+                and self.key_id == other.key_id
+                and self.description == other.description
+                and self.identity == other.identity
+                and plaintext == other_plaintext
+                and self.meta == other.meta
+                and self.cipher == other.cipher
+            )
+
         return (
             self.timestamp == other.timestamp
             and self.entry_id == other.entry_id
@@ -68,6 +83,7 @@ class Entry(Record):
             and self.identity == other.identity
             and self.ciphertext == other.ciphertext
             and self.meta == other.meta
+            and self.cipher == other.cipher
         )
 
     @property
