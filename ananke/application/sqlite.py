@@ -142,7 +142,7 @@ class SqliteApplication(Application):
                 entry = Entry.from_tuple(row).with_cipher(self.cipher)
                 secure_entries.append(entry.to_secure_entry())
         cipher = Text(self.config.key_id)
-        common.write(path, secure_entries, cipher)
+        common.write(path, sorted(secure_entries), cipher)
 
     def clear(self) -> None:
         sql = "DELETE FROM entries"

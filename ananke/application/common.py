@@ -2,12 +2,12 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Protocol, Sequence, Type, cast
+from typing import Any, Dict, List, Optional, Sequence, Type, cast
 
 from .. import data
 from ..cipher import ArmoredCiphertext, Plaintext
 from ..cipher.gpg import Text
-from ..data import Description, Dictable, Entry, EntryId, Identity, Metadata, Record, Sortable
+from ..data import Description, Dictable, Entry, EntryId, Identity, Metadata, Record
 
 type Target = EntryId | Description
 
@@ -161,13 +161,9 @@ def read[T: Dictable](cls: Type[T], path: Path, cipher: Optional[Text] = None) -
     return _read_json(cls, json_str)
 
 
-class Writable(Dictable, Sortable, Protocol):
-    """A protocol for objects that can be written to a JSON file"""
-
-
-def write[T: Writable](path: Path, writes: Sequence[T], cipher: Optional[Text] = None) -> None:
+def write[T: Dictable](path: Path, writes: Sequence[T], cipher: Optional[Text] = None) -> None:
     """Writes entries to a JSON file"""
-    dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in sorted(writes)]
+    dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in writes]
     json_str = json.dumps(dicts, indent=4)
     text = json_str if cipher is None else cipher.encrypt(Plaintext(json_str))
     if not path.parent.exists():

@@ -43,7 +43,7 @@ class JsonApplication(Application):
             meta=maybe_meta,
         )
         self.entries.append(entry)
-        common.write(self.config.data_file, self.entries)
+        common.write(self.config.data_file, sorted(self.entries))
 
     def lookup(self, description: Description, maybe_identity: Optional[Identity] = None) -> List[Record]:
         query = Query(description=description, identity=maybe_identity)
@@ -85,7 +85,7 @@ class JsonApplication(Application):
         entry.update()
 
         self.entries.append(entry)
-        common.write(self.config.data_file, self.entries)
+        common.write(self.config.data_file, sorted(self.entries))
 
     def remove(self, target: Target) -> None:
         idxs = [i for i, entry in enumerate(self.entries) if common.target_matches(target, entry)]
@@ -100,20 +100,20 @@ class JsonApplication(Application):
         idx = idxs[0]
 
         del self.entries[idx]
-        common.write(self.config.data_file, self.entries)
+        common.write(self.config.data_file, sorted(self.entries))
 
     def import_entries(self, path: Path) -> None:
         secure_entries: List[SecureEntry] = common.read(SecureEntry, path, Text(self.config.key_id))
         self.entries += [Entry.from_secure_entry(secure_entry, self.cipher) for secure_entry in secure_entries]
-        common.write(self.config.data_file, self.entries)
+        common.write(self.config.data_file, sorted(self.entries))
 
     def export_entries(self, path: Path) -> None:
         secure_entries = [entry.with_cipher(self.cipher).to_secure_entry() for entry in self.entries]
-        common.write(path, secure_entries, Text(self.config.key_id))
+        common.write(path, sorted(secure_entries), Text(self.config.key_id))
 
     def clear(self) -> None:
         self.entries.clear()
-        common.write(self.config.data_file, self.entries)
+        common.write(self.config.data_file, sorted(self.entries))
 
 
 class QueryMatcher:
