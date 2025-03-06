@@ -53,7 +53,7 @@ class Entry(Record):
         return hash(self.entry_id)
 
     def __lt__(self, other: Self) -> bool:
-        return self.timestamp < other.timestamp
+        return self.timestamp.__lt__(other.timestamp)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Entry):

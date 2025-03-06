@@ -108,6 +108,9 @@ class SecureEntry(Record):
             and self.meta == other.meta
         )
 
+    def __lt__(self, other: Self) -> bool:
+        return self.timestamp.__lt__(other.timestamp)
+
     @property
     def plaintext(self) -> Plaintext:
         return self._plaintext

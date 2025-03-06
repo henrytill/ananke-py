@@ -15,9 +15,7 @@ class SchemaVersion:
             return False
         return self.value.__eq__(other.value)
 
-    def __lt__(self, other: object) -> bool:
-        if not isinstance(other, SchemaVersion):
-            raise TypeError(f"'<' not supported between instances of 'SchemaVersion' and '{type(other).__name__}'")
+    def __lt__(self, other: Self) -> bool:
         return self.value.__lt__(other.value)
 
     def __str__(self) -> str:

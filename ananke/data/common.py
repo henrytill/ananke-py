@@ -29,9 +29,7 @@ class Timestamp:
             return False
         return self.value.__eq__(other.value)
 
-    def __lt__(self, other: object) -> bool:
-        if not isinstance(other, Timestamp):
-            raise TypeError(f"'<' not supported between instances of 'Timestamp' and '{type(other).__name__}'")
+    def __lt__(self, other: Self) -> bool:
         return self.value.__lt__(other.value)
 
     @classmethod
