@@ -125,9 +125,7 @@ class SqliteApplication(Application):
             cursor.execute(sql, parameters)
         self.connection.commit()
 
-    def import_entries(self, path: Optional[Path]) -> None:
-        if path is None:
-            return
+    def import_entries(self, path: Path) -> None:
         secure_entries: List[SecureEntry] = common.read(SecureEntry, path, Text(self.config.key_id))
         with closing(self.connection.cursor()) as cursor:
             for secure_entry in secure_entries:
@@ -136,9 +134,7 @@ class SqliteApplication(Application):
                 cursor.execute(sql, parameters)
         self.connection.commit()
 
-    def export_entries(self, path: Optional[Path]) -> None:
-        if path is None:
-            return
+    def export_entries(self, path: Path) -> None:
         sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries"
         secure_entries: List[SecureEntry] = []
         with closing(self.connection.cursor()) as cursor:

@@ -102,16 +102,12 @@ class JsonApplication(Application):
         del self.entries[idx]
         common.write(self.config.data_file, self.entries)
 
-    def import_entries(self, path: Optional[Path]) -> None:
-        if path is None:
-            return
+    def import_entries(self, path: Path) -> None:
         secure_entries: List[SecureEntry] = common.read(SecureEntry, path, Text(self.config.key_id))
         self.entries += [Entry.from_secure_entry(secure_entry, self.cipher) for secure_entry in secure_entries]
         common.write(self.config.data_file, self.entries)
 
-    def export_entries(self, path: Optional[Path]) -> None:
-        if path is None:
-            return
+    def export_entries(self, path: Path) -> None:
         secure_entries = [entry.with_cipher(self.cipher).to_secure_entry() for entry in self.entries]
         common.write(path, secure_entries, Text(self.config.key_id))
 

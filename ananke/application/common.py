@@ -87,7 +87,7 @@ class Application(ABC):
         """
 
     @abstractmethod
-    def import_entries(self, path: Optional[Path]) -> None:
+    def import_entries(self, path: Path) -> None:
         """Import entries from a JSON file.
 
         Args:
@@ -95,7 +95,7 @@ class Application(ABC):
         """
 
     @abstractmethod
-    def export_entries(self, path: Optional[Path]) -> None:
+    def export_entries(self, path: Path) -> None:
         """Export entries to a JSON file.
 
         Args:

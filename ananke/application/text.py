@@ -51,10 +51,10 @@ class TextApplication(Application):
     def remove(self, target: Target) -> None:
         raise NotImplementedError
 
-    def import_entries(self, path: Optional[Path]) -> None:
+    def import_entries(self, path: Path) -> None:
         raise NotImplementedError
 
-    def export_entries(self, path: Optional[Path]) -> None:
+    def export_entries(self, path: Path) -> None:
         raise NotImplementedError
 
     def clear(self) -> None:
