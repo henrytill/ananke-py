@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol, Sequence, Type, cast
 
 from .. import data
-from ..cipher import Plaintext
+from ..cipher import ArmoredCiphertext, Plaintext
+from ..cipher.gpg import Text
 from ..data import Description, Dictable, Entry, EntryId, Identity, Metadata, Record, Sortable
 
 type Target = EntryId | Description
@@ -147,11 +148,12 @@ def _read_json[T: Dictable](cls: Type[T], s: str) -> List[T]:
     return ret
 
 
-def read[T: Dictable](cls: Type[T], path: Path) -> List[T]:
+def read[T: Dictable](cls: Type[T], path: Path, cipher: Optional[Text] = None) -> List[T]:
     """Reads objects from a JSON file"""
     if not path.exists():
         raise FileNotFoundError(f"File '{path}' does not exist")
-    json_data = path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8")
+    json_data = text if cipher is None else cipher.decrypt(ArmoredCiphertext(text)).value
     return _read_json(cls, json_data)
 
 
@@ -159,9 +161,12 @@ class Writable(Dictable, Sortable, Protocol):
     """A protocol for objects that can be written to a JSON file"""
 
 
-def write[T: Writable](path: Path, writes: Sequence[T]) -> None:
+def write[T: Writable](path: Path, writes: Sequence[T], cipher: Optional[Text] = None) -> None:
     """Writes entries to a JSON file"""
     sorted_writes = sorted(writes)
     dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in sorted_writes]
     json_str = json.dumps(dicts, indent=4)
-    path.write_text(json_str, encoding="utf-8")
+    text = json_str if cipher is None else cipher.encrypt(Plaintext(json_str))
+    if not path.parent.exists():
+        path.parent.mkdir(parents=True, exist_ok=False)
+    path.write_text(text, encoding="utf-8")

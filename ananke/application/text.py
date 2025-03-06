@@ -1,12 +1,11 @@
-import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type, cast
+from typing import List, Optional
 
-from .. import data
-from ..cipher import ArmoredCiphertext, Plaintext
+from ..cipher import Plaintext
 from ..cipher.gpg import Text
 from ..config import Backend, Config
-from ..data import Description, Dictable, Identity, Metadata, Record, SecureIndexElement
+from ..data import Description, Identity, Metadata, Record, SecureIndexElement
+from . import common
 from .common import Application, Target
 
 
@@ -21,7 +20,7 @@ class TextApplication(Application):
         self.cipher = Text(self.config.key_id)
         self.elements: List[SecureIndexElement] = []
         if self.config.data_file.exists():
-            self.elements += read(SecureIndexElement, self.cipher, self.config.data_file)
+            self.elements += common.read(SecureIndexElement, self.config.data_file, self.cipher)
 
     def add(
         self,
@@ -57,28 +56,3 @@ class TextApplication(Application):
 
     def export_entries(self, path: Optional[Path]) -> None:
         raise NotImplementedError
-
-
-def read[T: Dictable](cls: Type[T], cipher: Text, path: Path) -> List[T]:
-    """Reads objects from a text file"""
-    if not path.exists():
-        raise FileNotFoundError(f"File '{path}' does not exist")
-    text = path.read_text(encoding="utf-8")
-    json_data = cipher.decrypt(ArmoredCiphertext(text)).value
-    parsed = json.loads(json_data, object_hook=data.remap_keys_camel_to_snake)
-    if not isinstance(parsed, list):
-        raise TypeError("Expected a list")
-    ret: List[T] = []
-    for item in cast(List[object], parsed):
-        if not isinstance(item, dict):
-            raise TypeError("Expected a dictionary")
-        ret.append(cls.from_dict(cast(Dict[str, Any], item)))
-    return ret
-
-
-def write(cipher: Text, path: Path, plaintext: Plaintext) -> None:
-    """Writes plaintext to a text file"""
-    armored = cipher.encrypt(plaintext)
-    if not path.parent.exists():
-        path.parent.mkdir(parents=True, exist_ok=False)
-    path.write_text(armored, encoding="utf-8")
