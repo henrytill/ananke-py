@@ -2,12 +2,12 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Type, cast
+from typing import Any, Dict, List, Optional, Protocol, Sequence, Type, cast
 
 from .. import data
 from ..cipher import ArmoredCiphertext, Plaintext
 from ..cipher.gpg import Text
-from ..data import Description, Dictable, Entry, EntryId, Identity, Metadata, Record, SecureIndexElement
+from ..data import Description, Dictable, EntryId, Identity, Metadata, Record
 
 type Target = EntryId | Description
 
@@ -132,7 +132,17 @@ class Query:
         return self.entry_id is None and self.description is None and self.identity is None and self.meta is None
 
 
-def target_matches(target: Target, entry: Entry | SecureIndexElement) -> bool:
+class EntryLike(Protocol):
+    """A protocol for objects that have entry_id and description fields."""
+
+    @property
+    def entry_id(self) -> EntryId: ...
+
+    @property
+    def description(self) -> Description: ...
+
+
+def target_matches(target: Target, entry: EntryLike) -> bool:
     """Match target against entry"""
     if isinstance(target, EntryId):
         return target == entry.entry_id
