@@ -157,7 +157,7 @@ def _create_insert(entry: Entry) -> Tuple[str, Dict[str, Optional[str]]]:
     entries(id, keyid, timestamp, description, identity, ciphertext, meta)
     VALUES(:id, :keyid, :timestamp, :description, :identity, :ciphertext, :meta)
     """
-    parameters: Dict[str, str | None] = {
+    parameters: Dict[str, Optional[str]] = {
         "id": str(entry.entry_id),
         "keyid": entry.key_id,
         "timestamp": entry.timestamp.isoformat(),
