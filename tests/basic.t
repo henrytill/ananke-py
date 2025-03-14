@@ -70,7 +70,7 @@ Configure
   $ python3 -m ananke configure -l
   config_dir = .+ (re)
   data_dir = .+ (re)
-  backend = json
+  backend = text
   key_id = 371C136C
   allow_multiple_keys = False
 
