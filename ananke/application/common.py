@@ -136,10 +136,14 @@ class EntryLike(Protocol):
     """A protocol for objects that have entry_id and description fields."""
 
     @property
-    def entry_id(self) -> EntryId: ...
+    def entry_id(self) -> EntryId:
+        """Get the unique identifier for the entry."""
+        ...
 
     @property
-    def description(self) -> Description: ...
+    def description(self) -> Description:
+        """Get the description of the entry."""
+        ...
 
 
 def target_matches(target: Target, entry: EntryLike) -> bool:
