@@ -9,7 +9,6 @@ from ananke.cipher import KeyId
 from ananke.config import Backend, ConfigBuilder, Env, OsFamily
 
 
-# pylint: disable=too-few-public-methods
 @dataclass(frozen=True)
 class ConfigFile:
     """A configuration file."""

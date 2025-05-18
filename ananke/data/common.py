@@ -100,7 +100,6 @@ class Dictable(Protocol):
         ...
 
 
-# pylint: disable=too-few-public-methods
 class Sortable(Protocol):
     """A protocol for objects that can be sorted."""
 
