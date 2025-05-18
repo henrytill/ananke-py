@@ -42,13 +42,8 @@ class TextApplication(Application):
             plaintext=plaintext,
             meta=maybe_meta,
         )
-        elem = SecureIndexElement(
-            entry_id=entry_id,
-            key_id=key_id,
-            description=description,
-        )
         self.write_entry(entry)
-        self.elements.append(elem)
+        self.elements.append(entry.to_index_element())
         self.write_index()
 
     def lookup(
@@ -121,13 +116,8 @@ class TextApplication(Application):
     def import_entries(self, path: Path) -> None:
         secure_entries = common.read(SecureEntry, path, self.cipher)
         for entry in secure_entries:
-            elem = SecureIndexElement(
-                entry_id=entry.entry_id,
-                key_id=entry.key_id,
-                description=entry.description,
-            )
             self.write_entry(entry)
-            self.elements.append(elem)
+            self.elements.append(entry.to_index_element())
         self.write_index()
 
     def export_entries(self, path: Path) -> None:

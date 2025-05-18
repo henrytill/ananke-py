@@ -190,6 +190,18 @@ class SecureEntry(Record):
         self.timestamp = Timestamp.now()
         return self
 
+    def to_index_element(self) -> SecureIndexElement:
+        """Converts the 'SecureEntry' to a 'SecureIndexElement'.
+
+        Returns:
+            The converted 'SecureIndexElement'.
+        """
+        return SecureIndexElement(
+            entry_id=self.entry_id,
+            key_id=self.key_id,
+            description=self.description,
+        )
+
 
 CAMEL_TO_SNAKE = {
     # camelCase
