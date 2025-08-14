@@ -57,7 +57,7 @@ class TextApplication(Application):
         for elem in self.elements:
             if matcher.match_description(elem.description):
                 entry = self.entry(elem.entry_id)
-                if matcher.match_identity(entry):
+                if matcher.match_identity(entry.identity):
                     ret.append(entry)
         return ret
 
@@ -186,10 +186,10 @@ class QueryMatcher:
             return True
         return self.query.description.lower() in description.lower()
 
-    def match_identity(self, entry: SecureEntry) -> bool:
+    def match_identity(self, maybe_identity: Optional[Identity]) -> bool:
         """Returns True if the identity matches the query."""
         if self.query.identity is None:
             return True
-        if entry.identity is None:
+        if maybe_identity is None:
             return False
-        return self.query.identity.lower() in entry.identity.lower()
+        return self.query.identity.lower() in maybe_identity.lower()

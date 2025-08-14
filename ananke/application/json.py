@@ -51,7 +51,7 @@ class JsonApplication(Application):
         return [
             copy.deepcopy(entry).with_cipher(self.cipher)
             for entry in self.entries
-            if matcher.match_description(entry.description) and matcher.match_identity(entry)
+            if matcher.match_description(entry.description) and matcher.match_identity(entry.identity)
         ]
 
     def modify(
@@ -131,10 +131,10 @@ class QueryMatcher:
             return True
         return self.query.description.lower() in description.lower()
 
-    def match_identity(self, entry: Entry) -> bool:
+    def match_identity(self, maybe_identity: Optional[Identity]) -> bool:
         """Returns True if the identity matches the query."""
         if self.query.identity is None:
             return True
-        if entry.identity is None:
+        if maybe_identity is None:
             return False
-        return self.query.identity.lower() in entry.identity.lower()
+        return self.query.identity.lower() in maybe_identity.lower()
