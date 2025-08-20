@@ -14,6 +14,8 @@ from .common import remap_keys as remap_keys
 from .entry import Entry as Entry
 from .entry import remap_keys_camel_to_snake as remap_keys_camel_to_snake
 from .entry import remap_keys_snake_to_camel as remap_keys_snake_to_camel
+from .migration import migrate_json_data as migrate_json_data
+from .migration import migrate_sqlite_data as migrate_sqlite_data
 from .schema import CURRENT_SCHEMA_VERSION as CURRENT_SCHEMA_VERSION
 from .schema import SchemaVersion as SchemaVersion
 from .schema import get_schema_version as get_schema_version

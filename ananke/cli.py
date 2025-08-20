@@ -11,7 +11,7 @@ from .application import Application, JsonApplication, SqliteApplication, TextAp
 from .cipher import KeyId, Plaintext
 from .cipher.gpg import Binary
 from .config import Backend, Config, ConfigBuilder, OsFamily
-from .data import CURRENT_SCHEMA_VERSION, Description, EntryId, Identity, Record, SchemaVersion
+from .data import CURRENT_SCHEMA_VERSION, Description, EntryId, Identity, Record, SchemaVersion, migration
 
 
 def configure(host_os: OsFamily, env: Mapping[str, str]) -> Config:
@@ -34,7 +34,13 @@ def migrate(cfg: Config, found: SchemaVersion) -> None:
         cfg: The configuration.
         found: The schema version found in the schema file.
     """
-    raise NotImplementedError()
+    match cfg.backend:
+        case Backend.JSON:
+            migration.migrate_json_data(cfg, found)
+        case Backend.SQLITE:
+            migration.migrate_sqlite_data(cfg, found)
+        case Backend.TEXT:
+            pass
 
 
 def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
