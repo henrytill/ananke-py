@@ -21,6 +21,8 @@ Metadata = NewType("Metadata", str)
 class Timestamp:
     """A UTC timestamp."""
 
+    __slots__ = ("value",)
+
     def __init__(self, value: datetime) -> None:
         self.value = value
 
@@ -59,6 +61,8 @@ class Timestamp:
 
 class EntryId:
     """Uniquely identifies an 'Entry'."""
+
+    __slots__ = ("value",)
 
     def __init__(self, value: UUID | str) -> None:
         self.value = value if isinstance(value, UUID) else UUID(value)

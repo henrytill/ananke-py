@@ -131,11 +131,8 @@ def format_results(records: List[Record], verbose: bool) -> str:
         record = records[0]
         return format_verbose(record) if verbose else str(record.plaintext)
 
-    formatted_results: List[str] = []
-    for record in records:
-        formatted = format_verbose(record) if verbose else f"{record.description} {record.identity} {record.plaintext}"
-        formatted_results.append(formatted)
-    return "\n".join(formatted_results)
+    formatter = format_verbose if verbose else lambda r: f"{r.description} {r.identity} {r.plaintext}"
+    return "\n".join(formatter(record) for record in records)
 
 
 def cmd_lookup(attrs: Namespace) -> int:

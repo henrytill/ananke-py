@@ -7,6 +7,8 @@ from typing import Self
 class SchemaVersion:
     """Schema version."""
 
+    __slots__ = ("value",)
+
     def __init__(self, value: int) -> None:
         self.value = value
 

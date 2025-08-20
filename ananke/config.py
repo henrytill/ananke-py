@@ -2,7 +2,8 @@
 
 import configparser
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, auto
+from functools import cached_property
 from pathlib import Path
 from typing import Callable, Mapping, Optional, Self
 
@@ -24,8 +25,11 @@ class Env:
 class OsFamily(Enum):
     """The operating system family."""
 
-    POSIX = 1
-    NT = 2
+    POSIX = auto()
+    NT = auto()
+
+    def __str__(self) -> str:
+        return self.name.lower()
 
     @classmethod
     def from_str(cls, os_family_str: str) -> "OsFamily":
@@ -37,28 +41,21 @@ class OsFamily(Enum):
         Returns:
             The created OsFamily.
         """
-        match os_family_str:
-            case "posix":
-                return cls.POSIX
-            case "nt":
-                return cls.NT
-            case _:
-                raise ValueError(f"Invalid OsFamily string: {os_family_str}")
-
-    def __str__(self) -> str:
-        match self:
-            case OsFamily.POSIX:
-                return "posix"
-            case OsFamily.NT:
-                return "nt"
+        try:
+            return cls[os_family_str.upper()]
+        except KeyError:
+            raise ValueError(f"Invalid OsFamily string: {os_family_str}") from None
 
 
 class Backend(Enum):
     """The backend used to store application data."""
 
-    SQLITE = 1
-    JSON = 2
-    TEXT = 3
+    SQLITE = auto()
+    JSON = auto()
+    TEXT = auto()
+
+    def __str__(self) -> str:
+        return self.name.lower()
 
     @classmethod
     def from_str(cls, backend_str: str) -> "Backend":
@@ -70,24 +67,10 @@ class Backend(Enum):
         Returns:
             The created Backend.
         """
-        match backend_str:
-            case "sqlite":
-                return cls.SQLITE
-            case "json":
-                return cls.JSON
-            case "text":
-                return cls.TEXT
-            case _:
-                raise ValueError(f"Invalid Backend string: {backend_str}")
-
-    def __str__(self) -> str:
-        match self:
-            case Backend.SQLITE:
-                return "sqlite"
-            case Backend.JSON:
-                return "json"
-            case Backend.TEXT:
-                return "text"
+        try:
+            return cls[backend_str.upper()]
+        except KeyError:
+            raise ValueError(f"Invalid Backend string: {backend_str}") from None
 
     @classmethod
     def default(cls) -> "Backend":
@@ -122,7 +105,7 @@ class Config:
         """Returns the path to db directory."""
         return self.data_dir / "db"
 
-    @property
+    @cached_property
     def data_file(self) -> Path:
         """Returns the path to the data file."""
         match self.backend:
