@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import List, Optional
 
+from .. import data
 from ..cipher import ArmoredCiphertext, Plaintext
 from ..cipher.gpg import Text
 from ..config import Backend, Config
@@ -162,7 +163,8 @@ def _read(path: Path, cipher: Text) -> SecureEntry:
     """Read a SecureEntry from a file."""
     blob = path.read_text()
     armored = cipher.decrypt(ArmoredCiphertext(blob))
-    return SecureEntry.from_dict(json.loads(str(armored)))
+    parsed = json.loads(str(armored), object_hook=data.remap_keys_camel_to_snake)
+    return SecureEntry.from_dict(parsed)
 
 
 def _write(path: Path, plaintext: Plaintext, cipher: Text) -> None:

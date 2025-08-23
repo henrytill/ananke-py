@@ -36,7 +36,7 @@ class SecureIndexElement:
             The created 'SecureIndexElement'.
         """
         # Get required keys
-        id_str = common.get_required(data, "id", str)
+        id_str = common.get_required(data, "entry_id", str)
         key_id_str = common.get_required(data, "key_id", str)
         description_str = common.get_required(data, "description", str)
 
@@ -59,7 +59,7 @@ class SecureIndexElement:
             The converted 'SecureIndexElement'.
         """
         return {
-            "id": str(self.entry_id),
+            "entry_id": str(self.entry_id),
             "key_id": self.key_id,
             "description": self.description,
         }
@@ -203,10 +203,12 @@ class SecureEntry(Record):
         )
 
 
+# TODO: Consolidate
 CAMEL_TO_SNAKE = {
     # camelCase
     "timestamp": "timestamp",
     "id": "id",
+    "entryId": "entry_id",
     "keyId": "key_id",
     "description": "description",
     "identity": "identity",
@@ -225,6 +227,7 @@ CAMEL_TO_SNAKE = {
 SNAKE_TO_CAMEL = {
     "timestamp": "timestamp",
     "id": "id",
+    "entry_id": "entryId",
     "key_id": "keyId",
     "description": "description",
     "identity": "identity",

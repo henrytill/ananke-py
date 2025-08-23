@@ -235,10 +235,12 @@ class Entry(Record):
         return ret
 
 
+# TODO: Consolidate
 CAMEL_TO_SNAKE = {
     # camelCase
     "timestamp": "timestamp",
     "id": "id",
+    "entryId": "entry_id",
     "keyId": "key_id",
     "description": "description",
     "identity": "identity",
@@ -257,6 +259,7 @@ CAMEL_TO_SNAKE = {
 SNAKE_TO_CAMEL = {
     "timestamp": "timestamp",
     "id": "id",
+    "entry_id": "entryId",
     "key_id": "keyId",
     "description": "description",
     "identity": "identity",
