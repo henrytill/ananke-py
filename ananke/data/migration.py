@@ -126,7 +126,8 @@ def _migrate_json_v3_to_v4(data_file: Path) -> None:
 
 def _migrate_sqlite_v1_to_v2(data_file: Path, config: Config) -> None:
     """Migrate SQLite data from schema v1 to v2 (add keyid column)."""
-    with sqlite3.connect(data_file) as conn:
+    connection = sqlite3.connect(data_file)
+    with closing(connection) as conn:
         with closing(conn.cursor()) as cursor:
             alter_table_sql: str = """\
             ALTER TABLE entries RENAME TO entries_v1
@@ -165,7 +166,8 @@ def _migrate_sqlite_v2_to_v3(_data_file: Path) -> None:
 
 def _migrate_sqlite_v3_to_v4(data_file: Path) -> None:
     """Migrate SQLite data from schema v3 to v4 (replace hash IDs with UUIDs)."""
-    with sqlite3.connect(data_file) as conn:
+    connection = sqlite3.connect(data_file)
+    with closing(connection) as conn:
         with closing(conn.cursor()) as cursor:
             alter_table_sql: str = """\
             ALTER TABLE entries RENAME TO entries_v3

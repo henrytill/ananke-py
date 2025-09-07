@@ -5,6 +5,7 @@ import shutil
 import sqlite3
 import unittest
 import uuid
+from contextlib import closing
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -147,8 +148,10 @@ class TestSqliteMigration(unittest.TestCase):
         target_file = self.data_dir / "db" / "db.sqlite"
         target_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with sqlite3.connect(target_file) as conn:
-            sql_script = source_path.read_text(encoding="utf-8")
+        sql_script = source_path.read_text(encoding="utf-8")
+
+        connection = sqlite3.connect(target_file)
+        with closing(connection) as conn:
             conn.executescript(sql_script)
             conn.commit()
 
@@ -163,17 +166,18 @@ class TestSqliteMigration(unittest.TestCase):
 
         check_schema(self.data_dir, 4)
 
-        with sqlite3.connect(self.config.data_file) as conn:
+        connection = sqlite3.connect(self.config.data_file)
+        with closing(connection) as conn:
             # Should have keyid column added (v1->v2)
-            cursor = conn.execute("SELECT keyid FROM entries LIMIT 1")
-            row = cursor.fetchone()
-            self.assertIsNotNone(row)
-            self.assertEqual(row[0], "371C136C")
+            with closing(conn.execute("SELECT keyid FROM entries LIMIT 1")) as cursor:
+                row = cursor.fetchone()
+                self.assertIsNotNone(row)
+                self.assertEqual(row[0], "371C136C")
 
             # Should have UUID IDs (v3->v4)
-            cursor = conn.execute("SELECT id FROM entries")
-            for (entry_id,) in cursor.fetchall():
-                uuid.UUID(entry_id)
+            with closing(conn.execute("SELECT id FROM entries")) as cursor:
+                for (entry_id,) in cursor.fetchall():
+                    self.assertIsInstance(uuid.UUID(entry_id), uuid.UUID)
 
     def test_migrate_v2_v4(self) -> None:
         """Test migration from schema v2 to v4 ."""
@@ -186,11 +190,12 @@ class TestSqliteMigration(unittest.TestCase):
 
         check_schema(self.data_dir, 4)
 
-        with sqlite3.connect(self.config.data_file) as conn:
+        connection = sqlite3.connect(self.config.data_file)
+        with closing(connection) as conn:
             # Should have UUID IDs (v3->v4)
-            cursor = conn.execute("SELECT id FROM entries")
-            for (entry_id,) in cursor.fetchall():
-                uuid.UUID(entry_id)
+            with closing(conn.execute("SELECT id FROM entries")) as cursor:
+                for (entry_id,) in cursor.fetchall():
+                    self.assertIsInstance(uuid.UUID(entry_id), uuid.UUID)
 
     def test_migrate_to_unknown_schema_version(self) -> None:
         """Test migration to unknown schema version ."""
