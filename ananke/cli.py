@@ -4,7 +4,7 @@ import os
 import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-from typing import List, Mapping, Sequence
+from typing import Callable, List, Mapping, Sequence
 
 from . import data, version
 from .application import Application, JsonApplication, SqliteApplication, TextApplication
@@ -12,6 +12,8 @@ from .cipher import KeyId, Plaintext
 from .cipher.gpg import Binary
 from .config import Backend, Config, ConfigBuilder, OsFamily
 from .data import CURRENT_SCHEMA_VERSION, Description, EntryId, Identity, Record, SchemaVersion, migration
+
+type Formatter = Callable[[Record], str]
 
 
 def configure(host_os: OsFamily, env: Mapping[str, str]) -> Config:
@@ -131,7 +133,7 @@ def format_results(records: List[Record], verbose: bool) -> str:
         record = records[0]
         return format_verbose(record) if verbose else str(record.plaintext)
 
-    formatter = format_verbose if verbose else lambda r: f"{r.description} {r.identity} {r.plaintext}"
+    formatter: Formatter = format_verbose if verbose else lambda r: f"{r.description} {r.identity} {r.plaintext}"
     return "\n".join(formatter(record) for record in records)
 
 
