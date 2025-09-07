@@ -1,6 +1,5 @@
 """Module for the 'Entry' class and related types."""
 
-import functools
 from typing import Any, Dict, Optional, Self, Tuple
 from uuid import UUID
 
@@ -233,40 +232,3 @@ class Entry(Record):
         if self.meta is not None:
             ret["meta"] = self.meta
         return ret
-
-
-# TODO: Consolidate
-CAMEL_TO_SNAKE = {
-    # camelCase
-    "timestamp": "timestamp",
-    "id": "id",
-    "entryId": "entry_id",
-    "keyId": "key_id",
-    "description": "description",
-    "identity": "identity",
-    "ciphertext": "ciphertext",
-    "meta": "meta",
-    # PascalCase
-    "Timestamp": "timestamp",
-    "Id": "id",
-    "KeyId": "key_id",
-    "Description": "description",
-    "Identity": "identity",
-    "Ciphertext": "ciphertext",
-    "Meta": "meta",
-}
-
-SNAKE_TO_CAMEL = {
-    "timestamp": "timestamp",
-    "id": "id",
-    "entry_id": "entryId",
-    "key_id": "keyId",
-    "description": "description",
-    "identity": "identity",
-    "ciphertext": "ciphertext",
-    "meta": "meta",
-}
-
-
-remap_keys_camel_to_snake = functools.partial(common.remap_keys, CAMEL_TO_SNAKE)
-remap_keys_snake_to_camel = functools.partial(common.remap_keys, SNAKE_TO_CAMEL)

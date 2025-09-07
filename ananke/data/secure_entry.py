@@ -1,7 +1,5 @@
 """Module for the 'SecureEntry' class and related types."""
 
-# pylint: disable=duplicate-code
-import functools
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Self
 from uuid import UUID
@@ -201,40 +199,3 @@ class SecureEntry(Record):
             key_id=self.key_id,
             description=self.description,
         )
-
-
-# TODO: Consolidate
-CAMEL_TO_SNAKE = {
-    # camelCase
-    "timestamp": "timestamp",
-    "id": "id",
-    "entryId": "entry_id",
-    "keyId": "key_id",
-    "description": "description",
-    "identity": "identity",
-    "plaintext": "plaintext",
-    "meta": "meta",
-    # PascalCase
-    "Timestamp": "timestamp",
-    "Id": "id",
-    "KeyId": "key_id",
-    "Description": "description",
-    "Identity": "identity",
-    "Plaintext": "plaintext",
-    "Meta": "meta",
-}
-
-SNAKE_TO_CAMEL = {
-    "timestamp": "timestamp",
-    "id": "id",
-    "entry_id": "entryId",
-    "key_id": "keyId",
-    "description": "description",
-    "identity": "identity",
-    "plaintext": "plaintext",
-    "meta": "meta",
-}
-
-
-remap_keys_camel_to_snake = functools.partial(common.remap_keys, CAMEL_TO_SNAKE)
-remap_keys_snake_to_camel = functools.partial(common.remap_keys, SNAKE_TO_CAMEL)

@@ -1,5 +1,6 @@
 """Common datatypes and related functions."""
 
+import functools
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -206,3 +207,39 @@ def get_required[K, V](d: Dict[K, Any], key: K, value_type: Type[V]) -> V:
     if value is None:
         raise KeyError(f"Invalid entry: missing required key: {key}")
     return value
+
+
+CAMEL_TO_SNAKE = {
+    # camelCase
+    "timestamp": "timestamp",
+    "id": "id",
+    "entryId": "entry_id",
+    "keyId": "key_id",
+    "description": "description",
+    "identity": "identity",
+    "ciphertext": "ciphertext",
+    "meta": "meta",
+    # PascalCase
+    "Timestamp": "timestamp",
+    "Id": "id",
+    "KeyId": "key_id",
+    "Description": "description",
+    "Identity": "identity",
+    "Ciphertext": "ciphertext",
+    "Meta": "meta",
+}
+
+SNAKE_TO_CAMEL = {
+    "timestamp": "timestamp",
+    "id": "id",
+    "entry_id": "entryId",
+    "key_id": "keyId",
+    "description": "description",
+    "identity": "identity",
+    "ciphertext": "ciphertext",
+    "meta": "meta",
+}
+
+
+remap_keys_camel_to_snake = functools.partial(remap_keys, CAMEL_TO_SNAKE)
+remap_keys_snake_to_camel = functools.partial(remap_keys, SNAKE_TO_CAMEL)
