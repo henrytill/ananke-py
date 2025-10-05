@@ -1,11 +1,10 @@
 [build-system]
-requires = ["setuptools>=52.0"]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core >=3.11,<4"]
+build-backend = "flit_core.buildapi"
 
 [project]
 name = "ananke"
-dynamic = ["version"]
-description = ""
+dynamic = ["version", "description"]
 authors = [{ name = "Henry Till", email = "henrytill@gmail.com" }]
 license = { file = "COPYING" }
 readme = "README.md"
@@ -17,12 +16,6 @@ test = ["coverage>=6.5.0", "cram>=0.7"]
 
 [project.scripts]
 ananke-py = "ananke.__main__:main"
-
-[tool.setuptools]
-packages = ["ananke", "ananke.application", "ananke.cipher", "ananke.data"]
-
-[tool.setuptools.dynamic]
-version = { attr = "ananke.version.__version__" }
 
 [tool.black]
 line-length = 120

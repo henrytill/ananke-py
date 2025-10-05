@@ -6,7 +6,7 @@ from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from typing import Callable, List, Mapping, Sequence
 
-from . import data, version
+from . import __version__, data
 from .application import Application, JsonApplication, SqliteApplication, TextApplication
 from .cipher import KeyId, Plaintext
 from .cipher.gpg import Binary
@@ -302,7 +302,7 @@ def main(args: Sequence[str] = sys.argv[1:]) -> int:
         An exit code.
     """
     parser = ArgumentParser(description="A minimal password manager.")
-    parser.add_argument("--version", action="version", version=f"%(prog)s {version.__version__}")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     subparsers = parser.add_subparsers(help="Commands")
 
     parser_add = subparsers.add_parser("add", help="add an entry")

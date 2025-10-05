@@ -42,8 +42,8 @@ generate_version() {
 
     log "Generated version: ${version}"
 
-    cat <<EOF >"${PACKAGE_NAME}/version.py"
-"""This module contains version information."""
+    cat <<EOF >"${PACKAGE_NAME}/__init__.py"
+"""A password manager."""
 
 # This file is auto-generated, do not edit by hand
 __version__ = "${version}"

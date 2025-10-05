@@ -23,7 +23,7 @@
         pkgs.python3Packages.buildPythonApplication {
           name = "ananke-py";
           pyproject = true;
-          build-system = with pkgs.python3Packages; [ setuptools ];
+          build-system = with pkgs.python3Packages; [ flit-core ];
           nativeCheckInputs = with pkgs.python3Packages; [
             cram
             mypy
