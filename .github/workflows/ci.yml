@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pip'
-      - run: ./build.sh generate
-      - run: ./build.sh create-env
-      - run: ./build.sh -e check
-      - run: ./build.sh -e test
+      - run: ./run.py generate
+      - run: ./run.py create-env
+      - run: ./run.py -e check
+      - run: ./run.py -e test
