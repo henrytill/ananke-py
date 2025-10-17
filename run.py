@@ -12,6 +12,7 @@ from typing import Optional
 PACKAGE_NAME = "ananke"
 TEST_DIR = "tests"
 VENV_DIR = "env"
+VERSION_FILE = "VERSION"
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,12 @@ def run(cmd: list[str], use_venv: bool = False):
 
 
 def generate(git_ref: Optional[str] = None):
-    base_version = "0.1.0"
+    version_file = Path(VERSION_FILE)
+    if not version_file.exists():
+        logger.error(f"Version file {VERSION_FILE} not found")
+        sys.exit(1)
+
+    base_version = version_file.read_text().strip()
     version = base_version
 
     if git_ref is None:

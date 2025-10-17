@@ -18,10 +18,14 @@
       ...
     }:
     let
+      baseVersion = nixpkgs.lib.trim (builtins.readFile ./VERSION);
+      gitRef = self.shortRev or self.dirtyShortRev;
+      version = "${baseVersion}+${gitRef}";
       makeAnanke =
         pkgs:
         pkgs.python3Packages.buildPythonApplication {
-          name = "ananke-py";
+          pname = "ananke-py";
+          inherit version;
           pyproject = true;
           build-system = with pkgs.python3Packages; [ flit-core ];
           nativeCheckInputs = with pkgs.python3Packages; [
@@ -34,7 +38,7 @@
             name = "ananke-py-src";
           };
           patchPhase = "patchShebangs run.py";
-          preConfigure = "./run.py generate -g ${self.shortRev or self.dirtyShortRev}";
+          preConfigure = "./run.py generate -g ${gitRef}";
           checkPhase = ''
             ./run.py check
             ./run.py test
