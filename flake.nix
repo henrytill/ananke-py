@@ -33,10 +33,7 @@
             mypy
             pkgs.gnupg
           ];
-          src = builtins.path {
-            path = ./.;
-            name = "ananke-py-src";
-          };
+          src = self;
           patchPhase = "patchShebangs run.py";
           preConfigure = "./run.py generate -g ${gitRef}";
           checkPhase = ''
