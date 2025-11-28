@@ -50,6 +50,20 @@
       {
         packages.ananke = makeAnanke pkgs;
         packages.default = self.packages.${system}.ananke;
+        devShells.default = pkgs.mkShell {
+          inputsFrom = [ self.packages.${system}.ananke ];
+          packages =
+            (with pkgs; [
+              pyright
+              yaml-language-server
+            ])
+            ++ (with pkgs.python3Packages; [
+              black
+              flake8
+              isort
+              pylint
+            ]);
+        };
       }
     );
 }
