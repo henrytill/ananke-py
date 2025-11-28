@@ -27,11 +27,11 @@
           pname = "ananke-py";
           inherit version;
           pyproject = true;
-          build-system = with pkgs.python3Packages; [ flit-core ];
-          nativeCheckInputs = with pkgs.python3Packages; [
-            cram
-            mypy
+          build-system = [ pkgs.python3Packages.flit-core ];
+          nativeCheckInputs = [
             pkgs.gnupg
+            pkgs.python3Packages.cram
+            pkgs.python3Packages.mypy
           ];
           src = self;
           patchPhase = "patchShebangs run.py";
