@@ -7,7 +7,7 @@ from ..cipher.gpg import Binary, Text
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, Identity, Metadata, Record, SecureEntry, Timestamp
 from . import common
-from .common import Application, Query, Target
+from .common import Application, Query, QueryMatcher, Target
 
 
 class JsonApplication(Application):
@@ -114,27 +114,3 @@ class JsonApplication(Application):
     def clear(self) -> None:
         self.entries.clear()
         common.write(self.config.data_file, sorted(self.entries))
-
-
-class QueryMatcher:
-    """A query matcher.
-
-    This class is used to filter entries.
-    """
-
-    def __init__(self, query: Query) -> None:
-        self.query = query
-
-    def match_description(self, description: Description) -> bool:
-        """Returns True if the description matches the query."""
-        if self.query.description is None:
-            return True
-        return self.query.description.lower() in description.lower()
-
-    def match_identity(self, maybe_identity: Optional[Identity]) -> bool:
-        """Returns True if the identity matches the query."""
-        if self.query.identity is None:
-            return True
-        if maybe_identity is None:
-            return False
-        return self.query.identity.lower() in maybe_identity.lower()

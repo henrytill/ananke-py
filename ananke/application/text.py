@@ -8,7 +8,7 @@ from ..cipher.gpg import Text
 from ..config import Backend, Config
 from ..data import Description, EntryId, Identity, Metadata, Record, SecureEntry, SecureIndexElement, Timestamp
 from . import common
-from .common import Application, Query, Target
+from .common import Application, Query, QueryMatcher, Target
 
 
 class TextApplication(Application):
@@ -171,27 +171,3 @@ def _write(path: Path, plaintext: Plaintext, cipher: Text) -> None:
     """Write a SecureEntry to a file."""
     armored = cipher.encrypt(plaintext)
     path.write_text(str(armored))
-
-
-class QueryMatcher:
-    """A query matcher.
-
-    This class is used to filter entries.
-    """
-
-    def __init__(self, query: Query) -> None:
-        self.query = query
-
-    def match_description(self, description: Description) -> bool:
-        """Returns True if the description matches the query."""
-        if self.query.description is None:
-            return True
-        return self.query.description.lower() in description.lower()
-
-    def match_identity(self, maybe_identity: Optional[Identity]) -> bool:
-        """Returns True if the identity matches the query."""
-        if self.query.identity is None:
-            return True
-        if maybe_identity is None:
-            return False
-        return self.query.identity.lower() in maybe_identity.lower()
