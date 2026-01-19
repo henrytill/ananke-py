@@ -28,10 +28,10 @@
           inherit version;
           pyproject = true;
           build-system = [ pkgs.python3Packages.flit-core ];
-          nativeCheckInputs = [
-            pkgs.gnupg
-            pkgs.python3Packages.cram
-            pkgs.python3Packages.mypy
+          nativeCheckInputs = with pkgs; [
+            gnupg
+            python3Packages.cram
+            python3Packages.mypy
           ];
           src = self;
           patchPhase = "patchShebangs run.py";
