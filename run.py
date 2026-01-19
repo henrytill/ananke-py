@@ -17,7 +17,7 @@ VERSION_FILE = "VERSION"
 logger = logging.getLogger(__name__)
 
 
-class CommandType(Enum):
+class Command(Enum):
     GENERATE = "generate"
     CREATE_ENV = "create-env"
     CHECK = "check"
@@ -140,14 +140,14 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    gen_parser = subparsers.add_parser(CommandType.GENERATE.value, help="Generate version file")
+    gen_parser = subparsers.add_parser(Command.GENERATE.value, help="Generate version file")
     gen_parser.add_argument("-g", "--git-ref", help="Git reference for version")
 
-    subparsers.add_parser(CommandType.CREATE_ENV.value, help="Create a new virtual environment")
-    subparsers.add_parser(CommandType.CHECK.value, help="Run type checks")
-    subparsers.add_parser(CommandType.LINT.value, help="Run linters")
-    subparsers.add_parser(CommandType.FMT.value, help="Format code")
-    subparsers.add_parser(CommandType.TEST.value, help="Run tests")
+    subparsers.add_parser(Command.CREATE_ENV.value, help="Create a new virtual environment")
+    subparsers.add_parser(Command.CHECK.value, help="Run type checks")
+    subparsers.add_parser(Command.LINT.value, help="Run linters")
+    subparsers.add_parser(Command.FMT.value, help="Format code")
+    subparsers.add_parser(Command.TEST.value, help="Run tests")
 
     args = parser.parse_args()
 
@@ -156,20 +156,20 @@ def main():
         format="%(levelname)s: %(message)s",
     )
 
-    command = CommandType(args.command)
+    command = Command(args.command)
 
     match command:
-        case CommandType.GENERATE:
+        case Command.GENERATE:
             generate(args.git_ref)
-        case CommandType.CREATE_ENV:
+        case Command.CREATE_ENV:
             create_env()
-        case CommandType.CHECK:
+        case Command.CHECK:
             check(args.venv)
-        case CommandType.LINT:
+        case Command.LINT:
             lint(args.venv)
-        case CommandType.FMT:
+        case Command.FMT:
             fmt(args.venv)
-        case CommandType.TEST:
+        case Command.TEST:
             test(args.venv)
 
 
