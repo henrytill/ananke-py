@@ -1,6 +1,6 @@
 """Module for the 'Entry' class and related types."""
 
-from typing import Any, Dict, Optional, Self, Tuple
+from typing import Any, Self
 from uuid import UUID
 
 from ..cipher import Cipher, Ciphertext, KeyId, Plaintext
@@ -20,10 +20,10 @@ class Entry(Record):
         key_id: KeyId,
         timestamp: Timestamp,
         description: Description,
-        identity: Optional[Identity],
+        identity: Identity | None,
         ciphertext: Ciphertext,
-        meta: Optional[Metadata],
-        cipher: Optional[Cipher[Ciphertext]] = None,
+        meta: Metadata | None,
+        cipher: Cipher[Ciphertext] | None = None,
     ) -> None:
         super().__init__(
             entry_id=entry_id,
@@ -143,7 +143,7 @@ class Entry(Record):
         )
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> Self:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Creates an 'Entry' from a dictionary.
 
         Args:
@@ -192,7 +192,7 @@ class Entry(Record):
         )
 
     @classmethod
-    def from_tuple(cls, row: Tuple[Any, Any, Any, Any, Any, Any, Any]) -> Self:
+    def from_tuple(cls, row: tuple[Any, Any, Any, Any, Any, Any, Any]) -> Self:
         """Creates an 'Entry' from a tuple.
 
         Args:
@@ -214,7 +214,7 @@ class Entry(Record):
             entry_dict["meta"] = row[6]
         return cls.from_dict(entry_dict)
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """Converts the 'Entry' to a dictionary.
 
         Returns:

@@ -2,7 +2,7 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Protocol, Sequence, Type, cast
+from typing import Any, Protocol, Sequence, cast
 
 from .. import data
 from ..cipher import ArmoredCiphertext, Plaintext
@@ -28,8 +28,8 @@ class Application(ABC):
         self,
         description: Description,
         plaintext: Plaintext,
-        maybe_identity: Optional[Identity] = None,
-        maybe_meta: Optional[Metadata] = None,
+        maybe_identity: Identity | None = None,
+        maybe_meta: Metadata | None = None,
     ) -> None:
         """Add a new entry.
 
@@ -44,8 +44,8 @@ class Application(ABC):
     def lookup(
         self,
         description: Description,
-        maybe_identity: Optional[Identity] = None,
-    ) -> List[Record]:
+        maybe_identity: Identity | None = None,
+    ) -> list[Record]:
         """Lookup the plaintexts of the matching entries.
 
         Searches for entries that match the provided description and identity,
@@ -63,10 +63,10 @@ class Application(ABC):
     def modify(
         self,
         target: Target,
-        maybe_description: Optional[Description],
-        maybe_identity: Optional[Identity],
-        maybe_plaintext: Optional[Plaintext],
-        maybe_meta: Optional[Metadata],
+        maybe_description: Description | None,
+        maybe_identity: Identity | None,
+        maybe_plaintext: Plaintext | None,
+        maybe_meta: Metadata | None,
     ) -> None:
         """Modify an existing entry.
 
@@ -122,10 +122,10 @@ class Query:
         meta: The metadata to filter by.
     """
 
-    entry_id: Optional[EntryId] = None
-    description: Optional[Description] = None
-    identity: Optional[Identity] = None
-    meta: Optional[Metadata] = None
+    entry_id: EntryId | None = None
+    description: Description | None = None
+    identity: Identity | None = None
+    meta: Metadata | None = None
 
     def is_empty(self) -> bool:
         """Returns 'true' if all fields are 'None'."""
@@ -147,7 +147,7 @@ class QueryMatcher:
             return True
         return self.query.description.lower() in description.lower()
 
-    def match_identity(self, maybe_identity: Optional[Identity]) -> bool:
+    def match_identity(self, maybe_identity: Identity | None) -> bool:
         """Returns True if the identity matches the query."""
         if self.query.identity is None:
             return True
@@ -202,20 +202,20 @@ def find_one[T: EntryLike](target: Target, entries: Sequence[T]) -> int:
     return idxs[0]
 
 
-def _read_json[T: Dictable](cls: Type[T], s: str) -> List[T]:
+def _read_json[T: Dictable](cls: type[T], s: str) -> list[T]:
     """Reads objects from a JSON string"""
     parsed = json.loads(s, object_hook=data.remap_keys_camel_to_snake)
     if not isinstance(parsed, list):
         raise TypeError("Expected a list")
-    ret: List[T] = []
-    for item in cast(List[object], parsed):
+    ret: list[T] = []
+    for item in cast(list[object], parsed):
         if not isinstance(item, dict):
             raise TypeError("Expected a dictionary")
-        ret.append(cls.from_dict(cast(Dict[str, Any], item)))
+        ret.append(cls.from_dict(cast(dict[str, Any], item)))
     return ret
 
 
-def read[T: Dictable](cls: Type[T], path: Path, cipher: Optional[Text] = None) -> List[T]:
+def read[T: Dictable](cls: type[T], path: Path, cipher: Text | None = None) -> list[T]:
     """Reads objects from a JSON file"""
     if not path.exists():
         raise FileNotFoundError(f"File '{path}' does not exist")
@@ -224,9 +224,9 @@ def read[T: Dictable](cls: Type[T], path: Path, cipher: Optional[Text] = None) -
     return _read_json(cls, json_str)
 
 
-def write[T: Dictable](path: Path, writes: Sequence[T], cipher: Optional[Text] = None) -> None:
+def write[T: Dictable](path: Path, writes: Sequence[T], cipher: Text | None = None) -> None:
     """Writes entries to a JSON file"""
-    dicts: List[Dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in writes]
+    dicts: list[dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in writes]
     json_str = json.dumps(dicts, indent=2)
     text = json_str if cipher is None else cipher.encrypt(Plaintext(json_str))
     if not path.parent.exists():

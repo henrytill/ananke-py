@@ -3,7 +3,7 @@ import unittest
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import List, Optional, TypedDict, cast
+from typing import TypedDict, cast
 
 from ananke.application import (
     Application,
@@ -25,14 +25,14 @@ class LookupArgs(TypedDict):
     """A type hint class for testing lookup."""
 
     description: Description
-    maybe_identity: Optional[Identity]
+    maybe_identity: Identity | None
 
 
 class LookupTestCase(TypedDict):
     """A type hint class for testing lookup."""
 
     args: LookupArgs
-    plaintexts: List[Plaintext]
+    plaintexts: list[Plaintext]
 
 
 class AddArgs(TypedDict):
@@ -40,18 +40,18 @@ class AddArgs(TypedDict):
 
     description: Description
     plaintext: Plaintext
-    maybe_identity: Optional[Identity]
-    maybe_meta: Optional[Metadata]
+    maybe_identity: Identity | None
+    maybe_meta: Metadata | None
 
 
 class ModifyArgs(TypedDict):
     """A type hint class for testing modify."""
 
     target: Target
-    maybe_description: Optional[Description]
-    maybe_identity: Optional[Identity]
-    maybe_plaintext: Optional[Plaintext]
-    maybe_meta: Optional[Metadata]
+    maybe_description: Description | None
+    maybe_identity: Identity | None
+    maybe_plaintext: Plaintext | None
+    maybe_meta: Metadata | None
 
 
 @dataclass(frozen=True)
@@ -87,7 +87,7 @@ class TestApplication:
             """Test the lookup method against the example data."""
 
             # see example/data.json for the test data
-            test_cases: List[LookupTestCase] = [
+            test_cases: list[LookupTestCase] = [
                 {
                     "args": {"description": Description("https://www.foomail.com"), "maybe_identity": Identity("quux")},
                     "plaintexts": [Plaintext("ASecretPassword"), Plaintext("ThisIsMyAltPassword")],
@@ -143,7 +143,7 @@ class TestApplication:
         def test_add(self) -> None:
             """Test the add method against the example data."""
 
-            test_cases: List[AddArgs] = [
+            test_cases: list[AddArgs] = [
                 {
                     "description": Description("https://www.foonews.com"),
                     "plaintext": Plaintext("FooNewsSecretPassword"),
@@ -185,7 +185,7 @@ class TestApplication:
         def test_modify(self) -> None:
             """Test the modify method against the example data."""
 
-            test_cases: List[ModifyArgs] = [
+            test_cases: list[ModifyArgs] = [
                 {
                     "target": Description("https://www.bazbank.com"),
                     "maybe_description": None,
@@ -298,7 +298,7 @@ class TestApplication:
         def test_remove(self) -> None:
             """Test the remove method against the example data."""
 
-            test_cases: List[Description] = [
+            test_cases: list[Description] = [
                 Description("https://www.bazbank.com"),
                 Description("https://www.barphone.com"),
             ]
@@ -325,7 +325,7 @@ class TestApplication:
         def test_remove_fails_if_no_entries_match(self) -> None:
             """Test that remove fails, rather than silently doing nothing, if no entries match."""
 
-            test_cases: List[Description] = [
+            test_cases: list[Description] = [
                 Description("zzz"),
                 # a partial description matches no entry: targets are matched exactly
                 Description("bazbank"),

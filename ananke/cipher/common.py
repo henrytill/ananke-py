@@ -5,7 +5,7 @@ import binascii
 import secrets
 import string
 from abc import ABC, abstractmethod
-from typing import NewType, Optional, Self
+from typing import NewType, Self
 
 
 class Plaintext:
@@ -157,5 +157,5 @@ class Cipher[T](ABC):
         """
 
     @staticmethod
-    def suggest_key() -> Optional[KeyId]:
+    def suggest_key() -> KeyId | None:
         """Suggests a KeyId"""

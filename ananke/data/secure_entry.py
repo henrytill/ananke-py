@@ -1,7 +1,7 @@
 """Module for the 'SecureEntry' class and related types."""
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Self
+from typing import Any, Self
 from uuid import UUID
 
 from ..cipher import KeyId, Plaintext
@@ -24,7 +24,7 @@ class SecureIndexElement:
     description: Description
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> Self:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Creates a 'SecureIndexElement' from a dictionary.
 
         Args:
@@ -50,7 +50,7 @@ class SecureIndexElement:
             description=Description(description_str),
         )
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """Converts the 'SecureIndexElement' to a dictionary.
 
         Returns:
@@ -73,9 +73,9 @@ class SecureEntry(Record):
         key_id: KeyId,
         timestamp: Timestamp,
         description: Description,
-        identity: Optional[Identity],
+        identity: Identity | None,
         plaintext: Plaintext,
-        meta: Optional[Metadata],
+        meta: Metadata | None,
     ) -> None:
         super().__init__(
             entry_id=entry_id,
@@ -118,7 +118,7 @@ class SecureEntry(Record):
         self._plaintext = plaintext
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> Self:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Creates a 'SecretEntry' from a dictionary.
 
         Args:
@@ -160,7 +160,7 @@ class SecureEntry(Record):
             meta=Metadata(maybe_meta) if maybe_meta else None,
         )
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """Converts the 'SecretEntry' to a dictionary.
 
         Returns:

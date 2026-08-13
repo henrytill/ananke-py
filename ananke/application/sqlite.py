@@ -2,7 +2,6 @@ import sqlite3
 from contextlib import closing
 from pathlib import Path
 from sqlite3 import Connection
-from typing import Dict, List, Optional, Tuple
 
 from ..cipher import Plaintext
 from ..cipher.gpg import Binary, Text
@@ -46,8 +45,8 @@ class SqliteApplication(Application):
         self,
         description: Description,
         plaintext: Plaintext,
-        maybe_identity: Optional[Identity] = None,
-        maybe_meta: Optional[Metadata] = None,
+        maybe_identity: Identity | None = None,
+        maybe_meta: Metadata | None = None,
     ) -> None:
         timestamp = Timestamp.now()
         entry_id = EntryId.generate()
@@ -66,10 +65,10 @@ class SqliteApplication(Application):
             cursor.execute(sql, parameters)
         self.connection.commit()
 
-    def lookup(self, description: Description, maybe_identity: Optional[Identity] = None) -> List[Record]:
+    def lookup(self, description: Description, maybe_identity: Identity | None = None) -> list[Record]:
         query = Query(description=description, identity=maybe_identity)
         sql, parameters = _create_query(query)
-        ret: List[Record] = []
+        ret: list[Record] = []
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql, parameters):
                 entry = Entry.from_tuple(row).with_cipher(self.cipher)
@@ -79,14 +78,14 @@ class SqliteApplication(Application):
     def modify(
         self,
         target: Target,
-        maybe_description: Optional[Description],
-        maybe_identity: Optional[Identity],
-        maybe_plaintext: Optional[Plaintext],
-        maybe_meta: Optional[Metadata],
+        maybe_description: Description | None,
+        maybe_identity: Identity | None,
+        maybe_plaintext: Plaintext | None,
+        maybe_meta: Metadata | None,
     ) -> None:
         query = Query(entry_id=target) if isinstance(target, EntryId) else Query(description=target)
         sql, parameters = _create_query(query)
-        entries: List[Entry] = []
+        entries: list[Entry] = []
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql, parameters):
                 entries.append(Entry.from_tuple(row))
@@ -130,7 +129,7 @@ class SqliteApplication(Application):
         self.connection.commit()
 
     def import_entries(self, path: Path) -> None:
-        secure_entries: List[SecureEntry] = common.read(SecureEntry, path, Text(self.config.key_id))
+        secure_entries: list[SecureEntry] = common.read(SecureEntry, path, Text(self.config.key_id))
         with closing(self.connection.cursor()) as cursor:
             for secure_entry in secure_entries:
                 entry = Entry.from_secure_entry(secure_entry, self.cipher)
@@ -140,7 +139,7 @@ class SqliteApplication(Application):
 
     def export_entries(self, path: Path) -> None:
         sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries"
-        secure_entries: List[SecureEntry] = []
+        secure_entries: list[SecureEntry] = []
         with closing(self.connection.cursor()) as cursor:
             for row in cursor.execute(sql):
                 entry = Entry.from_tuple(row).with_cipher(self.cipher)
@@ -155,13 +154,13 @@ class SqliteApplication(Application):
         self.connection.commit()
 
 
-def _create_insert(entry: Entry) -> Tuple[str, Dict[str, Optional[str]]]:
+def _create_insert(entry: Entry) -> tuple[str, dict[str, str | None]]:
     sql: str = """\
     INSERT OR REPLACE INTO
     entries(id, keyid, timestamp, description, identity, ciphertext, meta)
     VALUES(:id, :keyid, :timestamp, :description, :identity, :ciphertext, :meta)
     """
-    parameters: Dict[str, Optional[str]] = {
+    parameters: dict[str, str | None] = {
         "id": str(entry.entry_id),
         "keyid": entry.key_id,
         "timestamp": entry.timestamp.isoformat(),
@@ -173,15 +172,15 @@ def _create_insert(entry: Entry) -> Tuple[str, Dict[str, Optional[str]]]:
     return (sql, parameters)
 
 
-def _create_query(query: Query) -> Tuple[str, Dict[str, str]]:
+def _create_query(query: Query) -> tuple[str, dict[str, str]]:
     # A field that is set but empty still contributes a clause, which matches
     # everything, so that an empty description searches rather than fails.
     if query.is_empty():
         raise ValueError("Cannot build a query with no criteria")
 
     sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries WHERE "
-    wheres: List[str] = []
-    parameters: Dict[str, str] = {}
+    wheres: list[str] = []
+    parameters: dict[str, str] = {}
     if query.entry_id is not None:
         wheres += ["id LIKE :id"]
         parameters["id"] = str(query.entry_id)
@@ -198,17 +197,17 @@ def _create_query(query: Query) -> Tuple[str, Dict[str, str]]:
     return (sql, parameters)
 
 
-def _create_update(target: Target, entry: Entry) -> Tuple[str, Dict[str, str]]:
-    parameters: Dict[str, str] = {}
+def _create_update(target: Target, entry: Entry) -> tuple[str, dict[str, str]]:
+    parameters: dict[str, str] = {}
 
-    wheres: List[str] = []
+    wheres: list[str] = []
     if isinstance(target, EntryId):
         wheres += ["entries.id = :target"]
     else:
         wheres += ["entries.description = :target"]
     parameters["target"] = str(target)
 
-    sets: List[str] = []
+    sets: list[str] = []
 
     sets += ["timestamp = :timestamp"]
     parameters["timestamp"] = entry.timestamp.isoformat()

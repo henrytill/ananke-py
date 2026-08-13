@@ -5,7 +5,6 @@ import tempfile
 import unittest
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
 
 from ananke.cipher import ArmoredCiphertext, Cipher, Ciphertext, KeyId, Plaintext
 from ananke.cipher.gpg import Binary, Text
@@ -47,7 +46,7 @@ class TestCipher:
 
         def test_encode_decode_random(self) -> None:
             """Tests the encode and decode methods with random data."""
-            test_cases: List[RandomArgs] = [
+            test_cases: list[RandomArgs] = [
                 # length = 24
                 {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": True},
                 {"length": 24, "use_uppercase": True, "use_digits": True, "use_punctuation": False},
@@ -99,7 +98,7 @@ class TestCipher:
         def test_suggest_key(self) -> None:
             """Tests the suggest_key method."""
             expected = self.key_id
-            actual: Optional[KeyId] = self.cipher.suggest_key()
+            actual: KeyId | None = self.cipher.suggest_key()
             self.assertEqual(expected, actual)
 
         def _create_empty_ciphertext(self) -> T:

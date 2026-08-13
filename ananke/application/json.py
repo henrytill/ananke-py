@@ -1,6 +1,5 @@
 import copy
 from pathlib import Path
-from typing import List, Optional
 
 from ..cipher import Plaintext
 from ..cipher.gpg import Binary, Text
@@ -20,7 +19,7 @@ class JsonApplication(Application):
         self.config = config
         self.config.data_file.parent.mkdir(parents=True, exist_ok=True)
         self.cipher = Binary(self.config.key_id)
-        self.entries: List[Entry] = []
+        self.entries: list[Entry] = []
         if self.config.data_file.exists():
             self.entries += common.read(Entry, self.config.data_file)
 
@@ -28,8 +27,8 @@ class JsonApplication(Application):
         self,
         description: Description,
         plaintext: Plaintext,
-        maybe_identity: Optional[Identity] = None,
-        maybe_meta: Optional[Metadata] = None,
+        maybe_identity: Identity | None = None,
+        maybe_meta: Metadata | None = None,
     ) -> None:
         timestamp = Timestamp.now()
         entry_id = EntryId.generate()
@@ -46,7 +45,7 @@ class JsonApplication(Application):
         self.entries.append(entry)
         common.write(self.config.data_file, sorted(self.entries))
 
-    def lookup(self, description: Description, maybe_identity: Optional[Identity] = None) -> List[Record]:
+    def lookup(self, description: Description, maybe_identity: Identity | None = None) -> list[Record]:
         query = Query(description=description, identity=maybe_identity)
         matcher = QueryMatcher(query)
         return [
@@ -58,10 +57,10 @@ class JsonApplication(Application):
     def modify(
         self,
         target: Target,
-        maybe_description: Optional[Description],
-        maybe_identity: Optional[Identity],
-        maybe_plaintext: Optional[Plaintext],
-        maybe_meta: Optional[Metadata],
+        maybe_description: Description | None,
+        maybe_identity: Identity | None,
+        maybe_plaintext: Plaintext | None,
+        maybe_meta: Metadata | None,
     ) -> None:
         entry = self.entries.pop(common.find_one(target, self.entries))
         if maybe_description is not None:
@@ -82,7 +81,7 @@ class JsonApplication(Application):
         common.write(self.config.data_file, sorted(self.entries))
 
     def import_entries(self, path: Path) -> None:
-        secure_entries: List[SecureEntry] = common.read(SecureEntry, path, Text(self.config.key_id))
+        secure_entries: list[SecureEntry] = common.read(SecureEntry, path, Text(self.config.key_id))
         self.entries += [Entry.from_secure_entry(secure_entry, self.cipher) for secure_entry in secure_entries]
         common.write(self.config.data_file, sorted(self.entries))
 

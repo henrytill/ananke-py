@@ -5,7 +5,7 @@ import sqlite3
 import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-from typing import Callable, List, Mapping, Sequence
+from typing import Callable, Mapping, Sequence
 
 from . import __version__, data
 from .application import Application, JsonApplication, SqliteApplication, TextApplication
@@ -138,7 +138,7 @@ def format_verbose(record: Record) -> str:
     return " ".join(elements)
 
 
-def format_results(records: List[Record], verbose: bool) -> str:
+def format_results(records: list[Record], verbose: bool) -> str:
     """Formats the results of a lookup.
 
     Args:

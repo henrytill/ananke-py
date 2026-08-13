@@ -1,5 +1,4 @@
 import subprocess
-from typing import Optional
 
 from .common import ArmoredCiphertext, Cipher, Ciphertext, KeyId, Plaintext
 
@@ -72,7 +71,7 @@ class Binary(Cipher[Ciphertext]):
             raise ValueError(f"Could not decrypt Ciphertext: {stderr}") from exc
 
     @staticmethod
-    def suggest_key() -> Optional[KeyId]:
+    def suggest_key() -> KeyId | None:
         """Suggests a KeyId"""
         return _suggest_key()
 
@@ -146,12 +145,12 @@ class Text(Cipher[ArmoredCiphertext]):
             raise ValueError(f"Could not decrypt Ciphertext: {stderr}") from exc
 
     @staticmethod
-    def suggest_key() -> Optional[KeyId]:
+    def suggest_key() -> KeyId | None:
         """Suggests a KeyId"""
         return _suggest_key()
 
 
-def _suggest_key() -> Optional[KeyId]:
+def _suggest_key() -> KeyId | None:
     try:
         # Try getting default public key
         # https://lists.gnupg.org/pipermail/gnupg-devel/2011-November/026308.html

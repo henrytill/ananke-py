@@ -6,7 +6,7 @@ import sqlite3
 import uuid
 from contextlib import closing
 from pathlib import Path
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 from ..config import Config
 from . import common
@@ -92,11 +92,11 @@ def _migrate_json_v2_to_v3(data_file: Path) -> None:
     if not isinstance(data, list):
         raise MigrationError("JSON data is not an array")
 
-    for entry in cast(List[object], data):
+    for entry in cast(list[object], data):
         if not isinstance(entry, dict):
             raise MigrationError("JSON entry is not an object")
 
-        entry_dict = cast(Dict[str, Any], entry)
+        entry_dict = cast(dict[str, Any], entry)
         remapped = remap_keys_to_v3(entry_dict)
         entry_dict.clear()
         entry_dict.update(remapped)
@@ -114,7 +114,7 @@ def _migrate_json_v3_to_v4(data_file: Path) -> None:
     if not isinstance(data, list):
         raise MigrationError("JSON data is not an array")
 
-    for entry in cast(List[object], data):
+    for entry in cast(list[object], data):
         if not isinstance(entry, dict):
             raise MigrationError("JSON entry is not an object")
         entry["id"] = str(uuid.uuid4())

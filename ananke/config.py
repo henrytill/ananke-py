@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from functools import cached_property
 from pathlib import Path
-from typing import Callable, Mapping, Optional, Self
+from typing import Callable, Mapping, Self
 
 from .cipher import KeyId
 
@@ -163,11 +163,11 @@ class ConfigBuilder:
 
     def __init__(
         self,
-        config_dir: Optional[Path] = None,
-        data_dir: Optional[Path] = None,
-        backend: Optional[Backend] = None,
-        key_id: Optional[KeyId] = None,
-        allow_multiple_keys: Optional[bool] = None,
+        config_dir: Path | None = None,
+        data_dir: Path | None = None,
+        backend: Backend | None = None,
+        key_id: KeyId | None = None,
+        allow_multiple_keys: bool | None = None,
     ) -> None:
         self.config_dir = config_dir
         self.data_dir = data_dir
@@ -176,7 +176,7 @@ class ConfigBuilder:
         self.allow_multiple_keys = allow_multiple_keys
 
     @property
-    def config_file(self) -> Optional[Path]:
+    def config_file(self) -> Path | None:
         """Returns the path to a possible configuration file, if one can be determined."""
         return (self.config_dir / "ananke.ini") if self.config_dir else None
 

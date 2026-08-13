@@ -5,7 +5,7 @@ import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Dict, NewType, Optional, Protocol, Self, Type
+from typing import Any, NewType, Protocol, Self
 from uuid import UUID
 
 from ..cipher import KeyId, Plaintext
@@ -97,11 +97,11 @@ class Dictable(Protocol):
     """A protocol for objects that can be converted to and from dictionaries."""
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> Self:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         """Creates an instance from a dictionary."""
         ...
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """Converts the instance to a dictionary."""
         ...
 
@@ -114,8 +114,8 @@ class Record(ABC):
     key_id: KeyId
     timestamp: Timestamp
     description: Description
-    identity: Optional[Identity]
-    meta: Optional[Metadata]
+    identity: Identity | None
+    meta: Metadata | None
 
     @property
     @abstractmethod
@@ -123,7 +123,7 @@ class Record(ABC):
         """Returns the plaintext associated with this record."""
 
 
-def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
+def remap_keys(mapping: dict[str, str], data: dict[str, Any]) -> dict[str, Any]:
     """Maps the keys of a dictionary to a new set of keys.
 
     If a key is not present in the mapping, it is left unchanged.
@@ -146,7 +146,7 @@ def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
     return {mapping.get(key, key): value for key, value in data.items()}
 
 
-def get_optional[K, V](d: Dict[K, Any], key: K, value_type: Type[V]) -> Optional[V]:
+def get_optional[K, V](d: dict[K, Any], key: K, value_type: type[V]) -> V | None:
     """Gets an optional value from a dictionary.
 
     Args:
@@ -175,7 +175,7 @@ def get_optional[K, V](d: Dict[K, Any], key: K, value_type: Type[V]) -> Optional
     return value
 
 
-def get_required[K, V](d: Dict[K, Any], key: K, value_type: Type[V]) -> V:
+def get_required[K, V](d: dict[K, Any], key: K, value_type: type[V]) -> V:
     """Gets a required value from a dictionary.
 
     Args:

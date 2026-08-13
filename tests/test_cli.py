@@ -5,7 +5,6 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import List
 from unittest.mock import patch
 
 from ananke.cipher import KeyId, Plaintext
@@ -32,13 +31,13 @@ class TestFormatResults(unittest.TestCase):
 
     def test_single_result_is_the_plaintext_alone(self) -> None:
         """Tests that a lone result is formatted as just its plaintext."""
-        records: List[SecureEntry] = [make_record("https://www.foomail.com", "quux", "ASecretPassword")]
+        records: list[SecureEntry] = [make_record("https://www.foomail.com", "quux", "ASecretPassword")]
 
         self.assertEqual("ASecretPassword", format_results(list(records), verbose=False))
 
     def test_multiple_results_are_described(self) -> None:
         """Tests that ambiguous results carry enough context to tell them apart."""
-        records: List[SecureEntry] = [
+        records: list[SecureEntry] = [
             make_record("https://www.foomail.com", "quux", "ASecretPassword"),
             make_record("https://www.foomail.com", "altquux", "ThisIsMyAltPassword"),
         ]
