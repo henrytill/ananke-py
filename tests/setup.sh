@@ -2,7 +2,7 @@ EXAMPLE_DIR="${TESTDIR}/../example"
 export GNUPGHOME="${EXAMPLE_DIR}/gnupg"
 export ANANKE_CONFIG_DIR=$TMPDIR
 export ANANKE_DATA_DIR=$TMPDIR
-export PYTHONPATH="${TESTDIR}/.."
+export PYTHONPATH="${TESTDIR}/coverage_support:${TESTDIR}/.."
 cp "${EXAMPLE_DIR}/ananke.ini" $ANANKE_CONFIG_DIR
 
 # Point the config and data directories at a backend-specific subdirectory, so

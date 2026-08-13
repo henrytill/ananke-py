@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import os
 import subprocess
 import sys
 import venv
@@ -37,12 +38,20 @@ def get_python(use_venv: bool) -> str:
     return sys.executable
 
 
-def run(cmd: list[str], use_venv: bool = False):
+def run(cmd: list[str], use_venv: bool = False, extra_env: Optional[dict[str, str]] = None):
     python = get_python(use_venv)
     if cmd[0] in ("python3", "python"):
         cmd[0] = python
+    env = None
+    if extra_env or use_venv:
+        env = dict(os.environ)
+        if use_venv:
+            # cram invokes `python3` itself, which must resolve to the same
+            # interpreter as everything else, not whatever is first on PATH.
+            env["PATH"] = os.pathsep.join([str(Path(VENV_DIR).resolve() / "bin"), env.get("PATH", "")])
+        env.update(extra_env or {})
     logger.info(f"Running: {' '.join(cmd)}")
-    result = subprocess.run(cmd, check=False)
+    result = subprocess.run(cmd, check=False, env=env)
     if result.returncode != 0:
         sys.exit(result.returncode)
 
@@ -126,13 +135,29 @@ def fmt(use_venv: bool):
 
 def test(use_venv: bool, with_coverage: bool = False):
     logger.info("Running tests...")
+
     unittest_cmd = ["python3", "-m", "unittest", "discover", "-v", "-s", TEST_DIR]
+    cram_cmd = ["python3", "-m", "cram", TEST_DIR]
+    extra_env: Optional[dict[str, str]] = None
+
     if with_coverage:
-        unittest_cmd = ["python3", "-m", "coverage", "run", "--source", PACKAGE_NAME, "-m"] + unittest_cmd[2:]
-    run(unittest_cmd, use_venv=use_venv)
-    run(["python3", "-m", "cram", "tests"], use_venv=use_venv)
+        config_file = Path("pyproject.toml").resolve()
+        # Both the parent and the processes cram spawns must agree on where to
+        # write, and the latter run with the cram scratch directory as their cwd.
+        extra_env = {
+            "COVERAGE_FILE": str(Path(".coverage").resolve()),
+            "COVERAGE_PROCESS_START": str(config_file),
+        }
+        unittest_cmd = ["python3", "-m", "coverage", "run", "-m"] + unittest_cmd[2:]
+        for stale in Path().glob(".coverage*"):
+            stale.unlink()
+
+    run(unittest_cmd, use_venv=use_venv, extra_env=extra_env)
+    run(cram_cmd, use_venv=use_venv, extra_env=extra_env)
+
     if with_coverage:
-        run(["python3", "-m", "coverage", "report", "-m"], use_venv=use_venv)
+        run(["python3", "-m", "coverage", "combine"], use_venv=use_venv, extra_env=extra_env)
+        run(["python3", "-m", "coverage", "report"], use_venv=use_venv, extra_env=extra_env)
 
 
 def main():

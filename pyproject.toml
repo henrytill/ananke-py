@@ -45,5 +45,15 @@ disable = [
     "W2301", # unnecessary-ellipsis, yes but i want them
 ]
 
+[tool.coverage.run]
+source_pkgs = ["ananke"]
+# The cram tests drive the CLI in subprocesses, each of which writes its own
+# data file to be combined afterwards.
+parallel = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "@abstractmethod"]
+
 [tool.pyright]
 strict = ["ananke", "tests"]
