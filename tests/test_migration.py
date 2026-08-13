@@ -67,8 +67,6 @@ class TestJsonMigration(unittest.TestCase):
 
         migrate(self.config, SchemaVersion(2))
 
-        self.config.schema_file.write_text(str(CURRENT_SCHEMA_VERSION), encoding="utf-8")
-
         check_schema(self.data_dir, 4)
 
         with open(self.config.data_file, "r", encoding="utf-8") as f:
@@ -100,8 +98,6 @@ class TestJsonMigration(unittest.TestCase):
 
         migrate(self.config, SchemaVersion(3))
 
-        self.config.schema_file.write_text(str(CURRENT_SCHEMA_VERSION), encoding="utf-8")
-
         check_schema(self.data_dir, 4)
 
         with open(self.config.data_file, "r", encoding="utf-8") as f:
@@ -120,6 +116,28 @@ class TestJsonMigration(unittest.TestCase):
             migrate(self.config, UNKNOWN_SCHEMA_VERSION)
 
         self.assertIn("no supported migration path", str(cm.exception))
+
+    def test_migrated_data_is_stable_across_runs(self) -> None:
+        """Test that a migrated data file is not migrated again on the next run."""
+        self._copy_json_data("data-schema-v3.json")
+        create_schema_file(self.data_dir, 3)
+
+        migrate(self.config, SchemaVersion(3))
+
+        with open(self.config.data_file, "r", encoding="utf-8") as f:
+            migrated = json.load(f)
+
+        # A second run must find the current schema version and leave the data alone,
+        # rather than re-running v3 -> v4 and assigning every entry a fresh id.
+        for _ in range(2):
+            schema_version = get_schema_version(self.config.schema_file)
+            self.assertEqual(CURRENT_SCHEMA_VERSION, schema_version)
+
+            if schema_version < CURRENT_SCHEMA_VERSION:
+                migrate(self.config, schema_version)
+
+            with open(self.config.data_file, "r", encoding="utf-8") as f:
+                self.assertEqual(migrated, json.load(f))
 
 
 class TestSqliteMigration(unittest.TestCase):
@@ -162,8 +180,6 @@ class TestSqliteMigration(unittest.TestCase):
 
         migrate(self.config, SchemaVersion(1))
 
-        self.config.schema_file.write_text(str(CURRENT_SCHEMA_VERSION), encoding="utf-8")
-
         check_schema(self.data_dir, 4)
 
         connection = sqlite3.connect(self.config.data_file)
@@ -185,8 +201,6 @@ class TestSqliteMigration(unittest.TestCase):
         create_schema_file(self.data_dir, 2)
 
         migrate(self.config, SchemaVersion(2))
-
-        self.config.schema_file.write_text(str(CURRENT_SCHEMA_VERSION), encoding="utf-8")
 
         check_schema(self.data_dir, 4)
 

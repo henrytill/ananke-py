@@ -19,5 +19,6 @@ from .migration import migrate_sqlite_data as migrate_sqlite_data
 from .schema import CURRENT_SCHEMA_VERSION as CURRENT_SCHEMA_VERSION
 from .schema import SchemaVersion as SchemaVersion
 from .schema import get_schema_version as get_schema_version
+from .schema import set_schema_version as set_schema_version
 from .secure_entry import SecureEntry as SecureEntry
 from .secure_entry import SecureIndexElement as SecureIndexElement

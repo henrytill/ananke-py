@@ -59,7 +59,18 @@ def get_schema_version(schema_file: Path) -> SchemaVersion:
         The schema version.
     """
     if not schema_file.exists():
-        schema_file.write_text(str(CURRENT_SCHEMA_VERSION), encoding="utf-8")
+        set_schema_version(schema_file, CURRENT_SCHEMA_VERSION)
         return CURRENT_SCHEMA_VERSION
     schema_version_str = schema_file.read_text(encoding="utf-8")
     return SchemaVersion.from_str(schema_version_str)
+
+
+def set_schema_version(schema_file: Path, schema_version: SchemaVersion) -> None:
+    """Write a schema version to a file.
+
+    Args:
+        schema_file: The file to write to.
+        schema_version: The schema version to write.
+    """
+    schema_file.parent.mkdir(parents=True, exist_ok=True)
+    schema_file.write_text(str(schema_version), encoding="utf-8")

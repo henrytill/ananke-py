@@ -32,6 +32,9 @@ def configure(host_os: OsFamily, env: Mapping[str, str]) -> Config:
 def migrate(cfg: Config, found: SchemaVersion) -> None:
     """Migrates the data to the current schema version.
 
+    On success, records the current schema version, so that the migration is
+    not performed again on the next run.
+
     Args:
         cfg: The configuration.
         found: The schema version found in the schema file.
@@ -43,6 +46,7 @@ def migrate(cfg: Config, found: SchemaVersion) -> None:
             migration.migrate_sqlite_data(cfg, found)
         case Backend.TEXT:
             pass
+    data.set_schema_version(cfg.schema_file, CURRENT_SCHEMA_VERSION)
 
 
 def application(host_os: OsFamily, env: Mapping[str, str]) -> Application:
