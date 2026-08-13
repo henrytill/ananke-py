@@ -179,5 +179,6 @@ def _suggest_key() -> Optional[KeyId]:
     except subprocess.TimeoutExpired:
         raise ValueError("GPG key suggestion timed out") from None
     except subprocess.CalledProcessError as exc:
-        stderr = exc.stderr.decode("utf-8") if exc.stderr else "Unknown error"
+        # These commands are run with text=True, so stderr is already a str.
+        stderr = exc.stderr if exc.stderr else "Unknown error"
         raise ValueError(f"Failure occurred trying to find a key: {stderr}") from exc

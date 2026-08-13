@@ -69,6 +69,20 @@ class TestCiphertext(unittest.TestCase):
                 actual_output = Ciphertext.from_base64(ciphertext)
                 self.assertEqual(expected_output, actual_output)
 
+    def test_from_base64_rejects_invalid_input(self) -> None:
+        """Tests that input outside the base64 alphabet is rejected.
+
+        Characters outside the alphabet are discarded rather than reported unless
+        decoding is asked to validate, which turns a corrupt ciphertext into a
+        shorter one that only fails later, inside gpg.
+        """
+        test_cases = ["!!!!", "aGVsbG8=!!", "aG*Vsb G8="]
+
+        for ciphertext in test_cases:
+            with self.subTest(ciphertext=ciphertext):
+                with self.assertRaises(ValueError):
+                    Ciphertext.from_base64(ciphertext)
+
     def test_to_base64(self) -> None:
         """Tests the 'to_base64' method."""
         test_cases = {

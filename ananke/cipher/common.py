@@ -93,7 +93,7 @@ class Ciphertext(bytes):
             ValueError: If the value is not a valid base64 encoded string.
         """
         try:
-            return cls(base64.b64decode(value.encode("ascii")))
+            return cls(base64.b64decode(value.encode("ascii"), validate=True))
         except binascii.Error as exc:
             raise ValueError("Invalid base64 string") from exc
 

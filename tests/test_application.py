@@ -352,6 +352,20 @@ class TestApplication:
             self.assertEqual(f"Multiple entries match {target}", str(exc.exception))
             self.assertEqual(2, len(self.application.lookup(target)))
 
+        def test_lookup_with_an_empty_description(self) -> None:
+            """Test that an empty description constrains nothing, rather than failing.
+
+            The SQLite backend used to build a query with an empty WHERE clause here
+            and fail with an OperationalError, while the others returned everything.
+            """
+
+            self.assertEqual(4, len(self.application.lookup(Description(""))))
+
+        def test_lookup_with_an_empty_identity(self) -> None:
+            """Test that an empty identity constrains nothing, rather than failing."""
+
+            self.assertEqual(4, len(self.application.lookup(Description("www"), Identity(""))))
+
         def test_export_import(self) -> None:
             """Test that exported data can be re-imported."""
 

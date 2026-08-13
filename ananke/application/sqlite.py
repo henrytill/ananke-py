@@ -173,19 +173,24 @@ def _create_insert(entry: Entry) -> Tuple[str, Dict[str, Optional[str]]]:
 
 
 def _create_query(query: Query) -> Tuple[str, Dict[str, str]]:
+    # A field that is set but empty still contributes a clause, which matches
+    # everything, so that an empty description searches rather than fails.
+    if query.is_empty():
+        raise ValueError("Cannot build a query with no criteria")
+
     sql = "SELECT id, keyid, timestamp, description, identity, ciphertext, meta FROM entries WHERE "
     wheres: List[str] = []
     parameters: Dict[str, str] = {}
-    if query.entry_id:
+    if query.entry_id is not None:
         wheres += ["id LIKE :id"]
         parameters["id"] = str(query.entry_id)
-    if query.description:
+    if query.description is not None:
         wheres += ["description LIKE :description"]
         parameters["description"] = f"%{query.description}%"
-    if query.identity:
+    if query.identity is not None:
         wheres += ["identity LIKE :identity"]
         parameters["identity"] = f"%{query.identity}%"
-    if query.meta:
+    if query.meta is not None:
         wheres += ["meta LIKE :meta"]
         parameters["meta"] = query.meta
     sql += " AND ".join(wheres)
