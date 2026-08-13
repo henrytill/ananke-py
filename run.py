@@ -100,7 +100,7 @@ def create_env():
     logger.info(f"Using Python: {python}")
 
     run([python, "-m", "pip", "install", "--upgrade", "pip"], use_venv=True)
-    run([python, "-m", "pip", "install", "-e", ".[types,test,dev]"], use_venv=True)
+    run([python, "-m", "pip", "install", "-e", ".[test,dev]"], use_venv=True)
     logger.info("Environment created successfully")
 
 
@@ -124,13 +124,15 @@ def fmt(use_venv: bool):
     run(["python3", "-m", "black", PACKAGE_NAME, TEST_DIR], use_venv=use_venv)
 
 
-def test(use_venv: bool):
+def test(use_venv: bool, with_coverage: bool = False):
     logger.info("Running tests...")
-    run(
-        ["python3", "-m", "unittest", "discover", "-v", "-s", TEST_DIR],
-        use_venv=use_venv,
-    )
+    unittest_cmd = ["python3", "-m", "unittest", "discover", "-v", "-s", TEST_DIR]
+    if with_coverage:
+        unittest_cmd = ["python3", "-m", "coverage", "run", "--source", PACKAGE_NAME, "-m"] + unittest_cmd[2:]
+    run(unittest_cmd, use_venv=use_venv)
     run(["python3", "-m", "cram", "tests"], use_venv=use_venv)
+    if with_coverage:
+        run(["python3", "-m", "coverage", "report", "-m"], use_venv=use_venv)
 
 
 def main():
@@ -147,7 +149,8 @@ def main():
     subparsers.add_parser(Command.CHECK.value, help="Run type checks")
     subparsers.add_parser(Command.LINT.value, help="Run linters")
     subparsers.add_parser(Command.FMT.value, help="Format code")
-    subparsers.add_parser(Command.TEST.value, help="Run tests")
+    test_parser = subparsers.add_parser(Command.TEST.value, help="Run tests")
+    test_parser.add_argument("-c", "--coverage", action="store_true", help="Measure coverage")
 
     args = parser.parse_args()
 
@@ -170,7 +173,7 @@ def main():
         case Command.FMT:
             fmt(args.venv)
         case Command.TEST:
-            test(args.venv)
+            test(args.venv, args.coverage)
 
 
 if __name__ == "__main__":
