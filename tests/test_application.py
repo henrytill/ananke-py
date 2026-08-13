@@ -15,6 +15,7 @@ from ananke.application import (
     TextApplication,
 )
 from ananke.cipher import Plaintext
+from ananke.cli import EXPECTED_ERRORS
 from ananke.config import Config, ConfigBuilder, OsFamily
 from ananke.data import Description, EntryId, Identity, Metadata
 
@@ -57,12 +58,24 @@ class ModifyArgs(TypedDict):
 @dataclass(frozen=True)
 class TestApplication:
     class Inner(unittest.TestCase):
+        backend: str
+
         def setUp(self) -> None:
             # pylint: disable=consider-using-with
             self.dir = TemporaryDirectory(prefix="ananke")
             os.environ["GNUPGHOME"] = str(Path.cwd() / "example" / "gnupg")
+            env = {
+                "ANANKE_CONFIG_DIR": f"{self.dir.name}",
+                "ANANKE_DATA_DIR": f"{self.dir.name}",
+                "ANANKE_KEY_ID": "371C136C",
+                "ANANKE_BACKEND": self.backend,
+            }
+            self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
+            self.open_application()
+            self.application.import_entries(EXPORT_ASC)
 
         def tearDown(self) -> None:
+            self.close_application()
             self.dir.cleanup()
 
         @property
@@ -82,6 +95,17 @@ class TestApplication:
         @application.setter
         def application(self, application: Application) -> None:
             self._application = application
+
+        def open_application(self) -> None:
+            """Opens an application against the current configuration.
+
+            Overridden by each backend's test case, so that shared tests can reopen
+            a store without knowing which backend they are exercising.
+            """
+            raise NotImplementedError
+
+        def close_application(self) -> None:
+            """Releases any resources the application holds."""
 
         def test_lookup(self) -> None:
             """Test the lookup method against the example data."""
@@ -366,6 +390,78 @@ class TestApplication:
 
             self.assertEqual(4, len(self.application.lookup(Description("www"), Identity(""))))
 
+        def test_clear(self) -> None:
+            """Test that clear empties the store, and that the store stays usable."""
+
+            self.assertEqual(4, len(self.application.lookup(Description("www"))))
+
+            self.application.clear()
+
+            self.assertEqual(0, len(self.application.lookup(Description("www"))))
+
+            # An emptied store still accepts entries, rather than having had the
+            # files it needs deleted out from under it.
+            self.application.add(Description("https://www.bazlib.org/"), Plaintext("bazlibpass"))
+            self.assertEqual(1, len(self.application.lookup(Description("bazlib"))))
+
+        def test_clear_is_idempotent(self) -> None:
+            """Test that clearing an already empty store is not an error."""
+
+            self.application.clear()
+            self.application.clear()
+
+            self.assertEqual(0, len(self.application.lookup(Description("www"))))
+
+        def test_import_of_an_already_imported_file(self) -> None:
+            """Characterizes what a repeated import does to each backend.
+
+            The backends disagree, and so does the reference implementation, which
+            this follows: SQLite replaces by entry id, while JSON and Text append,
+            producing two entries that share an id and that no target can then
+            address.  See henrytill/ananke#143.  This test pins the current
+            behaviour so that a change to it is a deliberate one.
+            """
+
+            self.application.import_entries(EXPORT_ASC)
+
+            found = len(self.application.lookup(Description("https://www.bazbank.com")))
+            expected = 1 if isinstance(self.application, SqliteApplication) else 2
+
+            self.assertEqual(expected, found)
+
+        def test_import_of_a_corrupt_file(self) -> None:
+            """Test that a file which is not a valid store is rejected, not partly applied."""
+
+            before = len(self.application.lookup(Description("www")))
+
+            corrupt = Path(self.dir.name) / "corrupt.asc"
+            corrupt.write_text("this is not an encrypted export", encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                self.application.import_entries(corrupt)
+
+            self.assertEqual(before, len(self.application.lookup(Description("www"))))
+
+        def test_opening_a_corrupt_store(self) -> None:
+            """Test that a damaged store fails in a way the CLI can report.
+
+            The backends raise different types here -- a JSON decode error, a gpg
+            failure, a sqlite3 error -- so what matters is that each is one the
+            command line reports as a message rather than a traceback.
+            """
+
+            self.close_application()
+            self.config.data_file.write_text("this is not a store", encoding="utf-8")
+
+            with self.assertRaises(EXPECTED_ERRORS):
+                self.open_application()
+
+        def test_import_of_a_missing_file(self) -> None:
+            """Test that importing a file that is not there says so."""
+
+            with self.assertRaises(FileNotFoundError):
+                self.application.import_entries(Path(self.dir.name) / "nonexistent.asc")
+
         def test_export_import(self) -> None:
             """Test that exported data can be re-imported."""
 
@@ -386,46 +482,24 @@ class TestApplication:
 
 
 class TestJsonApplication(TestApplication.Inner):
-    def setUp(self) -> None:
-        super().setUp()
-        env = {
-            "ANANKE_CONFIG_DIR": f"{self.dir.name}",
-            "ANANKE_DATA_DIR": f"{self.dir.name}",
-            "ANANKE_KEY_ID": "371C136C",
-            "ANANKE_BACKEND": "json",
-        }
-        self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
+    backend = "json"
+
+    def open_application(self) -> None:
         self.application = JsonApplication(self.config)
-        self.application.import_entries(EXPORT_ASC)
 
 
 class TestSqliteApplication(TestApplication.Inner):
-    def setUp(self) -> None:
-        super().setUp()
-        env = {
-            "ANANKE_CONFIG_DIR": f"{self.dir.name}",
-            "ANANKE_DATA_DIR": f"{self.dir.name}",
-            "ANANKE_KEY_ID": "371C136C",
-            "ANANKE_BACKEND": "sqlite",
-        }
-        self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
-        self.application = SqliteApplication(self.config)
-        self.application.import_entries(EXPORT_ASC)
+    backend = "sqlite"
 
-    def tearDown(self) -> None:
+    def open_application(self) -> None:
+        self.application = SqliteApplication(self.config)
+
+    def close_application(self) -> None:
         cast(SqliteApplication, self.application).close()
-        return super().tearDown()
 
 
 class TestTextApplication(TestApplication.Inner):
-    def setUp(self) -> None:
-        super().setUp()
-        env = {
-            "ANANKE_CONFIG_DIR": f"{self.dir.name}",
-            "ANANKE_DATA_DIR": f"{self.dir.name}",
-            "ANANKE_KEY_ID": "371C136C",
-            "ANANKE_BACKEND": "text",
-        }
-        self.config = ConfigBuilder().with_defaults(OsFamily.POSIX, {}).with_env(env).build()
+    backend = "text"
+
+    def open_application(self) -> None:
         self.application = TextApplication(self.config)
-        self.application.import_entries(EXPORT_ASC)

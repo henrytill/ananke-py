@@ -1,8 +1,6 @@
-import json
 from pathlib import Path
 
-from .. import data
-from ..cipher import ArmoredCiphertext, Plaintext
+from ..cipher import Plaintext
 from ..cipher.gpg import Text
 from ..config import Backend, Config
 from ..data import Description, EntryId, Identity, Metadata, Record, SecureEntry, SecureIndexElement, Timestamp
@@ -122,34 +120,13 @@ class TextApplication(Application):
 
     def entry(self, entry_id: EntryId) -> SecureEntry:
         """Read an entry from a file."""
-        path = self._entry_path(entry_id)
-        return _read(path, self.cipher)
+        return common.read_one(SecureEntry, self._entry_path(entry_id), self.cipher)
 
     def write_entry(self, entry: SecureEntry) -> None:
         """Write an entry to a file."""
-        path = self._entry_path(entry.entry_id)
-        plaintext = Plaintext(json.dumps(data.remap_keys_snake_to_camel(entry.to_dict()), indent=2))
-        _write(path, plaintext, self.cipher)
+        common.write_one(self._entry_path(entry.entry_id), entry, self.cipher)
 
     def delete_entry(self, entry_id: EntryId) -> None:
         """Delete an entry."""
         path = self._entry_path(entry_id)
         path.unlink()
-
-
-def _read(path: Path, cipher: Text) -> SecureEntry:
-    """Read a SecureEntry from a file."""
-    if not path.exists():
-        raise FileNotFoundError(f"File '{path}' does not exist")
-    blob = path.read_text(encoding="utf-8")
-    armored = cipher.decrypt(ArmoredCiphertext(blob))
-    parsed = json.loads(str(armored), object_hook=data.remap_keys_camel_to_snake)
-    return SecureEntry.from_dict(parsed)
-
-
-def _write(path: Path, plaintext: Plaintext, cipher: Text) -> None:
-    """Write a SecureEntry to a file."""
-    armored = cipher.encrypt(plaintext)
-    if not path.parent.exists():
-        path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(str(armored), encoding="utf-8")

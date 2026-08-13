@@ -41,6 +41,12 @@ class SqliteApplication(Application):
         """Closes the database connection"""
         self.connection.close()
 
+    def __enter__(self) -> "SqliteApplication":
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        self.close()
+
     def add(
         self,
         description: Description,

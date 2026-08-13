@@ -215,20 +215,42 @@ def _read_json[T: Dictable](cls: type[T], s: str) -> list[T]:
     return ret
 
 
-def read[T: Dictable](cls: type[T], path: Path, cipher: Text | None = None) -> list[T]:
-    """Reads objects from a JSON file"""
+def _read_text(path: Path, cipher: Text | None) -> str:
+    """Reads a file, decrypting it if a cipher is given"""
     if not path.exists():
         raise FileNotFoundError(f"File '{path}' does not exist")
     text = path.read_text(encoding="utf-8")
-    json_str = text if cipher is None else cipher.decrypt(ArmoredCiphertext(text)).value
-    return _read_json(cls, json_str)
+    return text if cipher is None else cipher.decrypt(ArmoredCiphertext(text)).value
+
+
+def _write_text(path: Path, json_str: str, cipher: Text | None) -> None:
+    """Writes a file, encrypting it if a cipher is given"""
+    text = json_str if cipher is None else cipher.encrypt(Plaintext(json_str))
+    if not path.parent.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def read[T: Dictable](cls: type[T], path: Path, cipher: Text | None = None) -> list[T]:
+    """Reads objects from a JSON file"""
+    return _read_json(cls, _read_text(path, cipher))
 
 
 def write[T: Dictable](path: Path, writes: Sequence[T], cipher: Text | None = None) -> None:
     """Writes entries to a JSON file"""
     dicts: list[dict[str, str]] = [data.remap_keys_snake_to_camel(w.to_dict()) for w in writes]
-    json_str = json.dumps(dicts, indent=2)
-    text = json_str if cipher is None else cipher.encrypt(Plaintext(json_str))
-    if not path.parent.exists():
-        path.parent.mkdir(parents=True, exist_ok=False)
-    path.write_text(text, encoding="utf-8")
+    _write_text(path, json.dumps(dicts, indent=2), cipher)
+
+
+def read_one[T: Dictable](cls: type[T], path: Path, cipher: Text | None = None) -> T:
+    """Reads a single object from a JSON file"""
+    parsed = json.loads(_read_text(path, cipher), object_hook=data.remap_keys_camel_to_snake)
+    if not isinstance(parsed, dict):
+        raise TypeError("Expected a dictionary")
+    return cls.from_dict(cast(dict[str, Any], parsed))
+
+
+def write_one[T: Dictable](path: Path, obj: T, cipher: Text | None = None) -> None:
+    """Writes a single object to a JSON file"""
+    json_str = json.dumps(data.remap_keys_snake_to_camel(obj.to_dict()), indent=2)
+    _write_text(path, json_str, cipher)
