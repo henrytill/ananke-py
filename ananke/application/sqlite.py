@@ -31,7 +31,7 @@ class SqliteApplication(Application):
         assert config.backend == Backend.SQLITE
 
         self.config = config
-        self.config.data_file.parent.mkdir(parents=True)
+        self.config.data_file.parent.mkdir(parents=True, exist_ok=True)
         self.cipher = Binary(self.config.key_id)
         self.connection: Connection = sqlite3.connect(config.data_file)
         with closing(self.connection.cursor()) as cursor:
