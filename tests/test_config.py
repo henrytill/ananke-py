@@ -19,16 +19,14 @@ class ConfigFile:
     ALLOW_MULTIPLE_KEYS = "true"
 
     def __str__(self) -> str:
-        return textwrap.dedent(
-            f"""\
+        return textwrap.dedent(f"""\
             [data]
             backend={self.BACKEND}
             dir={self.DATA_DIR}
             [gpg]
             key_id={self.KEY_ID}
             allow_multiple_keys={self.ALLOW_MULTIPLE_KEYS}
-            """
-        )
+            """)
 
 
 def config_reader(_config_path: Path) -> str:
@@ -61,6 +59,28 @@ class TestBackend(unittest.TestCase):
         """Tests the 'from_str' method."""
         self.assertEqual(Backend.from_str("json"), Backend.JSON)
         self.assertEqual(Backend.from_str("sqlite"), Backend.SQLITE)
+
+    def test_from_choice(self) -> None:
+        """Tests that a backend can be chosen by name or by the number used to offer it."""
+        test_cases = [
+            ("text", Backend.TEXT),
+            ("json", Backend.JSON),
+            ("sqlite", Backend.SQLITE),
+            ("SQLite", Backend.SQLITE),
+            ("0", Backend.TEXT),
+            ("1", Backend.JSON),
+            ("2", Backend.SQLITE),
+        ]
+        for choice, expected in test_cases:
+            with self.subTest(choice=choice):
+                self.assertEqual(expected, Backend.from_choice(choice))
+
+    def test_from_choice_with_invalid_choice(self) -> None:
+        """Tests that an unrecognized choice is rejected."""
+        for choice in ["9", "-1", "zzz", ""]:
+            with self.subTest(choice=choice):
+                with self.assertRaises(ValueError):
+                    Backend.from_choice(choice)
 
     def test_from_str_with_invalid_backend(self) -> None:
         """Tests the 'from_str' method with an invalid backend."""
@@ -213,12 +233,10 @@ class TestConfigBuilder(unittest.TestCase):
 
     def test_build_with_defaults_with_config_file_with_env(self) -> None:
         """Tests the 'build' method with defaults, a configuration file, and an environment."""
-        partial_config_ini = textwrap.dedent(
-            """\
+        partial_config_ini = textwrap.dedent("""\
             [data]
             backend=sqlite
-            """
-        )
+            """)
 
         key_id = KeyId("alice_env@example.com")
 

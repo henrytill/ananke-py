@@ -50,9 +50,9 @@ class OsFamily(Enum):
 class Backend(Enum):
     """The backend used to store application data."""
 
-    SQLITE = auto()
-    JSON = auto()
-    TEXT = auto()
+    TEXT = 0
+    JSON = 1
+    SQLITE = 2
 
     def __str__(self) -> str:
         return self.name.lower()
@@ -71,6 +71,24 @@ class Backend(Enum):
             return cls[backend_str.upper()]
         except KeyError:
             raise ValueError(f"Invalid Backend string: {backend_str}") from None
+
+    @classmethod
+    def from_choice(cls, choice: str) -> "Backend":
+        """Creates a Backend from a name or from the number used to offer it.
+
+        Args:
+            choice: The name or number of the Backend, as entered by a user.
+
+        Returns:
+            The created Backend.
+
+        Raises:
+            ValueError: If the choice names no Backend.
+        """
+        try:
+            return cls(int(choice))
+        except ValueError:
+            return cls.from_str(choice)
 
     @classmethod
     def default(cls) -> "Backend":

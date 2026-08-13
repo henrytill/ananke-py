@@ -294,7 +294,7 @@ def cmd_configure(attrs: Namespace) -> int:
                     print(f"  {backend.value}: {backend}")
             backend_input = input(f"Enter choice: [{default_backend.value}] ")
             try:
-                backend_candidate = Backend(backend_input) if len(backend_input) > 0 else default_backend
+                backend_candidate = Backend.from_choice(backend_input) if len(backend_input) > 0 else default_backend
             except ValueError:
                 print("Invalid choice, try again.", file=sys.stderr)
         builder.backend = backend_candidate
