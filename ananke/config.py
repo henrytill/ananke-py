@@ -134,8 +134,9 @@ allow_multiple_keys = {self.allow_multiple_keys}\
 
 
 def _file_reader(path: Path) -> str:
+    """Reads a configuration file, treating a missing file as an empty one."""
     if not path.exists():
-        raise FileNotFoundError(f"File '{path}' does not exist")
+        return ""
     return path.read_text(encoding="utf-8")
 
 

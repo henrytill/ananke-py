@@ -1,6 +1,7 @@
 """The command line interface."""
 
 import os
+import sqlite3
 import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
@@ -12,8 +13,22 @@ from .cipher import KeyId, Plaintext
 from .cipher.gpg import Binary
 from .config import Backend, Config, ConfigBuilder, OsFamily
 from .data import CURRENT_SCHEMA_VERSION, Description, EntryId, Identity, Record, SchemaVersion, migration
+from .data.migration import MigrationError
 
 type Formatter = Callable[[Record], str]
+
+EXPECTED_ERRORS = (
+    EOFError,
+    MigrationError,
+    OSError,
+    RuntimeError,
+    ValueError,
+    sqlite3.Error,
+)
+"""Errors that represent a failed command rather than a defect.
+
+These are reported as a message on stderr, rather than as a traceback.
+"""
 
 
 def configure(host_os: OsFamily, env: Mapping[str, str]) -> Config:
@@ -357,7 +372,12 @@ def main(args: Sequence[str] = sys.argv[1:]) -> int:
     if not callable(parsed.func):
         raise TypeError("Expected callable")
 
-    ret = parsed.func(parsed)
+    try:
+        ret = parsed.func(parsed)
+    except EXPECTED_ERRORS as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
+
     if not isinstance(ret, int):
         raise TypeError("Expected int")
 

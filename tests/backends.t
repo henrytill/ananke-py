@@ -44,6 +44,34 @@ Import, look up, add, modify, remove and export, for each backend
   lookup after remove: 1
   backend = sqlite
 
+A target must match a description exactly, and must match exactly one entry
+
+  $ use_backend json
+  $ python3 -m ananke remove -d bazbank
+  Error: No entries match bazbank
+  [1]
+
+  $ python3 -m ananke remove -d https://www.foomail.com
+  Error: Multiple entries match https://www.foomail.com
+  [1]
+
+  $ python3 -m ananke lookup www | wc -l
+  \s*4 (re)
+
+A missing configuration file is not an error, so long as the environment
+supplies what it would have
+
+  $ (unset ANANKE_BACKEND; rm -rf "${TMPDIR}/nocfg"; mkdir -p "${TMPDIR}/nocfg";
+  >  ANANKE_CONFIG_DIR="${TMPDIR}/nocfg" ANANKE_DATA_DIR="${TMPDIR}/nocfg" \
+  >  python3 -m ananke lookup foomail)
+  Error: backend is not set
+  [1]
+
+  $ (rm -rf "${TMPDIR}/nocfg"; mkdir -p "${TMPDIR}/nocfg";
+  >  ANANKE_CONFIG_DIR="${TMPDIR}/nocfg" ANANKE_DATA_DIR="${TMPDIR}/nocfg" \
+  >  ANANKE_BACKEND=json ANANKE_KEY_ID=371C136C \
+  >  python3 -m ananke import "${EXAMPLE_DIR}/export.asc")
+
 Every backend writes an export that every other backend can import
 
   $ for target in text json sqlite; do
