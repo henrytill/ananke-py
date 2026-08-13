@@ -12,11 +12,11 @@ from ..data import Description, Dictable, EntryId, Identity, Metadata, Record
 type Target = EntryId | Description
 
 
-class NoEntries(Exception):
+class NoEntries(ValueError):
     """Signals that no entries match a given query"""
 
 
-class MultipleEntries(Exception):
+class MultipleEntries(ValueError):
     """Signals that multiple entries match a given query"""
 
 
@@ -174,7 +174,32 @@ def target_matches(target: Target, entry: EntryLike) -> bool:
     """Match target against entry"""
     if isinstance(target, EntryId):
         return target == entry.entry_id
-    return target in entry.description
+    return target == entry.description
+
+
+def find_one[T: EntryLike](target: Target, entries: Sequence[T]) -> int:
+    """Returns the index of the single entry matching target.
+
+    Args:
+        target: The entry to find.
+        entries: The entries to search.
+
+    Returns:
+        The index of the matching entry.
+
+    Raises:
+        NoEntries: If no entries match the target.
+        MultipleEntries: If more than one entry matches the target.
+    """
+    idxs = [i for i, entry in enumerate(entries) if target_matches(target, entry)]
+
+    if not idxs:
+        raise NoEntries(f"No entries match {target}")
+
+    if len(idxs) > 1:
+        raise MultipleEntries(f"Multiple entries match {target}")
+
+    return idxs[0]
 
 
 def _read_json[T: Dictable](cls: Type[T], s: str) -> List[T]:

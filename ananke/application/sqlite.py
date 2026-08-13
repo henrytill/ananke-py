@@ -9,7 +9,7 @@ from ..cipher.gpg import Binary, Text
 from ..config import Backend, Config
 from ..data import Description, Entry, EntryId, Identity, Metadata, Record, SecureEntry, Timestamp
 from . import common
-from .common import Application, Query, Target
+from .common import Application, MultipleEntries, NoEntries, Query, Target
 
 CREATE_TABLE = """\
 CREATE TABLE IF NOT EXISTS entries (
@@ -90,15 +90,7 @@ class SqliteApplication(Application):
             for row in cursor.execute(sql, parameters):
                 entries.append(Entry.from_tuple(row))
 
-            entries_len = len(entries)
-
-            if entries_len == 0:
-                raise ValueError(f"No entries match {target}")
-
-            if entries_len > 1:
-                raise ValueError(f"Multiple entries match {target}")
-
-            entry: Entry = entries[0]
+            entry: Entry = entries[common.find_one(target, entries)]
             if maybe_description is not None:
                 entry.description = maybe_description
             if maybe_plaintext is not None:
@@ -116,13 +108,24 @@ class SqliteApplication(Application):
 
     def remove(self, target: Target) -> None:
         if isinstance(target, EntryId):
-            sql = "DELETE FROM entries WHERE id = :id"
-            parameters = {"id": str(target)}
+            column = "id"
+            parameters = {"target": str(target)}
         else:
-            sql = "DELETE FROM entries WHERE description = :description"
-            parameters = {"description": str(target)}
+            column = "description"
+            parameters = {"target": str(target)}
+
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(sql, parameters)
+            count_sql = f"SELECT count(*) FROM entries WHERE {column} = :target"
+            (count,) = cursor.execute(count_sql, parameters).fetchone()
+
+            if count == 0:
+                raise NoEntries(f"No entries match {target}")
+
+            if count > 1:
+                raise MultipleEntries(f"Multiple entries match {target}")
+
+            cursor.execute(f"DELETE FROM entries WHERE {column} = :target", parameters)
+
         self.connection.commit()
 
     def import_entries(self, path: Path) -> None:

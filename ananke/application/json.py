@@ -62,18 +62,7 @@ class JsonApplication(Application):
         maybe_plaintext: Optional[Plaintext],
         maybe_meta: Optional[Metadata],
     ) -> None:
-        idxs = [i for i, entry in enumerate(self.entries) if common.target_matches(target, entry)]
-        idxs_len = len(idxs)
-
-        if idxs_len == 0:
-            raise ValueError(f"No entries match {target}")
-
-        if idxs_len > 1:
-            raise ValueError(f"Multiple entries match {target}")
-
-        idx = idxs[0]
-
-        entry = self.entries.pop(idx)
+        entry = self.entries.pop(common.find_one(target, self.entries))
         if maybe_description is not None:
             entry.description = maybe_description
         if maybe_plaintext is not None:
@@ -88,18 +77,7 @@ class JsonApplication(Application):
         common.write(self.config.data_file, sorted(self.entries))
 
     def remove(self, target: Target) -> None:
-        idxs = [i for i, entry in enumerate(self.entries) if common.target_matches(target, entry)]
-        idxs_len = len(idxs)
-
-        if idxs_len == 0:
-            raise ValueError(f"No entries match {target}")
-
-        if idxs_len > 1:
-            raise ValueError(f"Multiple entries match {target}")
-
-        idx = idxs[0]
-
-        del self.entries[idx]
+        del self.entries[common.find_one(target, self.entries)]
         common.write(self.config.data_file, sorted(self.entries))
 
     def import_entries(self, path: Path) -> None:

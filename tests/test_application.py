@@ -5,7 +5,15 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import List, Optional, TypedDict, cast
 
-from ananke.application import Application, JsonApplication, SqliteApplication, Target, TextApplication
+from ananke.application import (
+    Application,
+    JsonApplication,
+    MultipleEntries,
+    NoEntries,
+    SqliteApplication,
+    Target,
+    TextApplication,
+)
 from ananke.cipher import Plaintext
 from ananke.config import Config, ConfigBuilder, OsFamily
 from ananke.data import Description, EntryId, Identity, Metadata
@@ -262,7 +270,7 @@ class TestApplication:
 
             target = Description("zzz")
 
-            with self.assertRaises(ValueError) as exc:
+            with self.assertRaises(NoEntries) as exc:
                 self.application.modify(target, None, None, None, None)
 
             self.assertEqual(f"No entries match {target}", str(exc.exception))
@@ -270,26 +278,33 @@ class TestApplication:
         def test_modify_fails_if_multiple_entries_match(self) -> None:
             """Test that modify fails if multiple entries match."""
 
-            target = Description("www")
+            target = Description("https://www.foomail.com")
 
-            with self.assertRaises(ValueError) as exc:
+            with self.assertRaises(MultipleEntries) as exc:
                 self.application.modify(target, None, None, None, None)
 
             self.assertEqual(f"Multiple entries match {target}", str(exc.exception))
 
+        def test_modify_fails_on_partial_description(self) -> None:
+            """Test that a target matches a description exactly, not as a substring."""
+
+            target = Description("foomail")
+
+            with self.assertRaises(NoEntries) as exc:
+                self.application.modify(target, None, None, None, None)
+
+            self.assertEqual(f"No entries match {target}", str(exc.exception))
+
         def test_remove(self) -> None:
             """Test the remove method against the example data."""
 
-            test_cases: List[Description | EntryId] = [
+            test_cases: List[Description] = [
                 Description("https://www.bazbank.com"),
                 Description("https://www.barphone.com"),
             ]
 
             for test_case in test_cases:
                 with self.subTest(test_case=test_case):
-                    if isinstance(test_case, EntryId):
-                        raise NotImplementedError
-
                     records = self.application.lookup(test_case)
                     self.assertEqual(1, len(records))
                     record = records[0]
@@ -297,6 +312,45 @@ class TestApplication:
                     self.application.remove(record.entry_id)
                     records = self.application.lookup(test_case)
                     self.assertEqual(0, len(records))
+
+        def test_remove_by_description(self) -> None:
+            """Test that remove accepts a description as a target."""
+
+            target = Description("https://www.bazbank.com")
+
+            self.assertEqual(1, len(self.application.lookup(target)))
+            self.application.remove(target)
+            self.assertEqual(0, len(self.application.lookup(target)))
+
+        def test_remove_fails_if_no_entries_match(self) -> None:
+            """Test that remove fails, rather than silently doing nothing, if no entries match."""
+
+            test_cases: List[Description] = [
+                Description("zzz"),
+                # a partial description matches no entry: targets are matched exactly
+                Description("bazbank"),
+            ]
+
+            for target in test_cases:
+                with self.subTest(target=target):
+                    with self.assertRaises(NoEntries) as exc:
+                        self.application.remove(target)
+
+                    self.assertEqual(f"No entries match {target}", str(exc.exception))
+                    self.assertEqual(4, len(self.application.lookup(Description("www"))))
+
+        def test_remove_fails_if_multiple_entries_match(self) -> None:
+            """Test that remove fails, rather than removing every match, if multiple entries match."""
+
+            target = Description("https://www.foomail.com")
+
+            self.assertEqual(2, len(self.application.lookup(target)))
+
+            with self.assertRaises(MultipleEntries) as exc:
+                self.application.remove(target)
+
+            self.assertEqual(f"Multiple entries match {target}", str(exc.exception))
+            self.assertEqual(2, len(self.application.lookup(target)))
 
         def test_export_import(self) -> None:
             """Test that exported data can be re-imported."""

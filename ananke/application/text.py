@@ -70,18 +70,7 @@ class TextApplication(Application):
         maybe_plaintext: Optional[Plaintext],
         maybe_meta: Optional[Metadata],
     ) -> None:
-        idxs = [i for i, elem in enumerate(self.elements) if common.target_matches(target, elem)]
-        idxs_len = len(idxs)
-
-        if idxs_len == 0:
-            raise ValueError(f"No entries match {target}")
-
-        if idxs_len > 1:
-            raise ValueError(f"Multiple entries match {target}")
-
-        idx = idxs[0]
-
-        elem = self.elements.pop(idx)
+        elem = self.elements.pop(common.find_one(target, self.elements))
         entry = self.entry(elem.entry_id)
         if maybe_description is not None:
             entry.description = maybe_description
@@ -99,18 +88,7 @@ class TextApplication(Application):
         self.write_index()
 
     def remove(self, target: Target) -> None:
-        idxs = [i for i, elem in enumerate(self.elements) if common.target_matches(target, elem)]
-        idxs_len = len(idxs)
-
-        if idxs_len == 0:
-            raise ValueError(f"No entries match {target}")
-
-        if idxs_len > 1:
-            raise ValueError(f"Multiple entries match {target}")
-
-        idx = idxs[0]
-
-        elem = self.elements.pop(idx)
+        elem = self.elements.pop(common.find_one(target, self.elements))
         self.delete_entry(elem.entry_id)
         self.write_index()
 
