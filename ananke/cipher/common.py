@@ -52,7 +52,6 @@ class Plaintext:
 
         Args:
             length: The length of the generated string.
-            use_lowercase: Whether to use lowercase letters.
             use_uppercase: Whether to use uppercase letters.
             use_digits: Whether to use digits.
             use_punctuation: Whether to use punctuation.

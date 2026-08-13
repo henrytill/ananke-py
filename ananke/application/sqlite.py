@@ -28,7 +28,8 @@ class SqliteApplication(Application):
     """A SQLite Application"""
 
     def __init__(self, config: Config) -> None:
-        assert config.backend == Backend.SQLITE
+        if config.backend != Backend.SQLITE:
+            raise ValueError(f"SqliteApplication requires the {Backend.SQLITE} backend, got {config.backend}")
 
         self.config = config
         self.config.data_file.parent.mkdir(parents=True, exist_ok=True)
@@ -204,7 +205,7 @@ def _create_update(target: Target, entry: Entry) -> Tuple[str, Dict[str, str]]:
     if isinstance(target, EntryId):
         wheres += ["entries.id = :target"]
     else:
-        wheres += ["entries.description LIKE :target"]
+        wheres += ["entries.description = :target"]
     parameters["target"] = str(target)
 
     sets: List[str] = []

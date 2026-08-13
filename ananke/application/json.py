@@ -14,7 +14,8 @@ class JsonApplication(Application):
     """A JSON Application"""
 
     def __init__(self, config: Config) -> None:
-        assert config.backend == Backend.JSON
+        if config.backend != Backend.JSON:
+            raise ValueError(f"JsonApplication requires the {Backend.JSON} backend, got {config.backend}")
 
         self.config = config
         self.config.data_file.parent.mkdir(parents=True, exist_ok=True)

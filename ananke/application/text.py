@@ -15,7 +15,8 @@ class TextApplication(Application):
     """A Text Application"""
 
     def __init__(self, config: Config) -> None:
-        assert config.backend == Backend.TEXT
+        if config.backend != Backend.TEXT:
+            raise ValueError(f"TextApplication requires the {Backend.TEXT} backend, got {config.backend}")
 
         self.config = config
         self.config.data_file.parent.mkdir(parents=True, exist_ok=True)
@@ -128,7 +129,7 @@ class TextApplication(Application):
     def write_entry(self, entry: SecureEntry) -> None:
         """Write an entry to a file."""
         path = self._entry_path(entry.entry_id)
-        plaintext = Plaintext(json.dumps(entry.to_dict(), indent=2))
+        plaintext = Plaintext(json.dumps(data.remap_keys_snake_to_camel(entry.to_dict()), indent=2))
         _write(path, plaintext, self.cipher)
 
     def delete_entry(self, entry_id: EntryId) -> None:
@@ -139,7 +140,9 @@ class TextApplication(Application):
 
 def _read(path: Path, cipher: Text) -> SecureEntry:
     """Read a SecureEntry from a file."""
-    blob = path.read_text()
+    if not path.exists():
+        raise FileNotFoundError(f"File '{path}' does not exist")
+    blob = path.read_text(encoding="utf-8")
     armored = cipher.decrypt(ArmoredCiphertext(blob))
     parsed = json.loads(str(armored), object_hook=data.remap_keys_camel_to_snake)
     return SecureEntry.from_dict(parsed)
@@ -148,4 +151,6 @@ def _read(path: Path, cipher: Text) -> SecureEntry:
 def _write(path: Path, plaintext: Plaintext, cipher: Text) -> None:
     """Write a SecureEntry to a file."""
     armored = cipher.encrypt(plaintext)
-    path.write_text(str(armored))
+    if not path.parent.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(str(armored), encoding="utf-8")

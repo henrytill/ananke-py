@@ -2,6 +2,7 @@
 
 import functools
 import uuid
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, NewType, Optional, Protocol, Self, Type
@@ -105,14 +106,8 @@ class Dictable(Protocol):
         ...
 
 
-class Sortable(Protocol):
-    """A protocol for objects that can be sorted."""
-
-    def __lt__(self, other: Self) -> bool: ...
-
-
 @dataclass
-class Record:
+class Record(ABC):
     """The result of a lookup"""
 
     entry_id: EntryId
@@ -123,9 +118,9 @@ class Record:
     meta: Optional[Metadata]
 
     @property
+    @abstractmethod
     def plaintext(self) -> Plaintext:
         """Returns the plaintext associated with this record."""
-        raise NotImplementedError()
 
 
 def remap_keys(mapping: Dict[str, str], data: Dict[str, Any]) -> Dict[str, Any]:
