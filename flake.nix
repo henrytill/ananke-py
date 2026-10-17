@@ -58,12 +58,8 @@
               pyright
               yaml-language-server
             ])
-            ++ (with pkgs.python3Packages; [
-              black
-              flake8
-              isort
-              pylint
-            ]);
+            ++ [ pkgs.ruff ]
+            ++ (with pkgs.python3Packages; [ pylint ]);
         };
       }
     );

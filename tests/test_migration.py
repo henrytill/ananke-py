@@ -28,9 +28,9 @@ def check_schema(data_dir: Path, expected_version: int) -> None:
     """Check that the schema file contains the expected version."""
     schema_file = data_dir / "db" / "schema"
     actual_version = get_schema_version(schema_file)
-    assert actual_version == SchemaVersion(
-        expected_version
-    ), f"Expected schema version {expected_version}, got {actual_version}"
+    assert actual_version == SchemaVersion(expected_version), (
+        f"Expected schema version {expected_version}, got {actual_version}"
+    )
 
 
 class TestJsonMigration(unittest.TestCase):

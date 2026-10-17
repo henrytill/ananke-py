@@ -83,14 +83,14 @@ def check(use_venv: bool):
 
 def lint(use_venv: bool):
     logger.info("Running linters...")
-    run(["python3", "-m", "flake8", "--config", ".flake8"], use_venv=use_venv)
+    run(["python3", "-m", "ruff", "check", PACKAGE_NAME, TEST_DIR], use_venv=use_venv)
     run(["python3", "-m", "pylint", PACKAGE_NAME, TEST_DIR], use_venv=use_venv)
 
 
 def fmt(use_venv: bool):
     logger.info("Formatting code...")
-    run(["python3", "-m", "isort", PACKAGE_NAME, TEST_DIR], use_venv=use_venv)
-    run(["python3", "-m", "black", PACKAGE_NAME, TEST_DIR], use_venv=use_venv)
+    run(["python3", "-m", "ruff", "check", "--select", "I", "--fix", PACKAGE_NAME, TEST_DIR], use_venv=use_venv)
+    run(["python3", "-m", "ruff", "format", PACKAGE_NAME, TEST_DIR], use_venv=use_venv)
 
 
 def test(use_venv: bool, with_coverage: bool = False):
