@@ -43,6 +43,7 @@ ignore = [
 
 [tool.mypy]
 strict = true
+files = ["ananke", "tests", "version.py"]
 check_untyped_defs = true
 warn_redundant_casts = false
 
@@ -57,4 +58,6 @@ show_missing = true
 exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "@abstractmethod"]
 
 [tool.pyright]
-strict = ["ananke", "tests"]
+# The same sources as mypy's files; without them pyright walks the whole tree, ./result's installed copy included.
+include = ["ananke", "tests", "version.py"]
+typeCheckingMode = "strict"
