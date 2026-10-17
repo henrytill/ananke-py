@@ -7,17 +7,17 @@ on:
     branches: ["master"]
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   linux:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          python-version: "3.12"
-          cache: "pip"
-      - run: ./run.py create-env
-      - run: ./run.py -e check
-      - run: ./run.py -e test
+          persist-credentials: false
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
+      - uses: DeterminateSystems/magic-nix-cache-action@84c0677f58dcedf3b91f8223ce36a9ea5b3c84b7 # v15
+      - run: nix flake check -L

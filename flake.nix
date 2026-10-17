@@ -37,15 +37,15 @@
           nativeCheckInputs = with pkgs; [
             gnupg
             python3Packages.cram
-            python3Packages.mypy
           ];
           src = self;
-          patchPhase = "patchShebangs run.py";
           # version.py asks git for the reference, and the sandbox has no .git.
           env.ANANKE_GIT_REF = gitRef;
           checkPhase = ''
-            ./run.py check
-            ./run.py test
+            runHook preCheck
+            python3 -m unittest discover -v -s tests
+            cram tests
+            runHook postCheck
           '';
         };
     in
@@ -84,6 +84,8 @@
         packages.ananke = makeAnanke pkgs;
         packages.default = self.packages.${system}.ananke;
 
+        # The package's check phase runs the tests.
+        checks.ananke = self.packages.${system}.ananke;
         # Runs the hooks over the whole repo. They are kept out of the package's check phase so that a new release of
         # one of the tools fails `nix flake check` rather than the build.
         checks.pre-commit = preCommit;
@@ -93,6 +95,7 @@
           inputsFrom = [ self.packages.${system}.ananke ];
           packages = preCommit.enabledPackages ++ [
             pkgs.pre-commit
+            pkgs.python3Packages.coverage
             pkgs.yaml-language-server
           ];
           inherit (preCommit) shellHook;
