@@ -57,9 +57,7 @@ def run(cmd: list[str], use_venv: bool = False, extra_env: Optional[dict[str, st
 def create_env():
     venv_path = Path(VENV_DIR)
     if venv_path.exists():
-        logger.error(
-            f"Environment directory {VENV_DIR} already exists. " "Remove it first to create a fresh environment."
-        )
+        logger.error(f"Environment directory {VENV_DIR} already exists. Remove it first to create a fresh environment.")
         sys.exit(1)
 
     logger.info("Creating new virtual environment...")
