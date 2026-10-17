@@ -27,7 +27,7 @@
           pname = "ananke-py";
           inherit version;
           pyproject = true;
-          build-system = [ pkgs.python3Packages.flit-core ];
+          build-system = [ pkgs.python3Packages.hatchling ];
           nativeCheckInputs = with pkgs; [
             gnupg
             python3Packages.cram
@@ -35,7 +35,8 @@
           ];
           src = self;
           patchPhase = "patchShebangs run.py";
-          preConfigure = "./run.py generate -g ${gitRef}";
+          # version.py asks git for the reference, and the sandbox has no .git.
+          env.ANANKE_GIT_REF = gitRef;
           checkPhase = ''
             ./run.py check
             ./run.py test
