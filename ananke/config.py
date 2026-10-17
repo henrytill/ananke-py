@@ -10,7 +10,6 @@ from typing import Callable, Mapping, Self
 from .cipher import KeyId
 
 
-# pylint: disable=invalid-name
 @dataclass(frozen=True)
 class Env:
     """Environment variables used for configuration."""

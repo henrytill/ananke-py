@@ -63,7 +63,6 @@ class SecureIndexElement:
         }
 
 
-# pylint: disable=too-many-instance-attributes
 class SecureEntry(Record):
     """A record that stores a plaintext value along with associated information."""
 

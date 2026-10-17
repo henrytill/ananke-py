@@ -10,7 +10,6 @@ from .common import Description, EntryId, Identity, Metadata, Record, Timestamp
 from .secure_entry import SecureEntry
 
 
-# pylint: disable=too-many-instance-attributes
 class Entry(Record):
     """A record that stores an encrypted value along with associated information."""
 

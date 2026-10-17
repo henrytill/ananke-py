@@ -61,7 +61,6 @@ class TestApplication:
         backend: str
 
         def setUp(self) -> None:
-            # pylint: disable=consider-using-with
             self.dir = TemporaryDirectory(prefix="ananke")
             os.environ["GNUPGHOME"] = str(Path.cwd() / "example" / "gnupg")
             env = {
