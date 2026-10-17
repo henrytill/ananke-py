@@ -27,15 +27,16 @@
       baseVersion = nixpkgs.lib.trim (builtins.readFile ./VERSION);
       gitRef = self.shortRev or self.dirtyShortRev;
       version = "${baseVersion}+${gitRef}";
+      # python3Packages is a parameter so that checks can build the package against more than one Python.
       makeAnanke =
-        pkgs:
-        pkgs.python3Packages.buildPythonApplication {
+        pkgs: python3Packages:
+        python3Packages.buildPythonApplication {
           pname = "ananke-py";
           inherit version;
           pyproject = true;
-          build-system = [ pkgs.python3Packages.hatchling ];
-          nativeCheckInputs = with pkgs; [
-            gnupg
+          build-system = [ python3Packages.hatchling ];
+          nativeCheckInputs = [
+            pkgs.gnupg
             python3Packages.cram
             python3Packages.unittestCheckHook
           ];
@@ -85,11 +86,13 @@
         };
       in
       {
-        packages.ananke = makeAnanke pkgs;
+        packages.ananke = makeAnanke pkgs pkgs.python3Packages;
         packages.default = self.packages.${system}.ananke;
 
         # The package's check phase runs the tests.
         checks.ananke = self.packages.${system}.ananke;
+        # The oldest Python that requires-python admits.
+        checks.ananke-python312 = makeAnanke pkgs pkgs.python312Packages;
         # Runs the hooks over the whole repo. They are kept out of the package's check phase so that a new release of
         # one of the tools fails `nix flake check` rather than the build.
         checks.pre-commit = preCommit;
