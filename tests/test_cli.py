@@ -97,11 +97,10 @@ class TestConfigure(unittest.TestCase):
         """
         for backend in Backend:
             with self.subTest(backend=backend):
+                # Start each backend from an empty directory, cleaning up the one before; tearDown cleans up the last.
+                self.tearDown()
                 self.setUp()
-                try:
-                    self.assertIn(f"backend={backend}", self._configure_with_input(str(backend.value)))
-                finally:
-                    self.tearDown()
+                self.assertIn(f"backend={backend}", self._configure_with_input(str(backend.value)))
 
     def test_empty_choice_takes_the_default(self) -> None:
         """Tests that an empty answer selects the default backend."""
