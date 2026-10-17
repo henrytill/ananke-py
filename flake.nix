@@ -48,6 +48,9 @@
             "tests"
           ];
           postCheck = "cram tests";
+          # The tests import ananke from the source tree, so this is what checks the installed package. ananke.cli
+          # imports every module.
+          pythonImportsCheck = [ "ananke.cli" ];
         };
     in
     flake-utils.lib.eachDefaultSystem (
