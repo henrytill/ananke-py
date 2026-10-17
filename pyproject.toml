@@ -44,7 +44,6 @@ ignore = [
 [tool.mypy]
 strict = true
 files = ["ananke", "tests", "version.py"]
-check_untyped_defs = true
 warn_redundant_casts = false
 
 [tool.coverage.run]
