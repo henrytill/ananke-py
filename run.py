@@ -13,13 +13,11 @@ from typing import Optional
 PACKAGE_NAME = "ananke"
 TEST_DIR = "tests"
 VENV_DIR = "env"
-VERSION_FILE = "VERSION"
 
 logger = logging.getLogger(__name__)
 
 
 class Command(Enum):
-    GENERATE = "generate"
     CREATE_ENV = "create-env"
     CHECK = "check"
     LINT = "lint"
@@ -56,43 +54,6 @@ def run(cmd: list[str], use_venv: bool = False, extra_env: Optional[dict[str, st
         sys.exit(result.returncode)
 
 
-def generate(git_ref: Optional[str] = None):
-    version_file = Path(VERSION_FILE)
-    if not version_file.exists():
-        logger.error(f"Version file {VERSION_FILE} not found")
-        sys.exit(1)
-
-    base_version = version_file.read_text().strip()
-    version = base_version
-
-    if git_ref is None:
-        try:
-            result = subprocess.run(
-                ["git", "rev-parse", "--short", "HEAD"],
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-            if result.returncode == 0:
-                git_ref = result.stdout.strip()
-        except FileNotFoundError:
-            pass
-
-    if git_ref:
-        version = f"{base_version}+{git_ref}"
-
-    logger.info(f"Generated version: {version}")
-
-    init_file = Path(PACKAGE_NAME) / "__init__.py"
-    init_file.write_text(
-        f'''"""A password manager."""
-
-# This file is auto-generated, do not edit by hand
-__version__ = "{version}"
-'''
-    )
-
-
 def create_env():
     venv_path = Path(VENV_DIR)
     if venv_path.exists():
@@ -102,7 +63,6 @@ def create_env():
         sys.exit(1)
 
     logger.info("Creating new virtual environment...")
-    generate()
     venv.create(venv_path, with_pip=True)
 
     python = get_python(True)
@@ -167,9 +127,6 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    gen_parser = subparsers.add_parser(Command.GENERATE.value, help="Generate version file")
-    gen_parser.add_argument("-g", "--git-ref", help="Git reference for version")
-
     subparsers.add_parser(Command.CREATE_ENV.value, help="Create a new virtual environment")
     subparsers.add_parser(Command.CHECK.value, help="Run type checks")
     subparsers.add_parser(Command.LINT.value, help="Run linters")
@@ -187,8 +144,6 @@ def main():
     command = Command(args.command)
 
     match command:
-        case Command.GENERATE:
-            generate(args.git_ref)
         case Command.CREATE_ENV:
             create_env()
         case Command.CHECK:
