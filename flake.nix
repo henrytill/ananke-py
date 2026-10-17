@@ -37,16 +37,17 @@
           nativeCheckInputs = with pkgs; [
             gnupg
             python3Packages.cram
+            python3Packages.unittestCheckHook
           ];
           src = self;
           # version.py asks git for the reference, and the sandbox has no .git.
           env.ANANKE_GIT_REF = gitRef;
-          checkPhase = ''
-            runHook preCheck
-            python3 -m unittest discover -v -s tests
-            cram tests
-            runHook postCheck
-          '';
+          unittestFlags = [
+            "-v"
+            "-s"
+            "tests"
+          ];
+          postCheck = "cram tests";
         };
     in
     flake-utils.lib.eachDefaultSystem (
