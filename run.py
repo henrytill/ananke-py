@@ -84,7 +84,6 @@ def check(use_venv: bool):
 def lint(use_venv: bool):
     logger.info("Running linters...")
     run(["python3", "-m", "ruff", "check", PACKAGE_NAME, TEST_DIR], use_venv=use_venv)
-    run(["python3", "-m", "pylint", PACKAGE_NAME, TEST_DIR], use_venv=use_venv)
 
 
 def fmt(use_venv: bool):

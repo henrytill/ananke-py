@@ -30,9 +30,9 @@ class TestTimestamp(unittest.TestCase):
             "2023-06-07T02:58Z": datetime(2023, 6, 7, 2, 58),
         }
 
-        for timestamp, expected_output in test_cases.items():
+        for timestamp, expected_naive in test_cases.items():
             with self.subTest(timestamp=timestamp):
-                expected_output = expected_output.replace(tzinfo=timezone.utc)
+                expected_output = expected_naive.replace(tzinfo=timezone.utc)
                 actual_output = Timestamp.fromisoformat(timestamp).value
                 self.assertEqual(expected_output, actual_output)
 
