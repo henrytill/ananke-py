@@ -58,8 +58,7 @@
               pyright
               yaml-language-server
             ])
-            ++ [ pkgs.ruff ]
-            ++ (with pkgs.python3Packages; [ pylint ]);
+            ++ [ pkgs.ruff ];
         };
       }
     );
