@@ -66,7 +66,6 @@ class TestConfigure(unittest.TestCase):
     """Tests for the configure command."""
 
     def setUp(self) -> None:
-        # pylint: disable=consider-using-with
         self.dir = TemporaryDirectory(prefix="ananke-cli-test-")
         self.env = {
             Env.CONFIG_DIR: self.dir.name,

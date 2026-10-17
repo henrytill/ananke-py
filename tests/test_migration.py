@@ -38,7 +38,6 @@ class TestJsonMigration(unittest.TestCase):
 
     def setUp(self) -> None:
         """Set up test environment."""
-        # pylint: disable=consider-using-with
         self.temp_dir = TemporaryDirectory(prefix="ananke-migration-test-")
         self.data_dir = Path(self.temp_dir.name)
         env = {
@@ -145,7 +144,6 @@ class TestSqliteMigration(unittest.TestCase):
 
     def setUp(self) -> None:
         """Set up test environment."""
-        # pylint: disable=consider-using-with
         self.temp_dir = TemporaryDirectory(prefix="ananke-migration-test-")
         self.data_dir = Path(self.temp_dir.name)
         env = {
