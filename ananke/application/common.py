@@ -250,7 +250,7 @@ def read_one[T: Dictable](cls: type[T], path: Path, cipher: Text | None = None) 
     return cls.from_dict(cast(dict[str, Any], parsed))
 
 
-def write_one[T: Dictable](path: Path, obj: T, cipher: Text | None = None) -> None:
+def write_one(path: Path, obj: Dictable, cipher: Text | None = None) -> None:
     """Writes a single object to a JSON file"""
     json_str = json.dumps(data.remap_keys_snake_to_camel(obj.to_dict()), indent=2)
     _write_text(path, json_str, cipher)
