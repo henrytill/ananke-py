@@ -96,7 +96,6 @@
           inputsFrom = [ self.packages.${system}.ananke ];
           packages = preCommit.enabledPackages ++ [
             pkgs.pre-commit
-            pkgs.python3Packages.coverage
             pkgs.yaml-language-server
           ];
           inherit (preCommit) shellHook;
