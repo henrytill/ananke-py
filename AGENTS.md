@@ -27,7 +27,7 @@ The hooks are nixfmt, ruff (lint, with `--fix`) and ruff-format on the changed f
 whole project, which both take what to check from `pyproject.toml`. They run against `typingEnv`, a Python with
 `coverage`, because `tests/coverage_support/sitecustomize.py` imports it. CI (`.github/workflows/ci.yml`) runs
 `nix flake check`, so it runs both the hooks (`checks.pre-commit`) and the tests (`checks.ananke`, the package's
-check phase).
+check phase), the latter also against Python 3.12, the oldest `requires-python` admits (`checks.ananke-python312`).
 
 Without Nix, `pip install -e '.[test,dev]'` installs the Python tools from PyPI to run by hand; there is no hook
 configuration outside the dev shell.
