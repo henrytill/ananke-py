@@ -5,7 +5,7 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from ananke.cipher import KeyId, Plaintext
 from ananke.cli import cmd_configure, format_results, main
@@ -81,7 +81,7 @@ class TestConfigure(unittest.TestCase):
         """Runs `configure`, answering the backend prompt with backend_input."""
         with patch("os.environ", self.env), patch("builtins.input", return_value=backend_input):
             with redirect_stdout(io.StringIO()):
-                exit_code = cmd_configure(unittest.mock.Mock(list=False))
+                exit_code = cmd_configure(Mock(list=False))
 
         self.assertEqual(0, exit_code)
         return (Path(self.dir.name) / "ananke.ini").read_text(encoding="utf-8")
