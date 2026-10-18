@@ -65,7 +65,7 @@
           ps.mypy
         ]);
         preCommit = git-hooks.lib.${system}.run {
-          src = ./.;
+          src = self;
           hooks = {
             nixfmt.enable = true;
             ruff.enable = true;
