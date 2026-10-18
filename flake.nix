@@ -80,7 +80,7 @@
             pyright = {
               enable = true;
               pass_filenames = false;
-              entry = "${pkgs.pyright}/bin/pyright --pythonpath ${typingEnv}/bin/python";
+              entry = "${pkgs.lib.getExe pkgs.pyright} --pythonpath ${pkgs.lib.getExe' typingEnv "python"}";
             };
           };
         };
