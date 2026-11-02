@@ -12,7 +12,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 
 [project.optional-dependencies]
-dev = ["mypy>=2.4.0", "ruff>=0.13.0"]
+dev = ["mypy>=2.4.0", "ruff>=0.17.1"]
 test = ["coverage>=6.5.0", "cram>=0.7"]
 
 [project.scripts]
