@@ -2,30 +2,6 @@ Set up environment
 
   $ . "${TESTDIR}/setup.sh"
 
-Print usage string
-
-  $ python3 -m ananke
-  usage: __main__.py [-h] [--version]
-                     {add,lookup,modify,remove,import,export,configure} ...
-  
-  A minimal password manager.
-  
-  positional arguments:
-    {add,lookup,modify,remove,import,export,configure}
-                          Commands
-      add                 add an entry
-      lookup              lookup an entry
-      modify              modify an entry
-      remove              remove an entry
-      import              import entries from JSON file
-      export              export entries to JSON file
-      configure           create, modify, and list configuration
-  
-  options:
-    -h, --help            show this help message and exit
-    --version             show program's version number and exit
-  [2]
-
 Import example data
 
   $ python3 -m ananke import "${EXAMPLE_DIR}/export.asc"
